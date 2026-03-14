@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Church History Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Midnight blue backgrounds — very dark, blue-tinted */
+      --bg:           #080c14;
+      --bg-alt:       #0c1120;
+      --surface:      #0f1628;
+      --surface-2:    #141d33;
+      --raised:       #1a2540;
+      --border:       #1f2e4a;
+      --border-light: #172240;
+
+      /* Text — cool blue-white tones */
+      --ink:          #dce8f8;
+      --ink-2:        #a8c0de;
+      --ink-3:        #5c7a9e;
+      --ink-4:        #304060;
+      --ink-5:        #1e2e44;
+
+      /* Accent — bright sky/cyan pop */
+      --accent:       #38bdf8;
+      --accent-dim:   #0ea5e9;
+      --accent-2:     #0284c7;
+      --accent-glow:  rgba(56,189,248,0.12);
+
+      /* Gold — kept for logo and quotes */
+      --gold:         #f0c040;
+      --gold-dim:     #a07820;
+      --gold-glow:    rgba(240,192,64,0.1);
+
+      /* Semantic */
+      --red:          #f87171;
+      --red-dim:      rgba(248,113,113,0.15);
+      --green:        #34d399;
+      --green-dim:    rgba(52,211,153,0.15);
+
+      /* Era colours — vivid against dark blue */
+      --era1: #38bdf8;
+      --era2: #a78bfa;
+      --era3: #f0c040;
+      --era4: #fb923c;
+
+      --radius:    3px;
+      --radius-lg: 6px;
+      --shadow-sm: 0 1px 6px rgba(0,0,0,0.6);
+      --shadow:    0 4px 20px rgba(0,0,0,0.7);
+      --shadow-lg: 0 16px 56px rgba(0,0,0,0.85);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.65;
+      background-image:
+        radial-gradient(ellipse at 65% 0%, rgba(56,189,248,0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 10% 85%, rgba(167,139,250,0.04) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+    }
+
+    /* ─── HEADER ─────────────────────────────────── */
+    header {
+      background: rgba(8,12,20,0.96);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-top {
+      max-width: 1360px; margin: 0 auto;
+      padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; gap: 2rem;
+    }
+
+    .site-logo {
+      display: flex; align-items: center; gap: 0.75rem;
+      flex-shrink: 0; text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--bg); font-size: 1rem;
+      box-shadow: 0 2px 12px rgba(56,189,248,0.4);
+    }
+
+    .site-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--ink); letter-spacing: 0.01em;
+    }
+    .site-name em { font-style: normal; color: var(--ink-3); font-weight: 400; }
+
+    .header-search {
+      flex: 1; max-width: 440px; position: relative;
+    }
+
+    .header-search input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.95rem;
+      padding: 0.45rem 2.2rem 0.45rem 2.4rem;
+      border-radius: 20px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .header-search input:focus {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: var(--surface);
+    }
+    .header-search input::placeholder { color: var(--ink-4); }
+
+    .search-icon-left {
+      position: absolute; left: 0.75rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-4); font-size: 0.9rem; pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute; right: 0.7rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none; color: var(--ink-4);
+      cursor: pointer; font-size: 1rem; line-height: 1;
+      display: none; padding: 0;
+    }
+    .search-clear:hover { color: var(--ink-2); }
+    .header-search input:not(:placeholder-shown) ~ .search-clear { display: block; }
+
+    .header-right { margin-left: auto; flex-shrink: 0; }
+
+    .record-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem; color: var(--ink-3);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.25rem 0.75rem;
+    }
+
+    /* ─── STATS PANEL ─────────────────────────────── */
+    .stats-panel {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 0 0;
+    }
+
+    .stats-inner {
+      max-width: 1360px; margin: 0 auto; padding: 0 2rem;
+    }
+
+    .stats-header {
+      display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem;
+    }
+
+    .stats-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 600; color: var(--ink);
+    }
+
+    .stats-subtitle {
+      font-size: 0.9rem; color: var(--ink-3); font-style: italic;
+    }
+
+    /* Summary cards */
+    .summary-cards {
+      display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;
+    }
+
+    .summary-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      min-width: 140px; cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .summary-card:hover {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 12px var(--accent-glow);
+      background: var(--raised);
+    }
+    .summary-card.active {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .summary-card.active .sc-count { color: var(--accent); }
+    .summary-card.active .sc-label { color: var(--ink-2); }
+
+    .sc-icon { font-size: 1.1rem; line-height: 1; }
+    .sc-info { display: flex; flex-direction: column; }
+    .sc-count {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--ink); line-height: 1;
+    }
+    .sc-label {
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--ink-3); margin-top: 0.1rem;
+    }
+
+    /* ─── ERA RANGES ──────────────────────────────── */
+    .era-section {
+      margin-bottom: 0;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-3);
+      margin-bottom: 0.9rem;
+    }
+
+    .era-bands {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+
+    .era-band {
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.1rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .era-band::before {
+      content: '';
+      position: absolute; inset: 0;
+      opacity: 0.07;
+      transition: opacity 0.15s;
+    }
+
+    .era-band:hover { transform: translateY(-2px); }
+    .era-band:hover::before { opacity: 0.13; }
+    .era-band.active { border-color: currentColor; }
+    .era-band.active::before { opacity: 0.14; }
+
+    .era-band-1 { color: var(--era1); background: rgba(74,127,181,0.08); }
+    .era-band-1::before { background: var(--era1); }
+    .era-band-1:hover { box-shadow: 0 4px 16px rgba(74,127,181,0.2); }
+
+    .era-band-2 { color: var(--era2); background: rgba(139,92,246,0.08); }
+    .era-band-2::before { background: var(--era2); }
+    .era-band-2:hover { box-shadow: 0 4px 16px rgba(139,92,246,0.2); }
+
+    .era-band-3 { color: var(--era3); background: rgba(201,168,76,0.08); }
+    .era-band-3::before { background: var(--era3); }
+    .era-band-3:hover { box-shadow: 0 4px 16px rgba(201,168,76,0.2); }
+
+    .era-band-4 { color: var(--era4); background: rgba(224,123,57,0.08); }
+    .era-band-4::before { background: var(--era4); }
+    .era-band-4:hover { box-shadow: 0 4px 16px rgba(224,123,57,0.2); }
+
+    .era-band-dates {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.05em;
+      opacity: 0.7; margin-bottom: 0.3rem;
+    }
+
+    .era-band-count {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700;
+      line-height: 1; margin-bottom: 0.25rem;
+    }
+
+    .era-band-label {
+      font-size: 0.82rem; font-style: italic;
+      opacity: 0.8; line-height: 1.3;
+    }
+
+    .era-band-bar {
+      position: absolute; bottom: 0; left: 0;
+      height: 3px; background: currentColor;
+      opacity: 0.4; transition: opacity 0.15s;
+      border-radius: 0 2px 0 0;
+    }
+    .era-band:hover .era-band-bar { opacity: 0.7; }
+    .era-band.active .era-band-bar { opacity: 1; }
+
+    /* ─── TIMELINE ────────────────────────────────── */
+    .timeline-section { padding: 1.5rem 0 0; }
+
+    .timeline-track {
+      display: flex; align-items: flex-end;
+      gap: 3px; height: 80px; padding-bottom: 24px;
+      position: relative;
+    }
+
+    .timeline-track::after {
+      content: ''; position: absolute;
+      bottom: 20px; left: 0; right: 0;
+      height: 1px; background: var(--border);
+    }
+
+    .tl-bar-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 3px;
+      cursor: pointer; position: relative;
+    }
+
+    .tl-bar {
+      width: 100%; background: var(--raised);
+      border-radius: 2px 2px 0 0;
+      transition: background 0.2s, transform 0.15s;
+      min-height: 3px;
+    }
+
+    .tl-bar-wrap:hover .tl-bar { background: var(--accent-dim); transform: scaleY(1.05); }
+    .tl-bar-wrap.active .tl-bar { background: var(--accent); }
+    .tl-bar-wrap.active .tl-century { color: var(--accent); }
+
+    .tl-count {
+      position: absolute; top: -20px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem; color: var(--ink-3);
+      white-space: nowrap; opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tl-bar-wrap:hover .tl-count,
+    .tl-bar-wrap.active .tl-count { opacity: 1; }
+
+    .tl-century {
+      position: absolute; bottom: -2px; left: 50%;
+      transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.56rem; color: var(--ink-4);
+      white-space: nowrap; z-index: 1;
+    }
+
+    /* ─── APP BODY ────────────────────────────────── */
+    .app-body {
+      max-width: 1360px; margin: 0 auto;
+      padding: 1.5rem 2rem 3rem;
+      display: grid;
+      grid-template-columns: 236px 1fr;
+      gap: 2rem; align-items: start;
+    }
+
+    /* ─── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      position: sticky; top: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar-head {
+      padding: 1rem 1.25rem 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem; font-weight: 600; color: var(--ink);
+    }
+
+    .reset-link {
+      font-size: 0.78rem; color: var(--accent);
+      cursor: pointer; background: none; border: none;
+      padding: 0; font-family: 'Source Serif 4', serif;
+    }
+    .reset-link:hover { text-decoration: underline; }
+
+    .filter-section {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .filter-section:last-child { border-bottom: none; }
+
+    .filter-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-3);
+      display: block; margin-bottom: 0.6rem;
+    }
+
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+    .chip {
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.82rem; padding: 0.2rem 0.6rem;
+      border-radius: 20px; border: 1px solid var(--border);
+      color: var(--ink-3); cursor: pointer;
+      background: var(--surface-2);
+      transition: all 0.15s; white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--accent-dim); color: var(--accent); background: var(--accent-glow); }
+    .chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+
+    .filter-select {
+      width: 100%; background: var(--surface-2);
+      border: 1px solid var(--border); color: var(--ink-2);
+      font-family: 'Source Serif 4', serif; font-size: 0.9rem;
+      padding: 0.4rem 2rem 0.4rem 0.65rem;
+      border-radius: var(--radius); outline: none; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8272'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.6rem center;
+      transition: border-color 0.15s;
+    }
+    .filter-select option { background: var(--surface); }
+    .filter-select:focus { border-color: var(--accent-dim); }
+
+    /* ─── MAIN ────────────────────────────────────── */
+    .main-content { min-width: 0; }
+
+    .results-bar {
+      display: flex; align-items: center;
+      margin-bottom: 1.25rem; padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .results-info { font-size: 0.88rem; color: var(--ink-3); }
+    .results-info strong { color: var(--ink-2); font-weight: 500; }
+
+    /* ─── GRID ────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.1rem;
+    }
+
+    /* ─── CARD ────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      animation: fadeUp 0.35s ease both; position: relative;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow), 0 0 0 1px var(--accent-dim);
+      border-color: var(--accent-dim);
+    }
+
+    .card-img-wrap {
+      position: relative; overflow: hidden;
+      background: var(--surface-2);
+    }
+
+    .card-image {
+      width: 100%; aspect-ratio: 4/3;
+      object-fit: cover; object-position: top center;
+      display: block; transition: transform 0.3s ease;
+      filter: brightness(0.92) contrast(1.05);
+    }
+    .card:hover .card-image { transform: scale(1.04); filter: brightness(1); }
+
+    .card-placeholder {
+      width: 100%; aspect-ratio: 4/3;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--surface-2) 0%, var(--raised) 100%);
+    }
+
+    .card-placeholder-initial {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem; color: var(--ink-5);
+      font-style: italic;
+    }
+
+    .type-ribbon {
+      position: absolute; top: 0.6rem; left: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.57rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.15rem 0.45rem;
+      border-radius: var(--radius); backdrop-filter: blur(8px);
+    }
+    .type-ribbon.person  { background: rgba(56,189,248,0.75); color: #001a2e; }
+    .type-ribbon.event   { background: rgba(240,192,64,0.8);  color: #1a1000; }
+    .type-ribbon.group   { background: rgba(52,211,153,0.7);  color: #001a0e; }
+    .type-ribbon.default { background: rgba(0,0,0,0.6); color: var(--ink-2); }
+
+    .martyr-dot {
+      position: absolute; top: 0.6rem; right: 0.6rem;
+      width: 8px; height: 8px; background: var(--red);
+      border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 8px rgba(248,113,113,0.7);
+    }
+
+    .card-body { padding: 0.9rem; }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 600;
+      color: var(--ink); line-height: 1.3; margin-bottom: 0.3rem;
+    }
+
+    .card-role {
+      font-size: 0.8rem; color: var(--accent);
+      margin-bottom: 0.35rem; font-style: italic;
+    }
+
+    .card-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem; color: var(--ink-4);
+      margin-bottom: 0.5rem;
+      display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.84rem; color: var(--ink-3);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .card-beliefs { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+    .belief-tag {
+      font-size: 0.68rem; padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      background: var(--accent-glow);
+      color: var(--accent); border: 1px solid rgba(74,127,181,0.2);
+    }
+
+    /* ─── LOADING / EMPTY ─────────────────────────── */
+    .loading {
+      grid-column: 1/-1; padding: 5rem 2rem;
+      text-align: center; color: var(--ink-4);
+    }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      grid-column: 1/-1; padding: 5rem 2rem;
+      text-align: center; color: var(--ink-4);
+    }
+    .empty-state p { font-style: italic; font-size: 0.95rem; }
+
+    /* ─── PAGINATION ──────────────────────────────── */
+    .pagination {
+      display: flex; justify-content: center;
+      align-items: center; gap: 0.35rem;
+      margin-top: 2.5rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .page-btn {
+      background: var(--surface);
+      border: 1px solid var(--border); color: var(--ink-3);
+      font-family: 'Source Serif 4', serif; font-size: 0.9rem;
+      padding: 0.4rem 0.85rem; border-radius: var(--radius);
+      cursor: pointer; transition: all 0.15s; min-width: 36px;
+    }
+    .page-btn:hover:not(:disabled) { border-color: var(--accent-dim); color: var(--accent); background: var(--accent-glow); }
+    .page-btn.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+    .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ─── MODAL ───────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 2rem 1rem; overflow-y: auto;
+      backdrop-filter: blur(6px);
+      animation: fadeIn 0.18s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      max-width: 880px; width: 100%;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.22s ease; overflow: hidden;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      color: var(--ink-3); width: 2rem; height: 2rem;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; z-index: 10;
+      transition: all 0.15s; line-height: 1;
+    }
+    .modal-close:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+    .modal-hero { display: grid; grid-template-columns: 260px 1fr; }
+
+    .modal-img-wrap { background: var(--surface-2); position: relative; }
+
+    .modal-image {
+      width: 100%; height: 100%; min-height: 300px;
+      object-fit: cover; object-position: top center; display: block;
+      filter: brightness(0.9) contrast(1.05);
+    }
+
+    .modal-img-placeholder {
+      width: 100%; min-height: 300px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem; font-style: italic; color: var(--ink-5);
+    }
+
+    .modal-hero-body {
+      padding: 1.75rem 2rem;
+      border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 0.6rem;
+    }
+
+    .modal-type-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem; border-radius: var(--radius);
+      border: 1px solid var(--border); color: var(--ink-3); width: fit-content;
+    }
+
+    .modal-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem; font-weight: 700; color: var(--ink); line-height: 1.2;
+    }
+
+    .modal-alt { font-style: italic; color: var(--ink-3); font-size: 0.9rem; }
+    .modal-hr { border: none; border-top: 1px solid var(--border-light); }
+
+    .modal-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1rem; }
+
+    .fact-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--ink-4);
+      display: block; margin-bottom: 0.1rem;
+    }
+    .fact-value { font-size: 0.9rem; color: var(--ink-2); }
+
+    .martyred-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--red-dim); border: 1px solid rgba(192,57,43,0.4);
+      color: #ff8878; font-size: 0.78rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em; padding: 0.3rem 0.7rem;
+      border-radius: var(--radius); width: fit-content;
+    }
+
+    .modal-content-body {
+      padding: 1.75rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 1.5rem;
+    }
+
+    .modal-section-head {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--ink-3);
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 0.75rem;
+    }
+
+    .modal-text {
+      font-size: 0.95rem; color: var(--ink-2);
+      line-height: 1.8; white-space: pre-wrap;
+    }
+
+    .modal-quote {
+      border-left: 3px solid var(--gold-dim);
+      padding: 0.75rem 1.25rem;
+      background: var(--gold-glow);
+      color: var(--ink-2); font-style: italic;
+      font-size: 1rem; line-height: 1.75;
+      white-space: pre-wrap;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+
+    /* ─── SCROLLBAR ───────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
+
+    /* ─── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 960px) {
+      .app-body { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .era-bands { grid-template-columns: repeat(2, 1fr); }
+      .modal-hero { grid-template-columns: 1fr; }
+      .modal-img-wrap { min-height: 200px; }
+      .modal-hero-body { border-left: none; border-top: 1px solid var(--border); }
+    }
+    @media (max-width: 640px) {
+      .header-top { padding: 0 1rem; gap: 1rem; }
+      .site-name { display: none; }
+      .stats-inner, .app-body { padding-left: 1rem; padding-right: 1rem; }
+      .summary-cards { gap: 0.6rem; }
+      .summary-card { min-width: 110px; }
+      .era-bands { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <a class="site-logo" href="#">
+      <div class="logo-icon">✝</div>
+      <div class="site-name">Church History <em>Archive</em></div>
+    </a>
+    <div class="header-search">
+      <span class="search-icon-left">⚲</span>
+      <input type="text" id="searchInput" placeholder="Search people, events, groups…" autocomplete="off" />
+      <button class="search-clear" onclick="clearSearch()">×</button>
+    </div>
+    <div class="header-right">
+      <div class="record-count" id="headerCount">— records</div>
+    </div>
+  </div>
+</header>
+
+<!-- STATS PANEL -->
+<div class="stats-panel">
+  <div class="stats-inner">
+
+    <div class="stats-header">
+      <div class="stats-title">Archive Overview</div>
+      <div class="stats-subtitle" id="statsSubtitle">Loading…</div>
+    </div>
+
+    <!-- Summary stat cards -->
+    <div class="summary-cards">
+      <div class="summary-card" onclick="filterByType('')" id="sc-all">
+        <div class="sc-icon">📚</div>
+        <div class="sc-info">
+          <div class="sc-count" id="sc-total">—</div>
+          <div class="sc-label">Total Records</div>
+        </div>
+      </div>
+      <div class="summary-card" onclick="filterByType('Person')" id="sc-person">
+        <div class="sc-icon">👤</div>
+        <div class="sc-info">
+          <div class="sc-count" id="sc-persons">—</div>
+          <div class="sc-label">Persons</div>
+        </div>
+      </div>
+      <div class="summary-card" onclick="filterByType('Event')" id="sc-event">
+        <div class="sc-icon">📜</div>
+        <div class="sc-info">
+          <div class="sc-count" id="sc-events">—</div>
+          <div class="sc-label">Events</div>
+        </div>
+      </div>
+      <div class="summary-card" onclick="filterByType('Group')" id="sc-group">
+        <div class="sc-icon">🏛</div>
+        <div class="sc-info">
+          <div class="sc-count" id="sc-groups">—</div>
+          <div class="sc-label">Groups</div>
+        </div>
+      </div>
+      <div class="summary-card" id="sc-martyr" onclick="filterByMartyr()">
+        <div class="sc-icon">✝</div>
+        <div class="sc-info">
+          <div class="sc-count" id="sc-martyrs">—</div>
+          <div class="sc-label">Martyred</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historical Era Bands -->
+    <div class="era-section">
+      <div class="section-label">Records by Historical Era</div>
+      <div class="era-bands" id="eraBands">
+        <div class="era-band era-band-1" id="era-0" onclick="clickEra(0)">
+          <div class="era-band-dates">AD 30 – 100</div>
+          <div class="era-band-count" id="era-count-0">—</div>
+          <div class="era-band-label">Apostolic Age</div>
+          <div class="era-band-bar" id="era-bar-0" style="width:0%"></div>
+        </div>
+        <div class="era-band era-band-2" id="era-1" onclick="clickEra(1)">
+          <div class="era-band-dates">AD 100 – 313</div>
+          <div class="era-band-count" id="era-count-1">—</div>
+          <div class="era-band-label">Early Church</div>
+          <div class="era-band-bar" id="era-bar-1" style="width:0%"></div>
+        </div>
+        <div class="era-band era-band-3" id="era-2" onclick="clickEra(2)">
+          <div class="era-band-dates">AD 313 – 1517</div>
+          <div class="era-band-count" id="era-count-2">—</div>
+          <div class="era-band-label">Medieval Church</div>
+          <div class="era-band-bar" id="era-bar-2" style="width:0%"></div>
+        </div>
+        <div class="era-band era-band-4" id="era-3" onclick="clickEra(3)">
+          <div class="era-band-dates">AD 1517 – 1900</div>
+          <div class="era-band-count" id="era-count-3">—</div>
+          <div class="era-band-label">Reformation & Beyond</div>
+          <div class="era-band-bar" id="era-bar-3" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Century timeline -->
+    <div class="timeline-section">
+      <div class="section-label">Records by Century</div>
+      <div class="timeline-track" id="timeline"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="sidebar-title">Filters</div>
+      <button class="reset-link" onclick="resetFilters()">Reset all</button>
+    </div>
+    <div class="filter-section">
+      <label class="filter-label">Type</label>
+      <div class="filter-chips" id="typeChips"></div>
+    </div>
+    <div class="filter-section">
+      <label class="filter-label">Century</label>
+      <select class="filter-select" id="centurySelect">
+        <option value="">All Centuries</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <label class="filter-label">Gender</label>
+      <div class="filter-chips" id="genderChips"></div>
+    </div>
+    <div class="filter-section">
+      <label class="filter-label">Belief / Tradition</label>
+      <select class="filter-select" id="beliefSelect">
+        <option value="">All Beliefs</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <label class="filter-label">Martyred</label>
+      <div class="filter-chips" id="martyrChips">
+        <div class="chip active" data-value="" onclick="setMartyr(this,'')">All</div>
+        <div class="chip" data-value="true" onclick="setMartyr(this,'true')">Yes</div>
+        <div class="chip" data-value="false" onclick="setMartyr(this,'false')">No</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="results-bar">
+      <div class="results-info" id="resultsInfo">Loading…</div>
+    </div>
+    <div class="grid" id="grid">
+      <div class="loading"><div class="spinner"></div>Loading records…</div>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalInner"></div>
+  </div>
+</div>
+
+<script>
+  const API = 'https://historyapi.bbs1.net'; // proxied through Nginx → FastAPI
+
+  let state = { search:'', type:'', century:'', gender:'', belief_id:'', is_martyr:'', page:1, total:0, era_index: -1 };
+  const PAGE_SIZE = 24;
+  let searchTimer;
+  let eraRanges = [];
+
+  // ── BOOT ─────────────────────────────────────────────
+  async function boot() {
+    await Promise.all([loadFilters(), loadStats()]);
+    await loadFigures();
+  }
+
+  // ── STATS ─────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const [allRes, martyrRes, personRes, eventRes, groupRes, eraRes] = await Promise.all([
+        fetch(`${API}/figures?page=1&page_size=1`),
+        fetch(`${API}/figures?page=1&page_size=1&is_martyr=true`),
+        fetch(`${API}/figures?page=1&page_size=1&type=Person`),
+        fetch(`${API}/figures?page=1&page_size=1&type=Event`),
+        fetch(`${API}/figures?page=1&page_size=1&type=Group`),
+        fetch(`${API}/era-ranges`),
+      ]);
+
+      const [all, martyr, persons, events, groups] = await Promise.all([
+        allRes.json(), martyrRes.json(), personRes.json(), eventRes.json(), groupRes.json()
+      ]);
+
+      eraRanges = await eraRes.json();
+
+      document.getElementById('sc-total').textContent   = all.total;
+      document.getElementById('sc-martyrs').textContent = martyr.total;
+      document.getElementById('sc-persons').textContent = persons.total;
+      document.getElementById('sc-events').textContent  = events.total;
+      document.getElementById('sc-groups').textContent  = groups.total;
+      document.getElementById('headerCount').textContent = `${all.total.toLocaleString()} record${all.total !== 1 ? 's' : ''}`;
+      document.getElementById('statsSubtitle').textContent = `${all.total} records spanning from the Apostolic Age through the Reformation`;
+
+      // Render era bands
+      const maxCount = Math.max(...eraRanges.map(e => e.count), 1);
+      eraRanges.forEach((era, i) => {
+        document.getElementById(`era-count-${i}`).textContent = era.count;
+        const pct = Math.round((era.count / maxCount) * 100);
+        document.getElementById(`era-bar-${i}`).style.width = `${pct}%`;
+      });
+
+      await buildTimeline();
+    } catch(e) {
+      console.error('Stats error', e);
+    }
+  }
+
+  // ── ERA BAND CLICK ─────────────────────────────────────
+  function clickEra(index) {
+    const isSame = state.era_index === index;
+    state.era_index = isSame ? -1 : index;
+    state.page = 1;
+
+    document.querySelectorAll('.era-band').forEach((el, i) => {
+      el.classList.toggle('active', i === state.era_index);
+    });
+
+    // Reset century filter when era filter changes
+    state.century = '';
+    document.getElementById('centurySelect').value = '';
+    document.querySelectorAll('.tl-bar-wrap').forEach(el => el.classList.remove('active'));
+
+    loadFigures();
+  }
+
+  // ── TIMELINE ───────────────────────────────────────────
+  async function buildTimeline() {
+    const CENTURIES = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th'];
+    const counts = await Promise.all(
+      CENTURIES.map(c =>
+        fetch(`${API}/figures?page=1&page_size=1&century=${encodeURIComponent(c)}`)
+          .then(r => r.json()).then(d => d.total).catch(() => 0)
+      )
+    );
+
+    const max = Math.max(...counts, 1);
+    const BAR_MAX = 44;
+    const track = document.getElementById('timeline');
+    track.innerHTML = CENTURIES.map((c, i) => {
+      if (!counts[i]) return '';
+      const h = Math.max(3, Math.round((counts[i] / max) * BAR_MAX));
+      const short = c.replace('th','').replace('st','').replace('nd','').replace('rd','');
+      return `
+        <div class="tl-bar-wrap" data-century="${c}" onclick="clickCentury('${c}')">
+          <span class="tl-count">${counts[i]}</span>
+          <div class="tl-bar" style="height:${h}px"></div>
+          <span class="tl-century">${short}</span>
+        </div>`;
+    }).join('');
+  }
+
+  function clickCentury(c) {
+    const isSame = state.century === c;
+    state.century = isSame ? '' : c;
+    state.era_index = -1;
+    state.page = 1;
+    document.querySelectorAll('.tl-bar-wrap').forEach(el =>
+      el.classList.toggle('active', el.dataset.century === state.century));
+    document.querySelectorAll('.era-band').forEach(el => el.classList.remove('active'));
+    document.getElementById('centurySelect').value = state.century;
+    loadFigures();
+  }
+
+  // ── FILTERS ────────────────────────────────────────────
+  async function loadFilters() {
+    try {
+      const res = await fetch(`${API}/filters`);
+      const data = await res.json();
+
+      const typeChips = document.getElementById('typeChips');
+      typeChips.innerHTML = `<div class="chip active" data-value="" onclick="setType(this,'')">All</div>`;
+      data.types.forEach(t => {
+        typeChips.innerHTML += `<div class="chip" data-value="${t}" onclick="setType(this,'${t}')">${t}</div>`;
+      });
+
+      const centurySelect = document.getElementById('centurySelect');
+      sortCenturies(data.centuries).forEach(c => {
+        centurySelect.innerHTML += `<option value="${c}">${c} Century</option>`;
+      });
+      centurySelect.addEventListener('change', e => {
+        state.century = e.target.value;
+        state.era_index = -1;
+        state.page = 1;
+        document.querySelectorAll('.tl-bar-wrap').forEach(el =>
+          el.classList.toggle('active', el.dataset.century === state.century));
+        document.querySelectorAll('.era-band').forEach(el => el.classList.remove('active'));
+        loadFigures();
+      });
+
+      const genderChips = document.getElementById('genderChips');
+      genderChips.innerHTML = `<div class="chip active" data-value="" onclick="setGender(this,'')">All</div>`;
+      data.genders.forEach(g => {
+        genderChips.innerHTML += `<div class="chip" data-value="${g}" onclick="setGender(this,'${g}')">${g}</div>`;
+      });
+
+      const beliefSelect = document.getElementById('beliefSelect');
+      data.beliefs.forEach(b => {
+        beliefSelect.innerHTML += `<option value="${b.id}">${b.belief_name}</option>`;
+      });
+      beliefSelect.addEventListener('change', e => {
+        state.belief_id = e.target.value; state.page = 1; loadFigures();
+      });
+    } catch(e) { console.error('Filter error', e); }
+  }
+
+  function sortCenturies(arr) {
+    const order = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th'];
+    return [...arr].sort((a,b) => {
+      const ai = order.indexOf(a), bi = order.indexOf(b);
+      return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    });
+  }
+
+  // ── FIGURES ────────────────────────────────────────────
+  async function loadFigures() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = `<div class="loading"><div class="spinner"></div>Loading records…</div>`;
+
+    const params = new URLSearchParams({ page: state.page, page_size: PAGE_SIZE });
+    if (state.search)    params.set('search', state.search);
+    if (state.type)      params.set('type', state.type);
+    if (state.century)   params.set('century', state.century);
+    if (state.gender)    params.set('gender', state.gender);
+    if (state.belief_id) params.set('belief_id', state.belief_id);
+    if (state.is_martyr !== '') params.set('is_martyr', state.is_martyr);
+
+    // Era range filter: use century filter as proxy for era bands
+    if (state.era_index >= 0 && eraRanges[state.era_index]) {
+      // Era band filtering is display-only for now — counts show in bands
+      // Full era filtering coming in a future update
+    }
+
+    try {
+      const res = await fetch(`${API}/figures?${params}`);
+      const data = await res.json();
+      state.total = data.total;
+
+      const start = (state.page - 1) * PAGE_SIZE + 1;
+      const end   = Math.min(state.page * PAGE_SIZE, data.total);
+      document.getElementById('resultsInfo').innerHTML = data.total > 0
+        ? `Showing <strong>${start}–${end}</strong> of <strong>${data.total}</strong> records`
+        : `No records found`;
+
+      if (!data.results.length) {
+        grid.innerHTML = `<div class="empty-state"><p>No records match your current filters.</p></div>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      grid.innerHTML = data.results.map((f, i) => renderCard(f, i)).join('');
+      renderPagination(data.total);
+    } catch(e) {
+      grid.innerHTML = `<div class="empty-state"><p>Could not reach the API. Is the backend running?</p></div>`;
+      console.error(e);
+    }
+  }
+
+  function renderCard(f, i) {
+    const delay = (i % PAGE_SIZE) * 25;
+    const name = f.name || 'Unknown';
+    const initial = name.charAt(0);
+    const typeClass = (f.type || 'default').toLowerCase();
+    const dates = formatDates(f.born, f.death, f.era_type);
+    const metaParts = [dates, f.century ? `${f.century} c.` : '', f.birthplace].filter(Boolean);
+    const beliefs = (f.beliefs || []).slice(0,3).map(b => `<span class="belief-tag">${b.belief_name}</span>`).join('');
+
+    const imageHtml = f.image_url
+      ? `<img class="card-image" src="${f.image_url}" alt="${name}" loading="lazy"
+            onerror="this.parentElement.innerHTML='<div class=\\'card-placeholder\\'><div class=\\'card-placeholder-initial\\'>${initial}</div></div>'">`
+      : `<div class="card-placeholder"><div class="card-placeholder-initial">${initial}</div></div>`;
+
+    return `
+      <div class="card" style="animation-delay:${delay}ms" onclick="openFigure(${f.id})">
+        <div class="card-img-wrap">
+          ${imageHtml}
+          <div class="type-ribbon ${typeClass}">${f.type || ''}</div>
+          ${f.is_martyr === 'Yes' ? '<div class="martyr-dot" title="Martyred"></div>' : ''}
+        </div>
+        <div class="card-body">
+          <div class="card-name">${name}</div>
+          ${f.role_office ? `<div class="card-role">${f.role_office}</div>` : ''}
+          ${metaParts.length ? `<div class="card-meta">${metaParts.join(' · ')}</div>` : ''}
+          ${f.short_description ? `<div class="card-desc">${f.short_description}</div>` : ''}
+          ${beliefs ? `<div class="card-beliefs">${beliefs}</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  function formatDates(born, death, eraType) {
+    if (!born && !death) return '';
+    const isBC = (eraType || '').includes('BC') && !(eraType || '').includes('AD');
+    const suffix = isBC ? ' BC' : ' AD';
+    if (born && death) return `${born}–${death}${suffix}`;
+    if (born)  return `b. ${born}${suffix}`;
+    if (death) return `d. ${death} AD`;
+    return '';
+  }
+
+  // ── PAGINATION ─────────────────────────────────────────
+  function renderPagination(total) {
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    if (totalPages <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+    let html = `<button class="page-btn" onclick="goPage(${state.page-1})" ${state.page===1?'disabled':''}>‹</button>`;
+    getPageNumbers(state.page, totalPages).forEach(p => {
+      html += p === '…'
+        ? `<span style="color:var(--ink-4);padding:0 0.2rem">…</span>`
+        : `<button class="page-btn ${p===state.page?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    });
+    html += `<button class="page-btn" onclick="goPage(${state.page+1})" ${state.page===totalPages?'disabled':''}>›</button>`;
+    document.getElementById('pagination').innerHTML = html;
+  }
+
+  function getPageNumbers(cur, total) {
+    if (total <= 7) return Array.from({length:total},(_,i)=>i+1);
+    if (cur <= 4)   return [1,2,3,4,5,'…',total];
+    if (cur >= total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
+    return [1,'…',cur-1,cur,cur+1,'…',total];
+  }
+
+  function goPage(p) {
+    state.page = p; loadFigures();
+    window.scrollTo({top: document.querySelector('.app-body').offsetTop - 80, behavior:'smooth'});
+  }
+
+  // ── MODAL ──────────────────────────────────────────────
+  async function openFigure(id) {
+    document.getElementById('modalInner').innerHTML =
+      `<div style="padding:4rem;text-align:center"><div class="spinner"></div></div>`;
+    document.getElementById('modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    try {
+      const f = await fetch(`${API}/figures/${id}`).then(r => r.json());
+      document.getElementById('modalInner').innerHTML = renderModal(f);
+    } catch(e) {
+      document.getElementById('modalInner').innerHTML =
+        `<div style="padding:2rem;color:var(--ink-3)">Failed to load record.</div>`;
+    }
+  }
+
+  function renderModal(f) {
+    const name = f.name || 'Unknown';
+    const initial = name.charAt(0);
+    const typeClass = (f.type || 'default').toLowerCase();
+    const imgHtml = f.image_url
+      ? `<img class="modal-image" src="${f.image_url}" alt="${name}"
+            onerror="this.parentElement.innerHTML='<div class=\\'modal-img-placeholder\\'>${initial}</div>'">`
+      : `<div class="modal-img-placeholder">${initial}</div>`;
+
+    const facts = [
+      ['Role / Office', f.role_office],
+      ['Century', f.century ? `${f.century} Century` : null],
+      ['Born', f.born ? `${f.born} ${(f.era_type||'').includes('BC') ? 'BC' : 'AD'}` : null],
+      ['Died', f.death ? `${f.death} AD` : null],
+      ['Birthplace', f.birthplace],
+      ['Region', f.primary_region],
+      ['Denomination', f.denomination_tradition],
+      ['Gender', f.gender],
+    ].filter(([,v]) => v);
+
+    const beliefs = (f.beliefs||[]).map(b=>`<span class="belief-tag">${b.belief_name}</span>`).join('');
+    const eras = (f.eras||[]).map(e=>`<span class="belief-tag">${[e.name,e.time_span?`(${e.time_span})`:null].filter(Boolean).join(' ')}</span>`).join('');
+
+    let body = '';
+    if (f.short_description)     body += msec('Overview', `<p class="modal-text">${f.short_description}</p>`);
+    if (f.long_biography)        body += msec('Biography', `<div class="modal-text">${f.long_biography}</div>`);
+    if (f.key_life_events)       body += msec('Key Life Events', `<div class="modal-text">${f.key_life_events}</div>`);
+    if (f.primary_contributions) body += msec('Contributions & Accomplishments', `<div class="modal-text">${f.primary_contributions}</div>`);
+    if (f.major_works)           body += msec('Major Works & Writings', `<div class="modal-text">${f.major_works}</div>`);
+    if (f.associated_movements)  body += msec('Associated Movements', `<div class="modal-text">${f.associated_movements}</div>`);
+    if (f.scripture_references)  body += msec('Scripture References', `<div class="modal-text">${f.scripture_references}</div>`);
+    if (f.famous_quotes)         body += msec('Famous Quotes', `<blockquote class="modal-quote">${f.famous_quotes}</blockquote>`);
+    if (f.notes)                 body += msec('Notes', `<div class="modal-text">${f.notes}</div>`);
+
+    return `
+      <div class="modal-hero">
+        <div class="modal-img-wrap">${imgHtml}</div>
+        <div class="modal-hero-body">
+          <div class="modal-type-badge ${typeClass}">${f.type || 'Record'}</div>
+          <div class="modal-name">${name}</div>
+          ${f.alternative_names ? `<div class="modal-alt">Also known as: ${f.alternative_names}</div>` : ''}
+          ${f.is_martyr === 'Yes' ? `<div class="martyred-badge">✝ Died as a Martyr</div>` : ''}
+          <hr class="modal-hr"/>
+          <div class="modal-facts">
+            ${facts.map(([l,v])=>`<div><span class="fact-label">${l}</span><span class="fact-value">${v}</span></div>`).join('')}
+          </div>
+          ${beliefs ? `<hr class="modal-hr"/><div class="modal-section-head">Beliefs</div><div class="card-beliefs">${beliefs}</div>` : ''}
+          ${eras ? `<div style="margin-top:0.5rem"><div class="modal-section-head">Era</div><div class="card-beliefs">${eras}</div></div>` : ''}
+        </div>
+      </div>
+      ${body ? `<div class="modal-content-body">${body}</div>` : ''}`;
+  }
+
+  function msec(title, content) {
+    return `<div><div class="modal-section-head">${title}</div>${content}</div>`;
+  }
+
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function closeOnOverlay(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── FILTER HANDLERS ────────────────────────────────────
+  function setChipActive(group, value) {
+    if (!group) return;
+    group.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.value === value));
+  }
+
+  function filterByType(type) {
+    state.type = type; state.page = 1;
+    setChipActive(document.getElementById('typeChips'), type);
+    ['all','person','event','group'].forEach(k => {
+      const el = document.getElementById(`sc-${k}`);
+      if (el) el.classList.toggle('active', (k === 'all' && type === '') || k === type.toLowerCase());
+    });
+    loadFigures();
+  }
+
+  function filterByMartyr() {
+    state.is_martyr = state.is_martyr === 'true' ? '' : 'true';
+    state.page = 1;
+    document.getElementById('sc-martyr').classList.toggle('active', state.is_martyr === 'true');
+    setChipActive(document.getElementById('martyrChips'), state.is_martyr);
+    loadFigures();
+  }
+
+  function setType(el, value) {
+    state.type = value; state.page = 1;
+    setChipActive(document.getElementById('typeChips'), value);
+    loadFigures();
+  }
+
+  function setGender(el, value) {
+    state.gender = value; state.page = 1;
+    setChipActive(document.getElementById('genderChips'), value);
+    loadFigures();
+  }
+
+  function setMartyr(el, value) {
+    state.is_martyr = value; state.page = 1;
+    setChipActive(document.getElementById('martyrChips'), value);
+    document.getElementById('sc-martyr').classList.toggle('active', value === 'true');
+    loadFigures();
+  }
+
+  function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    state.search = ''; state.page = 1; loadFigures();
+  }
+
+  function resetFilters() {
+    state = { search:'', type:'', century:'', gender:'', belief_id:'', is_martyr:'', page:1, total:0, era_index:-1 };
+    document.getElementById('searchInput').value = '';
+    document.getElementById('centurySelect').value = '';
+    document.getElementById('beliefSelect').value = '';
+    setChipActive(document.getElementById('typeChips'), '');
+    setChipActive(document.getElementById('genderChips'), '');
+    setChipActive(document.getElementById('martyrChips'), '');
+    document.querySelectorAll('.summary-card,.era-band,.tl-bar-wrap').forEach(c => c.classList.remove('active'));
+    loadFigures();
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      state.search = e.target.value.trim(); state.page = 1; loadFigures();
+    }, 350);
+  });
+
+  boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+services:
+
+  api:
+    build: ./api
+    ports:
+      - "8008:8000"
+    environment:
+      - DATABASE_URL=postgresql://miguel:${POSTGRES_PASSWORD}@postgres:5432/postgres
+      - NOCODB_BASE_URL=https://nocodb.bbs1.net
+    restart: unless-stopped
+    networks:
+      - postgres_postgres_net
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3003:80"
+    restart: unless-stopped
+
+networks:
+  postgres_postgres_net:
+    external: true
