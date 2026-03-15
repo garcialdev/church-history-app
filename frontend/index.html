@@ -433,12 +433,39 @@
 
     .results-bar {
       display: flex; align-items: center;
+      justify-content: space-between;
       margin-bottom: 1.25rem; padding-bottom: 0.75rem;
       border-bottom: 1px solid var(--border-light);
     }
 
     .results-info { font-size: 0.88rem; color: var(--ink-3); }
     .results-info strong { color: var(--ink-2); font-weight: 500; }
+
+    .sort-wrap {
+      display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
+    }
+
+    .sort-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.63rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-3);
+    }
+
+    .sort-select {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--ink-2);
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.85rem;
+      padding: 0.3rem 1.8rem 0.3rem 0.6rem;
+      border-radius: var(--radius); outline: none; cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235c7a9e'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.5rem center;
+      transition: border-color 0.15s;
+    }
+    .sort-select:focus { border-color: var(--accent-dim); }
+    .sort-select option { background: var(--surface); }
 
     /* ─── GRID ────────────────────────────────────── */
     .grid {
@@ -887,6 +914,19 @@
   <main class="main-content">
     <div class="results-bar">
       <div class="results-info" id="resultsInfo">Loading…</div>
+      <div class="sort-wrap">
+        <span class="sort-label">Sort by</span>
+        <select class="sort-select" id="sortSelect" onchange="setSort(this.value)">
+          <option value="default">Default order</option>
+          <option value="name_asc">Name A → Z</option>
+          <option value="name_desc">Name Z → A</option>
+          <option value="date_asc">Date (oldest first)</option>
+          <option value="date_desc">Date (newest first)</option>
+          <option value="century_asc">Century (earliest first)</option>
+          <option value="century_desc">Century (latest first)</option>
+          <option value="type">Type</option>
+        </select>
+      </div>
     </div>
     <div class="grid" id="grid">
       <div class="loading"><div class="spinner"></div>Loading records…</div>
@@ -906,7 +946,7 @@
 <script>
   const API = 'https://historyapi.bbs1.net'; // proxied through Nginx → FastAPI
 
-  let state = { search:'', type:'', century:'', gender:'', belief_id:'', is_martyr:'', page:1, total:0, era_index: -1 };
+  let state = { search:'', type:'', century:'', gender:'', belief_id:'', is_martyr:'', page:1, total:0, era_index: -1, sort:'default' };
   const PAGE_SIZE = 24;
   let searchTimer;
   let eraRanges = [];
@@ -1075,6 +1115,7 @@
     if (state.gender)    params.set('gender', state.gender);
     if (state.belief_id) params.set('belief_id', state.belief_id);
     if (state.is_martyr !== '') params.set('is_martyr', state.is_martyr);
+    if (state.sort && state.sort !== 'default') params.set('sort', state.sort);
 
     // Era range filter: pass century keywords for ILIKE matching
     if (state.era_index >= 0 && eraRanges[state.era_index]) {
@@ -1306,16 +1347,21 @@
     loadFigures();
   }
 
+  function setSort(value) {
+    state.sort = value; state.page = 1; loadFigures();
+  }
+
   function clearSearch() {
     document.getElementById('searchInput').value = '';
     state.search = ''; state.page = 1; loadFigures();
   }
 
   function resetFilters() {
-    state = { search:'', type:'', century:'', gender:'', belief_id:'', is_martyr:'', page:1, total:0, era_index:-1 };
+    state = { search:'', type:'', century:'', gender:'', belief_id:'', is_martyr:'', page:1, total:0, era_index:-1, sort:'default' };
     document.getElementById('searchInput').value = '';
     document.getElementById('centurySelect').value = '';
     document.getElementById('beliefSelect').value = '';
+    document.getElementById('sortSelect').value = 'default';
     setChipActive(document.getElementById('typeChips'), '');
     setChipActive(document.getElementById('genderChips'), '');
     setChipActive(document.getElementById('martyrChips'), '');

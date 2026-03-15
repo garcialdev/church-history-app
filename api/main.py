@@ -73,6 +73,7 @@ async def list_figures(
     denomination: Optional[str] = Query(None),
     belief_id: Optional[int] = Query(None),
     is_martyr: Optional[bool] = Query(None),
+    sort: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(24, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -80,7 +81,7 @@ async def list_figures(
     era_centuries = [k.strip() for k in century_keywords.split(",")] if century_keywords else None
     total, rows = get_figures(
         db, search, type_filter, century, era_centuries, gender,
-        denomination, belief_id, is_martyr, page, page_size
+        denomination, belief_id, is_martyr, sort, page, page_size
     )
     results = []
     for row in rows:

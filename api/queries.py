@@ -13,6 +13,7 @@ def get_figures(
     denomination: Optional[str] = None,
     belief_id: Optional[int] = None,
     is_martyr: Optional[bool] = None,
+    sort: Optional[str] = None,
     page: int = 1,
     page_size: int = 24,
 ):
@@ -69,6 +70,17 @@ def get_figures(
         params
     ).scalar()
 
+    sort_map = {
+        "name_asc":     'ch."Name_Event" ASC NULLS LAST',
+        "name_desc":    'ch."Name_Event" DESC NULLS LAST',
+        "date_asc":     'COALESCE(ch."Born___Start", ch."Death___End") ASC NULLS LAST',
+        "date_desc":    'COALESCE(ch."Born___Start", ch."Death___End") DESC NULLS LAST',
+        "century_asc":  'ch."Century" ASC NULLS LAST',
+        "century_desc": 'ch."Century" DESC NULLS LAST',
+        "type":         'ch."Type" ASC NULLS LAST, ch."Name_Event" ASC NULLS LAST',
+    }
+    order_clause = sort_map.get(sort, 'ch.nc_order ASC NULLS LAST, ch.id ASC')
+
     rows = db.execute(text(f"""
         SELECT
             ch.id,
@@ -91,7 +103,7 @@ def get_figures(
             ch."Wikipedia_Name"                      AS wikipedia_name
         FROM "Church History" ch
         WHERE {where_sql}
-        ORDER BY ch.nc_order ASC NULLS LAST, ch.id ASC
+        ORDER BY {order_clause}
         LIMIT :limit OFFSET :offset
     """), params).mappings().all()
 
