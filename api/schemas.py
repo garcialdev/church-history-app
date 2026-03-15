@@ -53,12 +53,6 @@ class FigureDetail(FigureCard):
     scripture_references: Optional[str] = None
     biblical_books: Optional[str] = None
     associated_movements: Optional[str] = None
-    father: Optional[str] = None
-    mother: Optional[str] = None
-    spouse: Optional[str] = None
-    children: Optional[str] = None
-    genealogy_notes: Optional[str] = None
-    burial_site: Optional[str] = None
     external_references: Optional[str] = None
     notes: Optional[str] = None
     eras: List[EraBase] = []

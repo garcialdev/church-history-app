@@ -8,6 +8,7 @@ def get_figures(
     search: Optional[str] = None,
     type_filter: Optional[str] = None,
     century: Optional[str] = None,
+    era_centuries: Optional[list] = None,
     gender: Optional[str] = None,
     denomination: Optional[str] = None,
     belief_id: Optional[int] = None,
@@ -33,6 +34,15 @@ def get_figures(
     if century:
         where_clauses.append('ch."Century" = :century')
         params["century"] = century
+
+    if era_centuries:
+        # Match any century keyword using ILIKE to handle compound values like '1st & 2nd'
+        ilike_parts = " OR ".join(
+            f'ch."Century" ILIKE :ec{i}' for i in range(len(era_centuries))
+        )
+        where_clauses.append(f'({ilike_parts})')
+        for i, kw in enumerate(era_centuries):
+            params[f"ec{i}"] = f"%{kw}%"
 
     if gender:
         where_clauses.append('ch."Gender" = :gender')
@@ -73,11 +83,12 @@ def get_figures(
             ch."Era_Type__BC_AD_"                    AS era_type,
             ch."Century"                             AS century,
             ch."Birthplace"                          AS birthplace,
-            ch."Primary_Region___Area"               AS primary_region,
+            ch."Region___Location"                    AS primary_region,
             ch."Short_Description"                   AS short_description,
             ch."Martyr___Yes_No_"                    AS is_martyr,
             ch."Believer_Saved"                      AS believer_saved,
-            ch."Thumbnail"                           AS thumbnail_json
+            ch."Thumbnail"                           AS thumbnail_json,
+            ch."Wikipedia_Name"                      AS wikipedia_name
         FROM "Church History" ch
         WHERE {where_sql}
         ORDER BY ch.nc_order ASC NULLS LAST, ch.id ASC
@@ -102,7 +113,7 @@ def get_figure_by_id(db: Session, figure_id: int):
             ch."Era_Type__BC_AD_"                        AS era_type,
             ch."Century"                                 AS century,
             ch."Birthplace"                              AS birthplace,
-            ch."Primary_Region___Area"                   AS primary_region,
+            ch."Region___Location"                        AS primary_region,
             ch."Short_Description"                       AS short_description,
             ch."Long_Biography_Notes"                    AS long_biography,
             ch."Famous_Quotes"                           AS famous_quotes,
@@ -112,17 +123,12 @@ def get_figure_by_id(db: Session, figure_id: int):
             ch."Scripture_References"                    AS scripture_references,
             ch."Biblical_Books_Mentioned_In"             AS biblical_books,
             ch."Associated_Movements"                    AS associated_movements,
-            ch."Father"                                  AS father,
-            ch."Mother"                                  AS mother,
-            ch."Spouse"                                  AS spouse,
-            ch."Children"                                AS children,
-            ch."Genealogy_Notes"                         AS genealogy_notes,
-            ch."Burial___Traditional_Site"               AS burial_site,
             ch."External_References___Sources"           AS external_references,
             ch."Notes"                                   AS notes,
             ch."Martyr___Yes_No_"                        AS is_martyr,
             ch."Believer_Saved"                          AS believer_saved,
-            ch."Thumbnail"                               AS thumbnail_json
+            ch."Thumbnail"                               AS thumbnail_json,
+            ch."Wikipedia_Name"                          AS wikipedia_name
         FROM "Church History" ch
         WHERE ch.id = :id
     """), {"id": figure_id}).mappings().first()
@@ -163,11 +169,10 @@ def get_all_eras(db: Session):
 
 def get_era_range_counts(db: Session):
     """
-    Count figures per historical era using dates first, Century field as fallback.
-    Handles compound century values like '1st & 2nd', '4th - 7th'.
+    Count figures per historical era.
+    Uses Century field as the primary source of truth when available,
+    falling back to date ranges for records without a century.
     """
-    # Each era: (label, start_year, end_year, century_keywords)
-    # Keywords are checked with ILIKE so '1st & 2nd' matches '1st'
     ranges = [
         ("Apostolic Age",         30,   100,  ["1st"]),
         ("Early Church",         100,   313,  ["2nd", "3rd"]),
@@ -176,25 +181,24 @@ def get_era_range_counts(db: Session):
     ]
     results = []
     for label, start, end, century_keywords in ranges:
-        # Build ILIKE conditions for each keyword e.g. "Century" ILIKE '%1st%'
         ilike_clauses = " OR ".join(
             f'"Century" ILIKE :kw{i}' for i in range(len(century_keywords))
         )
         ilike_params = {f"kw{i}": f"%{kw}%" for i, kw in enumerate(century_keywords)}
 
         row = db.execute(text(f"""
-            SELECT COUNT(*) FROM "Church History"
-            WHERE (
-                -- Primary: known date falls in range
-                ("Born___Start" >= :start AND "Born___Start" < :end)
-                OR ("Death___End" >= :start AND "Death___End" < :end)
-            )
-            OR (
-                -- Fallback: no dates, but Century keyword matches this era
-                "Born___Start" IS NULL
-                AND "Death___End" IS NULL
-                AND ({ilike_clauses})
-            )
+            SELECT COUNT(DISTINCT id) FROM "Church History"
+            WHERE
+                -- Primary: Century field matches this era
+                ({ilike_clauses})
+                OR (
+                    -- Fallback: no Century set, but dates fall in range
+                    ("Century" IS NULL OR "Century" = '')
+                    AND (
+                        ("Born___Start" IS NOT NULL AND "Born___Start" >= :start AND "Born___Start" < :end)
+                        OR ("Death___End" IS NOT NULL AND "Death___End" >= :start AND "Death___End" < :end)
+                    )
+                )
         """), {"start": start, "end": end, **ilike_params}).scalar()
         results.append({"label": label, "start": start, "end": end, "count": row or 0})
     return results

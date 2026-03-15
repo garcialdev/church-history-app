@@ -527,7 +527,7 @@
 
     .card-meta {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.68rem; color: var(--ink-4);
+      font-size: 0.68rem; color: var(--ink-2);
       margin-bottom: 0.5rem;
       display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem;
     }
@@ -1076,10 +1076,16 @@
     if (state.belief_id) params.set('belief_id', state.belief_id);
     if (state.is_martyr !== '') params.set('is_martyr', state.is_martyr);
 
-    // Era range filter: use century filter as proxy for era bands
+    // Era range filter: pass century keywords for ILIKE matching
     if (state.era_index >= 0 && eraRanges[state.era_index]) {
-      // Era band filtering is display-only for now — counts show in bands
-      // Full era filtering coming in a future update
+      const eraCenturyMap = [
+        ["1st"],
+        ["2nd","3rd"],
+        ["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],
+        ["16th"]
+      ];
+      const keywords = eraCenturyMap[state.era_index];
+      if (keywords) params.set('century_keywords', keywords.join(','));
     }
 
     try {

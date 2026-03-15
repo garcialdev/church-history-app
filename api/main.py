@@ -20,7 +20,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Tighten this to your frontend URL in production
+    allow_origins=[
+        "https://historyapp.bbs1.net",
+        "http://historyapp.bbs1.net",
+        "http://localhost:3003",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -63,6 +68,7 @@ async def list_figures(
     search: Optional[str] = Query(None),
     type_filter: Optional[str] = Query(None, alias="type"),
     century: Optional[str] = Query(None),
+    century_keywords: Optional[str] = Query(None),  # comma-separated e.g. "1st,2nd,3rd"
     gender: Optional[str] = Query(None),
     denomination: Optional[str] = Query(None),
     belief_id: Optional[int] = Query(None),
@@ -71,14 +77,15 @@ async def list_figures(
     page_size: int = Query(24, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
+    era_centuries = [k.strip() for k in century_keywords.split(",")] if century_keywords else None
     total, rows = get_figures(
-        db, search, type_filter, century, gender,
+        db, search, type_filter, century, era_centuries, gender,
         denomination, belief_id, is_martyr, page, page_size
     )
     results = []
     for row in rows:
         beliefs = get_figure_beliefs(db, row["id"])
-        image_url = await resolve_image(row["thumbnail_json"], row["name"])
+        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
         results.append(map_row_to_card(row, beliefs, image_url))
 
     return {"total": total, "page": page, "page_size": page_size, "results": results}
@@ -92,7 +99,7 @@ async def get_figure(figure_id: int, db: Session = Depends(get_db)):
 
     beliefs = get_figure_beliefs(db, figure_id)
     eras = get_figure_eras(db, figure_id)
-    image_url = await resolve_image(row["thumbnail_json"], row["name"])
+    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
 
     return {
         **map_row_to_card(row, beliefs, image_url),
@@ -104,12 +111,6 @@ async def get_figure(figure_id: int, db: Session = Depends(get_db)):
         "scripture_references": row["scripture_references"],
         "biblical_books": row["biblical_books"],
         "associated_movements": row["associated_movements"],
-        "father": row["father"],
-        "mother": row["mother"],
-        "spouse": row["spouse"],
-        "children": row["children"],
-        "genealogy_notes": row["genealogy_notes"],
-        "burial_site": row["burial_site"],
         "external_references": row["external_references"],
         "notes": row["notes"],
         "eras": [
