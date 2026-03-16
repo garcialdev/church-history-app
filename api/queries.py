@@ -110,6 +110,69 @@ def get_figures(
     return total, rows
 
 
+def get_related_figures(db: Session, figure_id: int, century: Optional[str], figure_type: Optional[str], limit: int = 6):
+    """
+    Find related figures by shared beliefs first, then same century, then same type.
+    Excludes the current figure.
+    """
+    rows = db.execute(text("""
+        SELECT DISTINCT
+            ch.id,
+            ch."Name_Event"         AS name,
+            ch."Type"               AS type,
+            ch."Role___Office"      AS role_office,
+            ch."Century"            AS century,
+            ch."Born___Start"       AS born,
+            ch."Death___End"        AS death,
+            ch."Era_Type__BC_AD_"   AS era_type,
+            ch."Short_Description"  AS short_description,
+            ch."Thumbnail"          AS thumbnail_json,
+            ch."Wikipedia_Name"     AS wikipedia_name,
+            -- Score: shared belief = 3pts, same century = 2pts, same type = 1pt
+            (
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM "nc_hxad___nc_m2m_Church History_Beliefs" m1
+                    JOIN "nc_hxad___nc_m2m_Church History_Beliefs" m2
+                        ON m1."Beliefs_id" = m2."Beliefs_id"
+                    WHERE m1."Church History_id" = :id
+                    AND m2."Church History_id" = ch.id
+                ) THEN 3 ELSE 0 END
+                +
+                CASE WHEN ch."Century" = :century THEN 2 ELSE 0 END
+                +
+                CASE WHEN ch."Type" = :type THEN 1 ELSE 0 END
+            ) AS score
+        FROM "Church History" ch
+        WHERE ch.id != :id
+        AND ch."Name_Event" IS NOT NULL
+        AND ch."Name_Event" != ''
+        AND (
+            EXISTS (
+                SELECT 1 FROM "nc_hxad___nc_m2m_Church History_Beliefs" m1
+                JOIN "nc_hxad___nc_m2m_Church History_Beliefs" m2
+                    ON m1."Beliefs_id" = m2."Beliefs_id"
+                WHERE m1."Church History_id" = :id
+                AND m2."Church History_id" = ch.id
+            )
+            OR ch."Century" = :century
+            OR ch."Type" = :type
+        )
+        ORDER BY score DESC, ch."Name_Event" ASC
+        LIMIT :limit
+    """), {"id": figure_id, "century": century, "type": figure_type, "limit": limit}).mappings().all()
+    return rows
+
+
+def get_random_figure_id(db: Session) -> Optional[int]:
+    """Return a random figure id."""
+    row = db.execute(text("""
+        SELECT id FROM "Church History"
+        ORDER BY RANDOM()
+        LIMIT 1
+    """)).scalar()
+    return row
+
+
 def get_figure_by_id(db: Session, figure_id: int):
     return db.execute(text("""
         SELECT

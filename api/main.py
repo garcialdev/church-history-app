@@ -8,7 +8,7 @@ from schemas import FigureCard, FigureDetail, FigureListResponse, FilterOptions,
 from queries import (
     get_figures, get_figure_by_id, get_figure_beliefs,
     get_figure_eras, get_all_beliefs, get_all_eras, get_filter_options,
-    get_era_range_counts
+    get_era_range_counts, get_random_figure_id, get_related_figures
 )
 from image_service import resolve_image
 
@@ -75,7 +75,7 @@ async def list_figures(
     is_martyr: Optional[bool] = Query(None),
     sort: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    page_size: int = Query(24, ge=1, le=100),
+    page_size: int = Query(24, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
     era_centuries = [k.strip() for k in century_keywords.split(",")] if century_keywords else None
@@ -90,6 +90,58 @@ async def list_figures(
         results.append(map_row_to_card(row, beliefs, image_url))
 
     return {"total": total, "page": page, "page_size": page_size, "results": results}
+
+
+@app.get("/figures/{figure_id}/related")
+async def get_figure_related(figure_id: int, db: Session = Depends(get_db)):
+    row = get_figure_by_id(db, figure_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Figure not found")
+    related = get_related_figures(db, figure_id, row["century"], row["type"])
+    results = []
+    for r in related:
+        image_url = await resolve_image(r["thumbnail_json"], r["name"], r["wikipedia_name"])
+        results.append({
+            "id": r["id"],
+            "name": r["name"],
+            "type": r["type"],
+            "role_office": r["role_office"],
+            "century": r["century"],
+            "born": r["born"],
+            "death": r["death"],
+            "era_type": r["era_type"],
+            "short_description": r["short_description"],
+            "image_url": image_url,
+        })
+    return results
+
+
+@app.get("/figures/random")
+async def get_random_figure(db: Session = Depends(get_db)):
+    figure_id = get_random_figure_id(db)
+    if not figure_id:
+        raise HTTPException(status_code=404, detail="No figures found")
+    row = get_figure_by_id(db, figure_id)
+    beliefs = get_figure_beliefs(db, figure_id)
+    eras = get_figure_eras(db, figure_id)
+    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+    return {
+        **map_row_to_card(row, beliefs, image_url),
+        "long_biography": row["long_biography"],
+        "famous_quotes": row["famous_quotes"],
+        "major_works": row["major_works"],
+        "key_life_events": row["key_life_events"],
+        "primary_contributions": row["primary_contributions"],
+        "scripture_references": row["scripture_references"],
+        "biblical_books": row["biblical_books"],
+        "associated_movements": row["associated_movements"],
+        "external_references": row["external_references"],
+        "notes": row["notes"],
+        "eras": [
+            {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
+            for e in eras
+        ],
+    }
 
 
 @app.get("/figures/{figure_id}", response_model=FigureDetail)

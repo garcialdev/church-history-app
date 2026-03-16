@@ -153,6 +153,28 @@
       border-radius: 20px; padding: 0.25rem 0.75rem;
     }
 
+    .discover-btn {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: var(--surface-2);
+      border: 1px solid var(--gold-dim);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 140px;
+    }
+    .discover-btn:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 16px var(--gold-glow);
+      background: var(--raised);
+    }
+    .discover-btn .sc-label { color: var(--gold-dim); }
+    .discover-btn:hover .sc-label { color: var(--gold); }
+    .discover-btn.spinning .discover-icon {
+      animation: spin 0.6s linear infinite;
+    }
+    .discover-icon { font-size: 1.1rem; line-height: 1; color: var(--gold); }
+
     /* ─── STATS PANEL ─────────────────────────────── */
     .stats-panel {
       background: var(--surface);
@@ -741,7 +763,258 @@
       border-radius: 0 var(--radius) var(--radius) 0;
     }
 
-    /* ─── SCROLLBAR ───────────────────────────────── */
+    /* ─── RELATED FIGURES ─────────────────────────── */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .related-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .related-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-dim);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .related-card-img {
+      width: 100%; aspect-ratio: 1/1;
+      object-fit: cover; object-position: top center;
+      display: block;
+      filter: brightness(0.85);
+    }
+
+    .related-card-placeholder {
+      width: 100%; aspect-ratio: 1/1;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--raised);
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-style: italic;
+      color: var(--ink-5);
+    }
+
+    .related-card-body {
+      padding: 0.5rem 0.6rem 0.6rem;
+    }
+
+    .related-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--ink); line-height: 1.3;
+      margin-bottom: 0.15rem;
+    }
+
+    .related-card-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem; color: var(--ink-3);
+    }
+
+    /* ─── VIEW TABS ───────────────────────────────── */
+    .view-tabs {
+      display: flex; gap: 0.35rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 0;
+    }
+
+    .view-tab {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: none; border: none;
+      color: var(--ink-3);
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.9rem; padding: 0.5rem 1rem;
+      cursor: pointer; border-radius: var(--radius) var(--radius) 0 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      margin-bottom: -1px;
+    }
+    .view-tab:hover { color: var(--ink-2); background: var(--surface); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: var(--surface);
+    }
+
+    /* ─── TIMELINE VIEW ───────────────────────────── */
+    .timeline-view-wrap {
+      position: relative;
+    }
+
+    .timeline-view-scroll {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      overflow-x: auto;
+      overflow-y: visible;
+      padding: 1rem 0 2rem;
+      scroll-behavior: smooth;
+      /* Custom scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+      min-height: 500px;
+    }
+    .timeline-view-scroll::-webkit-scrollbar { height: 6px; }
+    .timeline-view-scroll::-webkit-scrollbar-track { background: transparent; }
+    .timeline-view-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .timeline-scroll-hint {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em;
+      color: var(--ink-4); margin-top: 0.5rem;
+    }
+
+    /* Century column */
+    .tl-century-col {
+      display: flex; flex-direction: column;
+      align-items: center;
+      min-width: 200px; flex-shrink: 0;
+      position: relative;
+    }
+
+    .tl-century-header {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--accent); letter-spacing: 0.05em;
+      background: var(--surface-2);
+      border: 1px solid var(--accent-dim);
+      border-radius: 20px;
+      padding: 0.25rem 0.9rem;
+      margin-bottom: 1rem;
+      white-space: nowrap;
+      position: sticky; top: 0; z-index: 2;
+    }
+
+    /* Vertical spine line */
+    .tl-century-col::before {
+      content: '';
+      position: absolute;
+      top: 2.2rem; bottom: 0;
+      left: 50%; transform: translateX(-50%);
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent-dim), var(--border));
+      z-index: 0;
+    }
+
+    /* Connector between columns */
+    .tl-century-col::after {
+      content: '';
+      position: absolute;
+      top: 1.1rem;
+      right: -1px;
+      width: 1px; height: 1px;
+      background: var(--border);
+    }
+
+    .tl-figures {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0.75rem;
+      padding: 0 0.75rem; width: 100%;
+      position: relative; z-index: 1;
+    }
+
+    /* Timeline figure card */
+    .tl-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%; overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .tl-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-dim);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+
+    /* Dot on spine */
+    .tl-card::before {
+      content: '';
+      position: absolute;
+      top: 1rem; left: -1.1rem;
+      width: 8px; height: 8px;
+      background: var(--accent-dim);
+      border: 2px solid var(--bg);
+      border-radius: 50%;
+      z-index: 2;
+    }
+
+    .tl-card-inner {
+      display: flex; gap: 0.6rem;
+      padding: 0.6rem;
+      align-items: center;
+    }
+
+    .tl-card-img {
+      width: 44px; height: 44px;
+      border-radius: var(--radius);
+      object-fit: cover; object-position: top center;
+      flex-shrink: 0;
+      filter: brightness(0.88);
+    }
+
+    .tl-card-placeholder {
+      width: 44px; height: 44px;
+      border-radius: var(--radius);
+      background: var(--raised);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-style: italic;
+      color: var(--ink-5); flex-shrink: 0;
+    }
+
+    .tl-card-info { min-width: 0; }
+
+    .tl-card-type {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-4);
+      margin-bottom: 0.1rem;
+    }
+
+    .tl-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--ink); line-height: 1.2;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tl-card-role {
+      font-size: 0.72rem; color: var(--accent);
+      font-style: italic; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .tl-card-dates {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem; color: var(--ink-2);
+      margin-top: 0.1rem;
+    }
+
+    .tl-martyr-dot {
+      position: absolute; top: 0.4rem; right: 0.4rem;
+      width: 6px; height: 6px;
+      background: var(--red); border-radius: 50%;
+      box-shadow: 0 0 5px rgba(248,113,113,0.6);
+    }
+
+    /* Horizontal spine connecting columns */
+    .tl-spine {
+      height: 1px; width: 40px; flex-shrink: 0;
+      background: linear-gradient(to right, var(--border), var(--border));
+      align-self: center;
+      margin-top: 1.1rem;
+    }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -832,6 +1105,14 @@
           <div class="sc-label">Martyred</div>
         </div>
       </div>
+
+      <button class="discover-btn" id="discoverBtn" onclick="openRandomFigure()">
+        <span class="discover-icon">✦</span>
+        <div class="sc-info">
+          <div class="sc-count" style="color:var(--gold)">?</div>
+          <div class="sc-label">Discover</div>
+        </div>
+      </button>
     </div>
 
     <!-- Historical Era Bands -->
@@ -912,26 +1193,51 @@
   </aside>
 
   <main class="main-content">
-    <div class="results-bar">
-      <div class="results-info" id="resultsInfo">Loading…</div>
-      <div class="sort-wrap">
-        <span class="sort-label">Sort by</span>
-        <select class="sort-select" id="sortSelect" onchange="setSort(this.value)">
-          <option value="default">Default order</option>
-          <option value="name_asc">Name A → Z</option>
-          <option value="name_desc">Name Z → A</option>
-          <option value="date_asc">Date (oldest first)</option>
-          <option value="date_desc">Date (newest first)</option>
-          <option value="century_asc">Century (earliest first)</option>
-          <option value="century_desc">Century (latest first)</option>
-          <option value="type">Type</option>
-        </select>
+
+    <!-- View tabs -->
+    <div class="view-tabs">
+      <button class="view-tab active" id="tab-grid" onclick="switchView('grid')">
+        <span>⊞</span> Grid
+      </button>
+      <button class="view-tab" id="tab-timeline" onclick="switchView('timeline')">
+        <span>↔</span> Timeline
+      </button>
+    </div>
+
+    <!-- Grid view -->
+    <div id="view-grid">
+      <div class="results-bar">
+        <div class="results-info" id="resultsInfo">Loading…</div>
+        <div class="sort-wrap">
+          <span class="sort-label">Sort by</span>
+          <select class="sort-select" id="sortSelect" onchange="setSort(this.value)">
+            <option value="default">Default order</option>
+            <option value="name_asc">Name A → Z</option>
+            <option value="name_desc">Name Z → A</option>
+            <option value="date_asc">Date (oldest first)</option>
+            <option value="date_desc">Date (newest first)</option>
+            <option value="century_asc">Century (earliest first)</option>
+            <option value="century_desc">Century (latest first)</option>
+            <option value="type">Type</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid" id="grid">
+        <div class="loading"><div class="spinner"></div>Loading records…</div>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- Timeline view -->
+    <div id="view-timeline" style="display:none">
+      <div class="timeline-view-wrap">
+        <div class="timeline-view-scroll" id="timelineView">
+          <div class="loading"><div class="spinner"></div>Loading timeline…</div>
+        </div>
+        <div class="timeline-scroll-hint">← Scroll to explore →</div>
       </div>
     </div>
-    <div class="grid" id="grid">
-      <div class="loading"><div class="spinner"></div>Loading records…</div>
-    </div>
-    <div class="pagination" id="pagination"></div>
+
   </main>
 </div>
 
@@ -1221,6 +1527,119 @@
     window.scrollTo({top: document.querySelector('.app-body').offsetTop - 80, behavior:'smooth'});
   }
 
+  // ── VIEW SWITCHING ─────────────────────────────────────
+  let currentView = 'grid';
+  let timelineLoaded = false;
+
+  function switchView(view) {
+    currentView = view;
+    document.getElementById('view-grid').style.display = view === 'grid' ? 'block' : 'none';
+    document.getElementById('view-timeline').style.display = view === 'timeline' ? 'block' : 'none';
+    document.getElementById('tab-grid').classList.toggle('active', view === 'grid');
+    document.getElementById('tab-timeline').classList.toggle('active', view === 'timeline');
+
+    if (view === 'timeline' && !timelineLoaded) {
+      loadTimeline();
+    }
+  }
+
+  // ── TIMELINE ───────────────────────────────────────────
+  const CENTURY_ORDER = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th'];
+
+  async function loadTimeline() {
+    const container = document.getElementById('timelineView');
+    container.innerHTML = `<div class="loading"><div class="spinner"></div>Loading timeline…</div>`;
+
+    try {
+      // Fetch all figures (high page size to get everything)
+      const res = await fetch(`${API}/figures?page=1&page_size=500&sort=date_asc`);
+      const data = await res.json();
+
+      // Group by century
+      const byCentury = {};
+      for (const f of data.results) {
+        const century = f.century || 'Unknown';
+        if (!byCentury[century]) byCentury[century] = [];
+        byCentury[century].push(f);
+      }
+
+      // Sort centuries in order
+      const orderedCenturies = [
+        ...CENTURY_ORDER.filter(c => byCentury[c]),
+        ...Object.keys(byCentury).filter(c => !CENTURY_ORDER.includes(c) && c !== 'Unknown')
+      ];
+      if (byCentury['Unknown']) orderedCenturies.push('Unknown');
+
+      // Render
+      let html = '';
+      orderedCenturies.forEach((century, idx) => {
+        const figures = byCentury[century];
+
+        // Horizontal spine connector between columns
+        if (idx > 0) html += `<div class="tl-spine"></div>`;
+
+        const figureCards = figures.map(f => {
+          const initial = (f.name || '?').charAt(0);
+          const imgHtml = f.image_url
+            ? `<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy"
+                  onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`
+            : `<div class="tl-card-placeholder">${initial}</div>`;
+          const dates = formatDates(f.born, f.death, f.era_type);
+          return `
+            <div class="tl-card" onclick="openFigure(${f.id})">
+              ${f.is_martyr === 'Yes' ? '<div class="tl-martyr-dot" title="Martyred"></div>' : ''}
+              <div class="tl-card-inner">
+                ${imgHtml}
+                <div class="tl-card-info">
+                  <div class="tl-card-type">${f.type || ''}</div>
+                  <div class="tl-card-name">${f.name || 'Unknown'}</div>
+                  ${f.role_office ? `<div class="tl-card-role">${f.role_office}</div>` : ''}
+                  ${dates ? `<div class="tl-card-dates">${dates}</div>` : ''}
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+
+        html += `
+          <div class="tl-century-col">
+            <div class="tl-century-header">${century === 'Unknown' ? 'Unknown Era' : `${century} Century`}</div>
+            <div class="tl-figures">${figureCards}</div>
+          </div>`;
+      });
+
+      container.innerHTML = html;
+      timelineLoaded = true;
+
+    } catch(e) {
+      container.innerHTML = `<div class="empty-state"><p>Could not load timeline: ${e.message}</p></div>`;
+      console.error('Timeline error:', e);
+    }
+  }
+
+  // ── RANDOM FIGURE ──────────────────────────────────────
+  async function openRandomFigure() {
+    const btn = document.getElementById('discoverBtn');
+    btn.classList.add('spinning');
+    btn.disabled = true;
+
+    document.getElementById('modalInner').innerHTML =
+      `<div style="padding:4rem;text-align:center"><div class="spinner"></div></div>`;
+    document.getElementById('modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    try {
+      const f = await fetch(`${API}/figures/random`).then(r => r.json());
+      const related = await fetch(`${API}/figures/${f.id}/related`).then(r => r.json()).catch(() => []);
+      document.getElementById('modalInner').innerHTML = renderModal(f, related);
+    } catch(e) {
+      document.getElementById('modalInner').innerHTML =
+        `<div style="padding:2rem;color:var(--ink-3)">Failed to load a random record.</div>`;
+    } finally {
+      btn.classList.remove('spinning');
+      btn.disabled = false;
+    }
+  }
+
   // ── MODAL ──────────────────────────────────────────────
   async function openFigure(id) {
     document.getElementById('modalInner').innerHTML =
@@ -1228,15 +1647,18 @@
     document.getElementById('modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     try {
-      const f = await fetch(`${API}/figures/${id}`).then(r => r.json());
-      document.getElementById('modalInner').innerHTML = renderModal(f);
+      const [f, related] = await Promise.all([
+        fetch(`${API}/figures/${id}`).then(r => r.json()),
+        fetch(`${API}/figures/${id}/related`).then(r => r.json()).catch(() => [])
+      ]);
+      document.getElementById('modalInner').innerHTML = renderModal(f, related);
     } catch(e) {
       document.getElementById('modalInner').innerHTML =
         `<div style="padding:2rem;color:var(--ink-3)">Failed to load record.</div>`;
     }
   }
 
-  function renderModal(f) {
+  function renderModal(f, related = []) {
     const name = f.name || 'Unknown';
     const initial = name.charAt(0);
     const typeClass = (f.type || 'default').toLowerCase();
@@ -1270,6 +1692,28 @@
     if (f.famous_quotes)         body += msec('Famous Quotes', `<blockquote class="modal-quote">${f.famous_quotes}</blockquote>`);
     if (f.notes)                 body += msec('Notes', `<div class="modal-text">${f.notes}</div>`);
 
+    // Related figures section
+    let relatedHtml = '';
+    if (related && related.length > 0) {
+      const cards = related.map(r => {
+        const initial = (r.name || '?').charAt(0);
+        const imgHtml = r.image_url
+          ? `<img class="related-card-img" src="${r.image_url}" alt="${r.name}" loading="lazy"
+                onerror="this.parentElement.innerHTML='<div class=\\'related-card-placeholder\\'>${initial}</div>'">`
+          : `<div class="related-card-placeholder">${initial}</div>`;
+        const meta = [r.role_office, r.century ? `${r.century} c.` : ''].filter(Boolean).join(' · ');
+        return `
+          <div class="related-card" onclick="closeModal();setTimeout(()=>openFigure(${r.id}),150)">
+            ${imgHtml}
+            <div class="related-card-body">
+              <div class="related-card-name">${r.name}</div>
+              ${meta ? `<div class="related-card-meta">${meta}</div>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+      relatedHtml = `<div><div class="modal-section-head">Related Figures</div><div class="related-grid">${cards}</div></div>`;
+    }
+
     return `
       <div class="modal-hero">
         <div class="modal-img-wrap">${imgHtml}</div>
@@ -1286,7 +1730,7 @@
           ${eras ? `<div style="margin-top:0.5rem"><div class="modal-section-head">Era</div><div class="card-beliefs">${eras}</div></div>` : ''}
         </div>
       </div>
-      ${body ? `<div class="modal-content-body">${body}</div>` : ''}`;
+      ${body ? `<div class="modal-content-body">${body}${relatedHtml}</div>` : relatedHtml ? `<div class="modal-content-body">${relatedHtml}</div>` : ''}`;
   }
 
   function msec(title, content) {
