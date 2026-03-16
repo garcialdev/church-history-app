@@ -843,24 +843,19 @@
     }
 
     /* ─── TIMELINE VIEW ───────────────────────────── */
-    .timeline-view-wrap {
-      position: relative;
-    }
+    .timeline-view-wrap { position: relative; }
 
     .timeline-view-scroll {
-      display: flex;
-      align-items: flex-start;
-      gap: 0;
-      overflow-x: auto;
-      overflow-y: visible;
-      padding: 1rem 0 2rem;
+      overflow-x: auto; overflow-y: auto;
+      padding: 0 2rem 2rem;
       scroll-behavior: smooth;
-      /* Custom scrollbar */
       scrollbar-width: thin;
       scrollbar-color: var(--border) transparent;
-      min-height: 500px;
+      height: calc(100vh - 320px);
+      min-height: 600px;
+      position: relative;
     }
-    .timeline-view-scroll::-webkit-scrollbar { height: 6px; }
+    .timeline-view-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
     .timeline-view-scroll::-webkit-scrollbar-track { background: transparent; }
     .timeline-view-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -871,53 +866,76 @@
       color: var(--ink-4); margin-top: 0.5rem;
     }
 
-    /* Century column */
-    .tl-century-col {
-      display: flex; flex-direction: column;
-      align-items: center;
-      min-width: 200px; flex-shrink: 0;
+    /* The continuous canvas */
+    .tl-canvas {
       position: relative;
+      min-height: 120px;
+      overflow: visible;
     }
 
-    .tl-century-header {
+    /* Horizontal axis line */
+    .tl-axis {
+      position: absolute;
+      top: 52px; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--accent-dim) 2%, var(--accent-dim) 98%, transparent);
+      z-index: 1;
+    }
+
+    /* Century marker */
+    .tl-marker {
+      position: absolute;
+      top: 0;
+      display: flex; flex-direction: column;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .tl-marker-label {
       font-family: 'Playfair Display', serif;
-      font-size: 0.85rem; font-weight: 600;
-      color: var(--accent); letter-spacing: 0.05em;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--accent);
       background: var(--surface-2);
       border: 1px solid var(--accent-dim);
       border-radius: 20px;
-      padding: 0.25rem 0.9rem;
-      margin-bottom: 1rem;
+      padding: 0.2rem 0.7rem;
       white-space: nowrap;
-      position: sticky; top: 0; z-index: 2;
+      margin-bottom: 0.35rem;
     }
 
-    /* Vertical spine line */
-    .tl-century-col::before {
-      content: '';
+    .tl-marker-tick {
+      width: 1px; height: 16px;
+      background: var(--accent-dim);
+    }
+
+    /* Figure column — positioned absolutely on the axis */
+    .tl-fig-col {
       position: absolute;
-      top: 2.2rem; bottom: 0;
-      left: 50%; transform: translateX(-50%);
-      width: 1px;
-      background: linear-gradient(to bottom, var(--accent-dim), var(--border));
-      z-index: 0;
-    }
-
-    /* Connector between columns */
-    .tl-century-col::after {
-      content: '';
-      position: absolute;
-      top: 1.1rem;
-      right: -1px;
-      width: 1px; height: 1px;
-      background: var(--border);
-    }
-
-    .tl-figures {
+      top: 54px;
       display: flex; flex-direction: column;
-      align-items: center; gap: 0.75rem;
-      padding: 0 0.75rem; width: 100%;
-      position: relative; z-index: 1;
+      gap: 0.5rem;
+      align-items: flex-start;
+      z-index: 3;
+      padding-top: 0.5rem;
+      overflow: visible;
+    }
+
+    /* Elevate entire column when any card inside is hovered */
+    .tl-fig-col:hover {
+      z-index: 100;
+    }
+
+    /* Dot on axis */
+    .tl-fig-col::before {
+      content: '';
+      position: absolute;
+      top: -5px; left: 50%;
+      transform: translateX(-50%);
+      width: 10px; height: 10px;
+      background: var(--surface);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      z-index: 4;
     }
 
     /* Timeline figure card */
@@ -925,79 +943,67 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      width: 100%; overflow: hidden;
+      width: 200px; overflow: hidden;
       cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+      transition: transform 0.2s ease, border-color 0.15s, box-shadow 0.2s ease;
       position: relative;
+      flex-shrink: 0;
+      z-index: 1;
     }
     .tl-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent-dim);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-    }
-
-    /* Dot on spine */
-    .tl-card::before {
-      content: '';
-      position: absolute;
-      top: 1rem; left: -1.1rem;
-      width: 8px; height: 8px;
-      background: var(--accent-dim);
-      border: 2px solid var(--bg);
-      border-radius: 50%;
-      z-index: 2;
+      transform: translateY(-4px) scale(1.03);
+      border-color: var(--accent);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.8), 0 0 0 1px var(--accent-dim);
+      z-index: 50;
     }
 
     .tl-card-inner {
       display: flex; gap: 0.6rem;
-      padding: 0.6rem;
-      align-items: center;
+      padding: 0.65rem; align-items: center;
     }
 
     .tl-card-img {
-      width: 44px; height: 44px;
+      width: 48px; height: 48px;
       border-radius: var(--radius);
       object-fit: cover; object-position: top center;
-      flex-shrink: 0;
-      filter: brightness(0.88);
+      flex-shrink: 0; filter: brightness(0.88);
     }
 
     .tl-card-placeholder {
-      width: 44px; height: 44px;
+      width: 48px; height: 48px;
       border-radius: var(--radius);
       background: var(--raised);
       display: flex; align-items: center; justify-content: center;
       font-family: 'Playfair Display', serif;
-      font-size: 1.1rem; font-style: italic;
+      font-size: 1.2rem; font-style: italic;
       color: var(--ink-5); flex-shrink: 0;
     }
 
-    .tl-card-info { min-width: 0; }
+    .tl-card-info { min-width: 0; flex: 1; }
 
     .tl-card-type {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.55rem; letter-spacing: 0.1em;
+      font-size: 0.55rem; letter-spacing: 0.08em;
       text-transform: uppercase; color: var(--ink-4);
-      margin-bottom: 0.1rem;
     }
 
     .tl-card-name {
       font-family: 'Playfair Display', serif;
-      font-size: 0.88rem; font-weight: 600;
+      font-size: 0.92rem; font-weight: 600;
       color: var(--ink); line-height: 1.2;
       white-space: nowrap; overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .tl-card-role {
-      font-size: 0.72rem; color: var(--accent);
+      font-size: 0.75rem; color: var(--accent);
       font-style: italic; white-space: nowrap;
       overflow: hidden; text-overflow: ellipsis;
     }
 
     .tl-card-dates {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62rem; color: var(--ink-2);
+      font-size: 0.65rem; color: var(--ink-2);
       margin-top: 0.1rem;
     }
 
@@ -1005,15 +1011,7 @@
       position: absolute; top: 0.4rem; right: 0.4rem;
       width: 6px; height: 6px;
       background: var(--red); border-radius: 50%;
-      box-shadow: 0 0 5px rgba(248,113,113,0.6);
-    }
-
-    /* Horizontal spine connecting columns */
-    .tl-spine {
-      height: 1px; width: 40px; flex-shrink: 0;
-      background: linear-gradient(to right, var(--border), var(--border));
-      align-self: center;
-      margin-top: 1.1rem;
+      box-shadow: 0 0 5px rgba(248,113,113,0.7);
     }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
@@ -1546,39 +1544,75 @@
   // ── TIMELINE ───────────────────────────────────────────
   const CENTURY_ORDER = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th'];
 
+  // Convert century string to approximate year
+  function centuryToYear(c) {
+    const map = {'1st':50,'2nd':150,'3rd':250,'4th':350,'5th':450,'6th':550,
+                 '7th':650,'8th':750,'9th':850,'10th':950,'11th':1050,
+                 '12th':1150,'13th':1250,'14th':1350,'15th':1450,'16th':1550};
+    return map[c] || null;
+  }
+
+  // Get the best year to position a figure on the axis
+  function getFigureYear(f) {
+    if (f.born) return f.born;
+    if (f.death) return f.death;
+    return centuryToYear(f.century);
+  }
+
   async function loadTimeline() {
     const container = document.getElementById('timelineView');
     container.innerHTML = `<div class="loading"><div class="spinner"></div>Loading timeline…</div>`;
 
     try {
-      // Fetch all figures (high page size to get everything)
       const res = await fetch(`${API}/figures?page=1&page_size=500&sort=date_asc`);
       const data = await res.json();
 
-      // Group by century
-      const byCentury = {};
-      for (const f of data.results) {
-        const century = f.century || 'Unknown';
-        if (!byCentury[century]) byCentury[century] = [];
-        byCentury[century].push(f);
+      // Timeline range AD 1 – 1600
+      const START_YEAR = 1;
+      const END_YEAR   = 1600;
+      const PX_PER_YEAR = 5;      // pixels per year — more spread out
+      const CARD_WIDTH  = 200;    // px — slightly wider cards
+      const TOTAL_WIDTH = Math.round((END_YEAR - START_YEAR) * PX_PER_YEAR);
+      const PADDING     = 80;     // px on each side
+
+      // Group figures by their year position
+      // Use a bucket system to stack overlapping cards
+      const buckets = {}; // key = bucketed x position → array of figures
+      const BUCKET_SIZE = CARD_WIDTH + 16;
+
+      const figures = data.results.filter(f => getFigureYear(f) !== null);
+      const noDate  = data.results.filter(f => getFigureYear(f) === null);
+
+      figures.forEach(f => {
+        const year = getFigureYear(f);
+        const x = Math.round((year - START_YEAR) * PX_PER_YEAR);
+        const bucket = Math.floor(x / BUCKET_SIZE) * BUCKET_SIZE;
+        if (!buckets[bucket]) buckets[bucket] = [];
+        buckets[bucket].push({ ...f, _x: x });
+      });
+
+      // Build HTML
+      let html = `<div class="tl-canvas" style="width:${TOTAL_WIDTH + PADDING * 2}px">`;
+
+      // Axis line
+      html += `<div class="tl-axis"></div>`;
+
+      // Century markers
+      for (let yr = 100; yr <= END_YEAR; yr += 100) {
+        const x = PADDING + Math.round((yr - START_YEAR) * PX_PER_YEAR);
+        const label = CENTURY_ORDER[Math.floor(yr / 100) - 1];
+        if (!label) continue;
+        html += `
+          <div class="tl-marker" style="left:${x}px">
+            <div class="tl-marker-label">${label} c.</div>
+            <div class="tl-marker-tick"></div>
+          </div>`;
       }
 
-      // Sort centuries in order
-      const orderedCenturies = [
-        ...CENTURY_ORDER.filter(c => byCentury[c]),
-        ...Object.keys(byCentury).filter(c => !CENTURY_ORDER.includes(c) && c !== 'Unknown')
-      ];
-      if (byCentury['Unknown']) orderedCenturies.push('Unknown');
-
-      // Render
-      let html = '';
-      orderedCenturies.forEach((century, idx) => {
-        const figures = byCentury[century];
-
-        // Horizontal spine connector between columns
-        if (idx > 0) html += `<div class="tl-spine"></div>`;
-
-        const figureCards = figures.map(f => {
+      // Figure columns
+      Object.values(buckets).forEach(group => {
+        const x = PADDING + group[0]._x;
+        const cards = group.map(f => {
           const initial = (f.name || '?').charAt(0);
           const imgHtml = f.image_url
             ? `<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy"
@@ -1587,12 +1621,12 @@
           const dates = formatDates(f.born, f.death, f.era_type);
           return `
             <div class="tl-card" onclick="openFigure(${f.id})">
-              ${f.is_martyr === 'Yes' ? '<div class="tl-martyr-dot" title="Martyred"></div>' : ''}
+              ${f.is_martyr === 'Yes' ? '<div class="tl-martyr-dot"></div>' : ''}
               <div class="tl-card-inner">
                 ${imgHtml}
                 <div class="tl-card-info">
                   <div class="tl-card-type">${f.type || ''}</div>
-                  <div class="tl-card-name">${f.name || 'Unknown'}</div>
+                  <div class="tl-card-name">${f.name || ''}</div>
                   ${f.role_office ? `<div class="tl-card-role">${f.role_office}</div>` : ''}
                   ${dates ? `<div class="tl-card-dates">${dates}</div>` : ''}
                 </div>
@@ -1600,12 +1634,38 @@
             </div>`;
         }).join('');
 
-        html += `
-          <div class="tl-century-col">
-            <div class="tl-century-header">${century === 'Unknown' ? 'Unknown Era' : `${century} Century`}</div>
-            <div class="tl-figures">${figureCards}</div>
-          </div>`;
+        html += `<div class="tl-fig-col" style="left:${x}px">${cards}</div>`;
       });
+
+      html += `</div>`;
+
+      // If any figures have no date, show them in a separate strip below
+      if (noDate.length > 0) {
+        html += `
+          <div style="margin-top:1.5rem;padding:0.75rem 0;border-top:1px solid var(--border-light)">
+            <div class="section-label" style="margin-bottom:0.75rem">Date Unknown</div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+              ${noDate.map(f => {
+                const initial = (f.name||'?').charAt(0);
+                const imgHtml = f.image_url
+                  ? `<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy"
+                        onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`
+                  : `<div class="tl-card-placeholder">${initial}</div>`;
+                return `
+                  <div class="tl-card" style="width:200px" onclick="openFigure(${f.id})">
+                    <div class="tl-card-inner">
+                      ${imgHtml}
+                      <div class="tl-card-info">
+                        <div class="tl-card-type">${f.type||''}</div>
+                        <div class="tl-card-name">${f.name||''}</div>
+                        ${f.century ? `<div class="tl-card-dates">${f.century} c.</div>` : ''}
+                      </div>
+                    </div>
+                  </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+      }
 
       container.innerHTML = html;
       timelineLoaded = true;
