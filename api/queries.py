@@ -110,6 +110,54 @@ def get_figures(
     return total, rows
 
 
+def get_map_figures(db: Session):
+    """Fetch all figures that have parseable coordinates in Birthplace (format: lat;lng)."""
+    return db.execute(text("""
+        SELECT
+            ch.id,
+            ch."Name_Event"         AS name,
+            ch."Type"               AS type,
+            ch."Role___Office"      AS role_office,
+            ch."Century"            AS century,
+            ch."Born___Start"       AS born,
+            ch."Death___End"        AS death,
+            ch."Era_Type__BC_AD_"   AS era_type,
+            ch."Birthplace"         AS birthplace,
+            ch."Thumbnail"          AS thumbnail_json,
+            ch."Wikipedia_Name"     AS wikipedia_name,
+            SPLIT_PART(ch."Birthplace", ';', 1)::float AS lat,
+            SPLIT_PART(ch."Birthplace", ';', 2)::float AS lng
+        FROM "Church History" ch
+        WHERE ch."Birthplace" IS NOT NULL
+        AND ch."Birthplace" LIKE '%;%'
+        AND ch."Name_Event" IS NOT NULL
+        AND ch."Name_Event" != ''
+        ORDER BY ch."Name_Event" ASC
+    """)).mappings().all()
+
+
+def get_map_figures(db: Session):
+    """Fetch all figures that have coordinates in their Birthplace field."""
+    return db.execute(text("""
+        SELECT
+            ch.id,
+            ch."Name_Event"       AS name,
+            ch."Type"             AS type,
+            ch."Role___Office"    AS role_office,
+            ch."Century"          AS century,
+            ch."Birthplace"       AS birthplace,
+            ch."Thumbnail"        AS thumbnail_json,
+            ch."Wikipedia_Name"   AS wikipedia_name
+        FROM "Church History" ch
+        WHERE ch."Birthplace" IS NOT NULL
+        AND ch."Birthplace" != ''
+        AND ch."Birthplace" ~ '^-?[0-9]+\.?[0-9]*;-?[0-9]+\.?[0-9]*$'
+        AND ch."Name_Event" IS NOT NULL
+        AND ch."Name_Event" != ''
+        ORDER BY ch."Name_Event" ASC
+    """)).mappings().all()
+
+
 def get_related_figures(db: Session, figure_id: int, century: Optional[str], figure_type: Optional[str], limit: int = 6):
     """
     Find related figures by shared beliefs first, then same century, then same type.

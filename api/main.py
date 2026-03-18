@@ -8,7 +8,7 @@ from schemas import FigureCard, FigureDetail, FigureListResponse, FilterOptions,
 from queries import (
     get_figures, get_figure_by_id, get_figure_beliefs,
     get_figure_eras, get_all_beliefs, get_all_eras, get_filter_options,
-    get_era_range_counts, get_random_figure_id, get_related_figures
+    get_era_range_counts, get_random_figure_id, get_related_figures, get_map_figures
 )
 from image_service import resolve_image
 
@@ -63,12 +63,58 @@ def health_check():
     return {"status": "ok"}
 
 
+@app.get("/figures/map")
+async def get_map_figures_route(db: Session = Depends(get_db)):
+    rows = get_map_figures(db)
+    results = []
+    for row in rows:
+        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+        results.append({
+            "id": row["id"],
+            "name": row["name"],
+            "type": row["type"],
+            "role_office": row["role_office"],
+            "century": row["century"],
+            "birthplace": row["birthplace"],
+            "image_url": image_url,
+        })
+    return results
+
+
+@app.get("/figures/random")
+async def get_random_figure(db: Session = Depends(get_db)):
+    figure_id = get_random_figure_id(db)
+    if not figure_id:
+        raise HTTPException(status_code=404, detail="No figures found")
+    row = get_figure_by_id(db, figure_id)
+    beliefs = get_figure_beliefs(db, figure_id)
+    eras = get_figure_eras(db, figure_id)
+    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+    return {
+        **map_row_to_card(row, beliefs, image_url),
+        "long_biography": row["long_biography"],
+        "famous_quotes": row["famous_quotes"],
+        "major_works": row["major_works"],
+        "key_life_events": row["key_life_events"],
+        "primary_contributions": row["primary_contributions"],
+        "scripture_references": row["scripture_references"],
+        "biblical_books": row["biblical_books"],
+        "associated_movements": row["associated_movements"],
+        "external_references": row["external_references"],
+        "notes": row["notes"],
+        "eras": [
+            {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
+            for e in eras
+        ],
+    }
+
+
 @app.get("/figures", response_model=FigureListResponse)
 async def list_figures(
     search: Optional[str] = Query(None),
     type_filter: Optional[str] = Query(None, alias="type"),
     century: Optional[str] = Query(None),
-    century_keywords: Optional[str] = Query(None),  # comma-separated e.g. "1st,2nd,3rd"
+    century_keywords: Optional[str] = Query(None),
     gender: Optional[str] = Query(None),
     denomination: Optional[str] = Query(None),
     belief_id: Optional[int] = Query(None),
