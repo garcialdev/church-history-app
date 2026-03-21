@@ -8,9 +8,10 @@ from schemas import FigureCard, FigureDetail, FigureListResponse, FilterOptions,
 from queries import (
     get_figures, get_figure_by_id, get_figure_beliefs,
     get_figure_eras, get_all_beliefs, get_all_eras, get_filter_options,
-    get_era_range_counts, get_random_figure_id, get_related_figures, get_map_figures
+    get_era_range_counts, get_random_figure_id, get_related_figures, get_map_figures,
+    get_all_figures_for_caching, save_cached_image_url
 )
-from image_service import resolve_image
+from image_service import resolve_image, parse_nocodb_thumbnail
 
 app = FastAPI(
     title="Church History API",
@@ -68,7 +69,7 @@ async def get_map_figures_route(db: Session = Depends(get_db)):
     rows = get_map_figures(db)
     results = []
     for row in rows:
-        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
         results.append({
             "id": row["id"],
             "name": row["name"],
@@ -89,7 +90,7 @@ async def get_random_figure(db: Session = Depends(get_db)):
     row = get_figure_by_id(db, figure_id)
     beliefs = get_figure_beliefs(db, figure_id)
     eras = get_figure_eras(db, figure_id)
-    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
     return {
         **map_row_to_card(row, beliefs, image_url),
         "long_biography": row["long_biography"],
@@ -132,7 +133,7 @@ async def list_figures(
     results = []
     for row in rows:
         beliefs = get_figure_beliefs(db, row["id"])
-        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
         results.append(map_row_to_card(row, beliefs, image_url))
 
     return {"total": total, "page": page, "page_size": page_size, "results": results}
@@ -146,7 +147,7 @@ async def get_figure_related(figure_id: int, db: Session = Depends(get_db)):
     related = get_related_figures(db, figure_id, row["century"], row["type"])
     results = []
     for r in related:
-        image_url = await resolve_image(r["thumbnail_json"], r["name"], r["wikipedia_name"])
+        image_url = await resolve_image(r["thumbnail_json"], r["name"], r["wikipedia_name"], r.get("cached_image_url"))
         results.append({
             "id": r["id"],
             "name": r["name"],
@@ -170,7 +171,7 @@ async def get_random_figure(db: Session = Depends(get_db)):
     row = get_figure_by_id(db, figure_id)
     beliefs = get_figure_beliefs(db, figure_id)
     eras = get_figure_eras(db, figure_id)
-    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
     return {
         **map_row_to_card(row, beliefs, image_url),
         "long_biography": row["long_biography"],
@@ -198,7 +199,7 @@ async def get_figure(figure_id: int, db: Session = Depends(get_db)):
 
     beliefs = get_figure_beliefs(db, figure_id)
     eras = get_figure_eras(db, figure_id)
-    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"])
+    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
 
     return {
         **map_row_to_card(row, beliefs, image_url),
@@ -216,6 +217,46 @@ async def get_figure(figure_id: int, db: Session = Depends(get_db)):
             {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
             for e in eras
         ],
+    }
+
+
+@app.post("/admin/cache-images")
+async def cache_images(db: Session = Depends(get_db)):
+    """
+    Resolve and cache image URLs for all figures that don't have one yet.
+    Call this once after setup, then periodically when you add new figures.
+    """
+    figures = get_all_figures_for_caching(db)
+    updated = 0
+    skipped = 0
+    failed = 0
+
+    for f in figures:
+        # Skip if already has a NocoDB thumbnail or cached URL
+        if parse_nocodb_thumbnail(f["thumbnail_json"]):
+            skipped += 1
+            continue
+        if f["cached_image_url"] and f["cached_image_url"].strip():
+            skipped += 1
+            continue
+
+        # Try to resolve via Wikipedia
+        url = await resolve_image(
+            f["thumbnail_json"], f["name"],
+            f["wikipedia_name"], f["cached_image_url"]
+        )
+        if url:
+            save_cached_image_url(db, f["id"], url)
+            updated += 1
+        else:
+            failed += 1
+
+    return {
+        "status": "done",
+        "updated": updated,
+        "skipped": skipped,
+        "failed": failed,
+        "total": len(figures)
     }
 
 

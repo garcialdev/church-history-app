@@ -40,22 +40,33 @@ async def fetch_wikipedia_image(name: str) -> Optional[str]:
     return None
 
 
-async def resolve_image(thumbnail_json: Optional[str], name: Optional[str], wikipedia_name: Optional[str] = None) -> Optional[str]:
+async def resolve_image(
+    thumbnail_json: Optional[str],
+    name: Optional[str],
+    wikipedia_name: Optional[str] = None,
+    cached_image_url: Optional[str] = None,
+) -> Optional[str]:
     """
-    Priority: NocoDB thumbnail → Wikipedia (using Wikipedia_Name) → Wikipedia (using Name_Event) → None
+    Priority:
+    1. NocoDB uploaded thumbnail
+    2. Cached image URL from DB (no live HTTP call)
+    3. Wikipedia live lookup (only if no cache)
     """
-    # 1. Try NocoDB stored image first
+    # 1. NocoDB uploaded image
     nocodb_url = parse_nocodb_thumbnail(thumbnail_json)
     if nocodb_url:
         return nocodb_url
 
-    # 2. Try Wikipedia using the explicit Wikipedia_Name if set
+    # 2. Cached URL from DB — instant, no HTTP call
+    if cached_image_url and cached_image_url.strip():
+        return cached_image_url.strip()
+
+    # 3. Live Wikipedia lookup (slow path — only runs if not cached)
     if wikipedia_name and wikipedia_name.strip():
         wiki_url = await fetch_wikipedia_image(wikipedia_name.strip())
         if wiki_url:
             return wiki_url
 
-    # 3. Fall back to Name_Event as the search term
     if name:
         wiki_url = await fetch_wikipedia_image(name)
         if wiki_url:

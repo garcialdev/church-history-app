@@ -100,7 +100,8 @@ def get_figures(
             ch."Martyr___Yes_No_"                    AS is_martyr,
             ch."Believer_Saved"                      AS believer_saved,
             ch."Thumbnail"                           AS thumbnail_json,
-            ch."Wikipedia_Name"                      AS wikipedia_name
+            ch."Wikipedia_Name"                      AS wikipedia_name,
+            ch."Cached_Image_URL"                     AS cached_image_url
         FROM "Church History" ch
         WHERE {where_sql}
         ORDER BY {order_clause}
@@ -125,6 +126,7 @@ def get_map_figures(db: Session):
             ch."Birthplace"         AS birthplace,
             ch."Thumbnail"          AS thumbnail_json,
             ch."Wikipedia_Name"     AS wikipedia_name,
+            ch."Cached_Image_URL"          AS cached_image_url,
             SPLIT_PART(ch."Birthplace", ';', 1)::float AS lat,
             SPLIT_PART(ch."Birthplace", ';', 2)::float AS lng
         FROM "Church History" ch
@@ -147,7 +149,8 @@ def get_map_figures(db: Session):
             ch."Century"          AS century,
             ch."Birthplace"       AS birthplace,
             ch."Thumbnail"        AS thumbnail_json,
-            ch."Wikipedia_Name"   AS wikipedia_name
+            ch."Wikipedia_Name"   AS wikipedia_name,
+        ch."Cached_Image_URL"  AS cached_image_url
         FROM "Church History" ch
         WHERE ch."Birthplace" IS NOT NULL
         AND ch."Birthplace" != ''
@@ -176,6 +179,7 @@ def get_related_figures(db: Session, figure_id: int, century: Optional[str], fig
             ch."Short_Description"  AS short_description,
             ch."Thumbnail"          AS thumbnail_json,
             ch."Wikipedia_Name"     AS wikipedia_name,
+            ch."Cached_Image_URL"          AS cached_image_url,
             -- Score: shared belief = 3pts, same century = 2pts, same type = 1pt
             (
                 CASE WHEN EXISTS (
@@ -209,6 +213,25 @@ def get_related_figures(db: Session, figure_id: int, century: Optional[str], fig
         LIMIT :limit
     """), {"id": figure_id, "century": century, "type": figure_type, "limit": limit}).mappings().all()
     return rows
+
+
+def get_all_figures_for_caching(db: Session):
+    """Fetch all figures for image cache population."""
+    return db.execute(text("""
+        SELECT id, "Name_Event" AS name, "Thumbnail" AS thumbnail_json,
+               "Wikipedia_Name" AS wikipedia_name, "Cached_Image_URL" AS cached_image_url
+        FROM "Church History"
+        WHERE "Name_Event" IS NOT NULL AND "Name_Event" != ''
+        ORDER BY id ASC
+    """)).mappings().all()
+
+
+def save_cached_image_url(db: Session, figure_id: int, url: str):
+    """Write a resolved image URL back to the DB cache."""
+    db.execute(text("""
+        UPDATE "Church History" SET "Cached_Image_URL" = :url WHERE id = :id
+    """), {"url": url, "id": figure_id})
+    db.commit()
 
 
 def get_random_figure_id(db: Session) -> Optional[int]:

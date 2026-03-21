@@ -953,7 +953,10 @@
         if (el) el.classList.remove('active');
       });
     }
-    if (view === 'timeline' && !timelineLoaded) loadTimeline();
+    if (view === 'timeline') {
+      if (!timelineLoaded) loadTimeline();
+      // else already pre-loaded — instant display
+    }
     if (view === 'map') {
       if (!mapLoaded) loadMap();
       else setTimeout(() => mapInstance && mapInstance.invalidateSize(), 50);
@@ -964,6 +967,10 @@
   async function boot() {
     await Promise.all([loadFilters(), loadStats()]);
     await loadFigures();
+    // Pre-load timeline data in background after main content renders
+    setTimeout(() => {
+      if (!timelineLoaded) loadTimeline();
+    }, 1500);
   }
 
   // ── STATS ──────────────────────────────────────
@@ -1061,9 +1068,10 @@
         const x = PADDING+group[0]._x;
         const cards = group.map(f => {
           const initial = (f.name||'?').charAt(0);
+          // Use image_url if available, otherwise render placeholder and lazy-load
           const imgHtml = f.image_url
             ? `<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`
-            : `<div class="tl-card-placeholder">${initial}</div>`;
+            : `<div class="tl-card-placeholder" data-id="${f.id}" data-initial="${initial}">${initial}</div>`;
           const dates = formatDates(f.born, f.death, f.era_type);
           return `<div class="tl-card" onclick="openFigure(${f.id})">${f.is_martyr==='Yes'?'<div class="tl-martyr-dot"></div>':''}<div class="tl-card-inner">${imgHtml}<div class="tl-card-info"><div class="tl-card-type">${f.type||''}</div><div class="tl-card-name">${f.name||''}</div>${f.role_office?`<div class="tl-card-role">${f.role_office}</div>`:''} ${dates?`<div class="tl-card-dates">${dates}</div>`:''}</div></div></div>`;
         }).join('');
