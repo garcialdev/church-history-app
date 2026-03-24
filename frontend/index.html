@@ -488,7 +488,7 @@
     }
 
     .arch-card-img {
-      width: 52px; height: 52px;
+      width: 80px; height: 80px;
       border-radius: var(--radius-lg);
       object-fit: cover;
       object-position: top center;
@@ -497,12 +497,12 @@
     }
 
     .arch-card-placeholder {
-      width: 52px; height: 52px;
+      width: 80px; height: 80px;
       border-radius: var(--radius-lg);
       background: var(--card-img-bg);
       display: flex; align-items: center; justify-content: center;
       font-family: 'Playfair Display', serif;
-      font-size: 1.4rem; font-style: italic;
+      font-size: 2rem; font-style: italic;
       color: var(--ink-4); flex-shrink: 0;
     }
 
@@ -891,9 +891,18 @@
           <div class="map-legend-item"><div class="map-legend-dot" style="background:#34d399"></div>Group</div>
           <div class="map-legend-item"><div class="map-legend-dot" style="background:#a78bfa"></div>Other</div>
         </div>
-        <div id="mapCount" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem">— locations</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+          <div class="era-chips" style="gap:0.3rem">
+            <div class="era-chip active" data-map-type="" onclick="setMapTypeFilter(this,'')">All</div>
+            <div class="era-chip" data-map-type="Person" onclick="setMapTypeFilter(this,'Person')">Persons</div>
+            <div class="era-chip" data-map-type="Event" onclick="setMapTypeFilter(this,'Event')">Events</div>
+            <div class="era-chip" data-map-type="Group" onclick="setMapTypeFilter(this,'Group')">Groups</div>
+          </div>
+          <div id="mapCount" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--ink-3)">— locations</div>
+          <button class="era-chip" onclick="refreshMap()" title="Reload map data">↺ Refresh</button>
+        </div>
       </div>
-      <div id="mapContainer" style="height:calc(100vh - 200px);min-height:500px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border)"></div>
+      <div id="mapContainer" style="height:calc(100vh - 220px);min-height:500px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border)"></div>
     </div>
 
   </div>
@@ -958,8 +967,7 @@
       // else already pre-loaded — instant display
     }
     if (view === 'map') {
-      if (!mapLoaded) loadMap();
-      else setTimeout(() => mapInstance && mapInstance.invalidateSize(), 50);
+      loadMap(); // initialises once, uses cache on repeat visits
     }
   }
 
@@ -1016,6 +1024,7 @@
     document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === (state.era_index === -1 ? '' : String(state.era_index))));
     state.century = '';
     loadFigures();
+    if (currentView === 'map') renderMapPins();
   }
 
   function clickEraChip(el, index) {
@@ -1025,6 +1034,7 @@
     document.querySelectorAll('.era-band').forEach((b, i) => b.classList.toggle('active', i === index));
     state.century = '';
     loadFigures();
+    if (currentView === 'map') renderMapPins();
   }
 
   // ── TIMELINE BUILDER ───────────────────────────
@@ -1090,39 +1100,90 @@
 
   // ── MAP ────────────────────────────────────────
   const PIN_COLORS = { 'Person':'#38bdf8', 'Event':'#f0c040', 'Group':'#34d399' };
+  let allMapFigures = [];
+  let mapMarkers = [];
+  let mapTypeFilter = '';
+
   function makePin(color) {
     return L.divIcon({ className:'', html:`<div style="width:16px;height:16px;background:${color};border:2.5px solid rgba(255,255,255,0.85);border-radius:50%;box-shadow:0 0 10px ${color}99,0 2px 4px rgba(0,0,0,0.5);cursor:pointer;"></div>`, iconSize:[16,16], iconAnchor:[8,8], popupAnchor:[0,-12] });
   }
 
-  async function loadMap() {
-    if (mapLoaded) return;
-    mapInstance = L.map('mapContainer', { center:[35,30], zoom:4 });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19 }).addTo(mapInstance);
-    try {
-      const figures = await fetch(`${API}/figures/map`).then(r => r.json());
-      let plotted = 0;
-      figures.forEach(f => {
-        if (!f.birthplace) return;
-        const parts = f.birthplace.split(';');
-        if (parts.length < 2) return;
-        const lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
-        if (isNaN(lat)||isNaN(lng)) return;
-        const color = PIN_COLORS[f.type]||'#a78bfa';
-        const marker = L.marker([lat,lng], { icon:makePin(color) });
-        const initial = (f.name||'?').charAt(0);
-        const imgHtml = f.image_url
-          ? `<img class="map-popup-img" src="${f.image_url}" alt="${f.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            + `<div class="map-popup-placeholder" style="display:none">${initial}</div>`
-          : `<div class="map-popup-placeholder">${initial}</div>`;
-        marker.bindPopup(`<div class="map-popup" onclick="closeMapPopup();openFigure(${f.id})">${imgHtml}<div class="map-popup-info"><div class="map-popup-type">${f.type||''}</div><div class="map-popup-name">${f.name}</div>${f.role_office?`<div class="map-popup-role">${f.role_office}</div>`:''} ${f.century?`<div class="map-popup-century">${f.century} c.</div>`:''}<div class="map-popup-cta">Tap to view profile →</div></div></div>`, {maxWidth:244});
-        marker.addTo(mapInstance);
-        plotted++;
-      });
-      document.getElementById('mapCount').textContent = `${plotted} location${plotted!==1?'s':''} plotted`;
-      mapLoaded = true;
-    } catch(e) { console.error('Map error', e); }
+  function setMapTypeFilter(el, type) {
+    mapTypeFilter = type;
+    document.querySelectorAll('[data-map-type]').forEach(c => c.classList.toggle('active', c.dataset.mapType === type));
+    renderMapPins();
   }
+
+  function renderMapPins() {
+    if (!mapInstance) return;
+    // Clear existing markers
+    mapMarkers.forEach(m => m.remove());
+    mapMarkers = [];
+
+    // Era filter from global state
+    const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th"]];
+    const eraKeywords = state.era_index >= 0 ? eraCenturyMap[state.era_index] : null;
+
+    const filtered = allMapFigures.filter(f => {
+      if (mapTypeFilter && f.type !== mapTypeFilter) return false;
+      if (eraKeywords && f.century && !eraKeywords.some(k => f.century.includes(k))) return false;
+      return true;
+    });
+
+    let plotted = 0;
+    filtered.forEach(f => {
+      if (!f.birthplace) return;
+      const parts = f.birthplace.split(';');
+      if (parts.length < 2) return;
+      const lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
+      if (isNaN(lat)||isNaN(lng)) return;
+      const color = PIN_COLORS[f.type]||'#a78bfa';
+      const marker = L.marker([lat,lng], { icon:makePin(color) });
+      const initial = (f.name||'?').charAt(0);
+      const imgHtml = f.image_url
+        ? `<img class="map-popup-img" src="${f.image_url}" alt="${f.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` +
+          `<div class="map-popup-placeholder" style="display:none">${initial}</div>`
+        : `<div class="map-popup-placeholder">${initial}</div>`;
+      marker.bindPopup(`<div class="map-popup" onclick="closeMapPopup();openFigure(${f.id})">${imgHtml}<div class="map-popup-info"><div class="map-popup-type">${f.type||''}</div><div class="map-popup-name">${f.name}</div>${f.role_office?`<div class="map-popup-role">${f.role_office}</div>`:''} ${f.century?`<div class="map-popup-century">${f.century} c.</div>`:''}<div class="map-popup-cta">Tap to view profile →</div></div></div>`, {maxWidth:244});
+      marker.addTo(mapInstance);
+      mapMarkers.push(marker);
+      plotted++;
+    });
+
+    const countEl = document.getElementById('mapCount');
+    if (countEl) countEl.textContent = `${plotted} location${plotted!==1?'s':''} shown`;
+  }
+
+  async function loadMap() {
+    // Init Leaflet map only once
+    if (!mapLoaded) {
+      mapInstance = L.map('mapContainer', { center:[35,30], zoom:4 });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:19
+      }).addTo(mapInstance);
+      mapLoaded = true;
+    }
+    setTimeout(() => mapInstance && mapInstance.invalidateSize(), 50);
+
+    // Only fetch if we don't have data yet
+    if (allMapFigures.length === 0) {
+      try {
+        allMapFigures = await fetch(`${API}/figures/map`).then(r => r.json());
+      } catch(e) {
+        console.error('Map error', e);
+        return;
+      }
+    }
+    renderMapPins();
+  }
+
   function closeMapPopup() { if (mapInstance) mapInstance.closePopup(); }
+
+  async function refreshMap() {
+    // Force re-fetch by clearing cache
+    allMapFigures = [];
+    await loadMap();
+  }
 
   // ── FILTERS ────────────────────────────────────
   async function loadFilters() {

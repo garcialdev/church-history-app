@@ -23,8 +23,16 @@ def get_figures(
 
     if search:
         where_clauses.append(
-            '(ch."Name_Event" ILIKE :search OR ch."Alternative_Names___Titles" ILIKE :search '
-            'OR ch."Short_Description" ILIKE :search OR ch."Denomination___Tradition" ILIKE :search)'
+            '(ch."Name_Event" ILIKE :search '
+            'OR ch."Alternative_Names___Titles" ILIKE :search '
+            'OR ch."Short_Description" ILIKE :search '
+            'OR ch."Denomination___Tradition" ILIKE :search '
+            'OR ch."Long_Biography_Notes" ILIKE :search '
+            'OR ch."Famous_Quotes" ILIKE :search '
+            'OR ch."Key_Life_Events" ILIKE :search '
+            'OR ch."Major_Works___Writings" ILIKE :search '
+            'OR ch."Primary_Contributions___Accomplishments" ILIKE :search '
+            'OR ch."Associated_Movements" ILIKE :search)'
         )
         params["search"] = f"%{search}%"
 
@@ -378,3 +386,226 @@ def get_filter_options(db: Session):
         "genders": list(genders),
         "denominations": list(denominations),
     }
+
+
+# ── ADMIN QUERIES ─────────────────────────────────────────────────────────────
+
+def admin_get_all_figures(db: Session):
+    """Full list of figures for admin table — all fields."""
+    return db.execute(text("""
+        SELECT
+            id, "Name_Event" AS name, "Type" AS type,
+            "Gender" AS gender, "Century" AS century,
+            "Born___Start" AS born, "Death___End" AS death,
+            "Era_Type__BC_AD_" AS era_type,
+            "Role___Office" AS role_office,
+            "Denomination___Tradition" AS denomination_tradition,
+            "Short_Description" AS short_description,
+            "Wikipedia_Name" AS wikipedia_name,
+            "Cached_Image_URL" AS cached_image_url,
+            "Martyr___Yes_No_" AS is_martyr,
+            "Believer_Saved" AS believer_saved,
+            "Birthplace" AS birthplace,
+            "Region___Location" AS primary_region,
+            "Alternative_Names___Titles" AS alternative_names,
+            nc_order
+        FROM "Church History"
+        ORDER BY nc_order ASC NULLS LAST, id ASC
+    """)).mappings().all()
+
+
+def admin_get_figure(db: Session, figure_id: int):
+    """Full single figure for editing."""
+    return db.execute(text("""
+        SELECT
+            id, "Name_Event" AS name, "Type" AS type,
+            "Gender" AS gender, "Century" AS century,
+            "Born___Start" AS born, "Death___End" AS death,
+            "Era_Type__BC_AD_" AS era_type,
+            "Role___Office" AS role_office,
+            "Denomination___Tradition" AS denomination_tradition,
+            "Alternative_Names___Titles" AS alternative_names,
+            "Short_Description" AS short_description,
+            "Long_Biography_Notes" AS long_biography,
+            "Famous_Quotes" AS famous_quotes,
+            "Major_Works___Writings" AS major_works,
+            "Key_Life_Events" AS key_life_events,
+            "Primary_Contributions___Accomplishments" AS primary_contributions,
+            "Scripture_References" AS scripture_references,
+            "Biblical_Books_Mentioned_In" AS biblical_books,
+            "Associated_Movements" AS associated_movements,
+            "External_References___Sources" AS external_references,
+            "Notes" AS notes,
+            "Birthplace" AS birthplace,
+            "Deathplace" AS deathplace,
+            "Region___Location" AS primary_region,
+            "Wikipedia_Name" AS wikipedia_name,
+            "Cached_Image_URL" AS cached_image_url,
+            "Martyr___Yes_No_" AS is_martyr,
+            "Believer_Saved" AS believer_saved,
+            nc_order
+        FROM "Church History"
+        WHERE id = :id
+    """), {"id": figure_id}).mappings().first()
+
+
+def admin_create_figure(db: Session, data: dict) -> int:
+    """Insert a new figure and return its id."""
+    result = db.execute(text("""
+        INSERT INTO "Church History" (
+            "Name_Event", "Type", "Gender", "Century",
+            "Born___Start", "Death___End", "Era_Type__BC_AD_",
+            "Role___Office", "Denomination___Tradition",
+            "Alternative_Names___Titles", "Short_Description",
+            "Long_Biography_Notes", "Famous_Quotes",
+            "Major_Works___Writings", "Key_Life_Events",
+            "Primary_Contributions___Accomplishments",
+            "Scripture_References", "Biblical_Books_Mentioned_In",
+            "Associated_Movements", "External_References___Sources",
+            "Notes", "Birthplace", "Region___Location",
+            "Wikipedia_Name", "Cached_Image_URL",
+            "Martyr___Yes_No_", "Believer_Saved",
+            created_at, updated_at
+        ) VALUES (
+            :name, :type, :gender, :century,
+            :born, :death, :era_type,
+            :role_office, :denomination,
+            :alternative_names, :short_description,
+            :long_biography, :famous_quotes,
+            :major_works, :key_life_events,
+            :primary_contributions,
+            :scripture_references, :biblical_books,
+            :associated_movements, :external_references,
+            :notes, :birthplace, :primary_region,
+            :wikipedia_name, :cached_image_url,
+            :is_martyr, :believer_saved,
+            NOW(), NOW()
+        )
+        RETURNING id
+    """), data)
+    db.commit()
+    return result.scalar()
+
+
+def admin_update_figure(db: Session, figure_id: int, data: dict):
+    """Update an existing figure."""
+    data["id"] = figure_id
+    db.execute(text("""
+        UPDATE "Church History" SET
+            "Name_Event" = :name,
+            "Type" = :type,
+            "Gender" = :gender,
+            "Century" = :century,
+            "Born___Start" = :born,
+            "Death___End" = :death,
+            "Era_Type__BC_AD_" = :era_type,
+            "Role___Office" = :role_office,
+            "Denomination___Tradition" = :denomination,
+            "Alternative_Names___Titles" = :alternative_names,
+            "Short_Description" = :short_description,
+            "Long_Biography_Notes" = :long_biography,
+            "Famous_Quotes" = :famous_quotes,
+            "Major_Works___Writings" = :major_works,
+            "Key_Life_Events" = :key_life_events,
+            "Primary_Contributions___Accomplishments" = :primary_contributions,
+            "Scripture_References" = :scripture_references,
+            "Biblical_Books_Mentioned_In" = :biblical_books,
+            "Associated_Movements" = :associated_movements,
+            "External_References___Sources" = :external_references,
+            "Notes" = :notes,
+            "Birthplace" = :birthplace,
+            "Region___Location" = :primary_region,
+            "Wikipedia_Name" = :wikipedia_name,
+            "Cached_Image_URL" = :cached_image_url,
+            "Martyr___Yes_No_" = :is_martyr,
+            "Believer_Saved" = :believer_saved,
+            updated_at = NOW()
+        WHERE id = :id
+    """), data)
+    db.commit()
+
+
+def admin_delete_figure(db: Session, figure_id: int):
+    """Delete a figure and its belief/era links."""
+    db.execute(text('DELETE FROM "nc_hxad___nc_m2m_Church History_Beliefs" WHERE "Church History_id" = :id'), {"id": figure_id})
+    db.execute(text('DELETE FROM "nc_hxad___nc_m2m_Church History_Era" WHERE "Church History_id" = :id'), {"id": figure_id})
+    db.execute(text('DELETE FROM "Church History" WHERE id = :id'), {"id": figure_id})
+    db.commit()
+
+
+def admin_get_stats(db: Session) -> dict:
+    """Dashboard stats for admin panel."""
+    total         = db.execute(text('SELECT COUNT(*) FROM "Church History"')).scalar()
+    persons       = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Type" = \'Person\'')).scalar()
+    events        = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Type" = \'Event\'')).scalar()
+    groups        = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Type" = \'Group\'')).scalar()
+    martyrs       = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Martyr___Yes_No_" = \'Yes\'')).scalar()
+    no_desc       = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Short_Description" IS NULL OR "Short_Description" = \'\'')).scalar()
+    no_dates      = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Born___Start" IS NULL AND "Death___End" IS NULL')).scalar()
+    no_image      = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE ("Thumbnail" IS NULL OR "Thumbnail" = \'\') AND ("Cached_Image_URL" IS NULL OR "Cached_Image_URL" = \'\') AND ("Wikipedia_Name" IS NULL OR "Wikipedia_Name" = \'\')')).scalar()
+    no_century    = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Century" IS NULL OR "Century" = \'\'')).scalar()
+    has_coords    = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Birthplace" ~ \'^-?[0-9]+\\.?[0-9]*;-?[0-9]+\\.?[0-9]*$\'')).scalar()
+    cached_images = db.execute(text('SELECT COUNT(*) FROM "Church History" WHERE "Cached_Image_URL" IS NOT NULL AND "Cached_Image_URL" != \'\'')).scalar()
+
+    by_century = db.execute(text("""
+        SELECT "Century", COUNT(*) AS cnt
+        FROM "Church History"
+        WHERE "Century" IS NOT NULL AND "Century" != ''
+        GROUP BY "Century"
+        ORDER BY "Century"
+    """)).mappings().all()
+
+    return {
+        "total": total, "persons": persons, "events": events,
+        "groups": groups, "martyrs": martyrs,
+        "missing_description": no_desc, "missing_dates": no_dates,
+        "missing_image": no_image, "missing_century": no_century,
+        "has_coordinates": has_coords, "cached_images": cached_images,
+        "by_century": [{"century": r["Century"], "count": r["cnt"]} for r in by_century],
+    }
+
+
+def admin_get_beliefs(db: Session):
+    return db.execute(text(
+        'SELECT id, "Belief_Name" AS belief_name, "Description" AS description '
+        'FROM "Beliefs" ORDER BY nc_order ASC NULLS LAST, id ASC'
+    )).mappings().all()
+
+
+def admin_get_figure_belief_ids(db: Session, figure_id: int):
+    rows = db.execute(text(
+        'SELECT "Beliefs_id" FROM "nc_hxad___nc_m2m_Church History_Beliefs" '
+        'WHERE "Church History_id" = :id'
+    ), {"id": figure_id}).scalars().all()
+    return list(rows)
+
+
+def admin_set_figure_beliefs(db: Session, figure_id: int, belief_ids: list):
+    """Replace all belief links for a figure."""
+    db.execute(text(
+        'DELETE FROM "nc_hxad___nc_m2m_Church History_Beliefs" '
+        'WHERE "Church History_id" = :id'
+    ), {"id": figure_id})
+    for bid in belief_ids:
+        db.execute(text(
+            'INSERT INTO "nc_hxad___nc_m2m_Church History_Beliefs" '
+            '("Church History_id", "Beliefs_id") VALUES (:fid, :bid)'
+        ), {"fid": figure_id, "bid": bid})
+    db.commit()
+
+
+def admin_create_belief(db: Session, name: str, description: str) -> int:
+    result = db.execute(text(
+        'INSERT INTO "Beliefs" ("Belief_Name", "Description", created_at, updated_at) '
+        'VALUES (:name, :desc, NOW(), NOW()) RETURNING id'
+    ), {"name": name, "desc": description})
+    db.commit()
+    return result.scalar()
+
+
+def admin_delete_belief(db: Session, belief_id: int):
+    db.execute(text(
+        'DELETE FROM "nc_hxad___nc_m2m_Church History_Beliefs" WHERE "Beliefs_id" = :id'
+    ), {"id": belief_id})
+    db.execute(text('DELETE FROM "Beliefs" WHERE id = :id'), {"id": belief_id})
+    db.commit()

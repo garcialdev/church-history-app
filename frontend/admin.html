@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Church History — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f0f0f; --surface: #1a1a1a; --surface-2: #222; --border: #2a2a2a;
+      --ink: #f0f0f0; --ink-2: #aaa; --ink-3: #666;
+      --accent: #3b82f6; --accent-dim: rgba(59,130,246,0.15);
+      --red: #ef4444; --red-dim: rgba(239,68,68,0.12);
+      --green: #22c55e; --green-dim: rgba(34,197,94,0.12);
+      --gold: #f59e0b;
+      --radius: 6px; --radius-lg: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; font-size: 14px; min-height: 100vh; }
+
+    /* LOGIN */
+    .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; width: 360px; }
+    .login-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .login-sub { color: var(--ink-3); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.78rem; font-weight: 500; color: var(--ink-2); margin-bottom: 0.4rem; letter-spacing: 0.03em; }
+    .form-input { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.9rem; padding: 0.55rem 0.75rem; border-radius: var(--radius); outline: none; transition: border-color 0.15s; }
+    .form-input:focus { border-color: var(--accent); }
+    .form-textarea { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.88rem; padding: 0.55rem 0.75rem; border-radius: var(--radius); outline: none; transition: border-color 0.15s; resize: vertical; min-height: 80px; line-height: 1.5; }
+    .form-textarea:focus { border-color: var(--accent); }
+    .form-select { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.88rem; padding: 0.55rem 0.75rem; border-radius: var(--radius); outline: none; cursor: pointer; appearance: none; }
+    .form-select option { background: var(--surface); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.55rem 1rem; border-radius: var(--radius); border: none; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-danger  { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+    .btn-ghost   { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--ink); border-color: #444; }
+    .btn-sm { padding: 0.3rem 0.65rem; font-size: 0.78rem; }
+    .btn-full { width: 100%; }
+    .error-msg { color: var(--red); font-size: 0.82rem; margin-top: 0.5rem; }
+
+    /* APP LAYOUT */
+    .app { display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
+    .sidebar-logo { padding: 1.25rem 1rem; border-bottom: 1px solid var(--border); }
+    .sidebar-logo-title { font-weight: 700; font-size: 0.95rem; }
+    .sidebar-logo-sub { font-size: 0.72rem; color: var(--ink-3); margin-top: 0.15rem; }
+    .sidebar-nav { flex: 1; padding: 0.75rem 0.5rem; display: flex; flex-direction: column; gap: 0.15rem; }
+    .nav-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.65rem; border-radius: var(--radius); cursor: pointer; background: none; border: none; color: var(--ink-3); font-family: 'Inter', sans-serif; font-size: 0.85rem; text-align: left; width: 100%; transition: all 0.12s; }
+    .nav-item:hover { background: var(--surface-2); color: var(--ink); }
+    .nav-item.active { background: var(--accent-dim); color: var(--accent); }
+    .sidebar-footer { padding: 0.75rem; border-top: 1px solid var(--border); }
+
+    /* MAIN */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 1.5rem; height: 52px; display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+    .topbar-title { font-size: 0.95rem; font-weight: 600; }
+    .topbar-actions { margin-left: auto; display: flex; gap: 0.5rem; }
+    .content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem; }
+    .stat-label { font-size: 0.75rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .stat-card.warn .stat-value { color: var(--gold); }
+    .stat-card.good .stat-value { color: var(--green); }
+    .stat-card.info .stat-value { color: var(--accent); }
+
+    .section-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: 0.75rem; }
+
+    .century-bars { display: flex; flex-direction: column; gap: 0.4rem; }
+    .century-row { display: flex; align-items: center; gap: 0.75rem; }
+    .century-label { font-size: 0.78rem; color: var(--ink-2); width: 60px; flex-shrink: 0; }
+    .century-bar-wrap { flex: 1; background: var(--surface-2); border-radius: 3px; height: 18px; overflow: hidden; }
+    .century-bar { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; display: flex; align-items: center; padding: 0 0.4rem; }
+    .century-bar-num { font-size: 0.68rem; color: #fff; font-weight: 600; white-space: nowrap; }
+
+    /* TABLE */
+    .table-toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .search-input { background: var(--surface); border: 1px solid var(--border); color: var(--ink); font-family: 'Inter', sans-serif; font-size: 0.85rem; padding: 0.45rem 0.75rem; border-radius: var(--radius); outline: none; width: 280px; transition: border-color 0.15s; }
+    .search-input:focus { border-color: var(--accent); }
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: var(--surface-2); padding: 0.6rem 0.85rem; text-align: left; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-2); }
+    .badge { display: inline-block; font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 500; }
+    .badge-person  { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-event   { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-group   { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-default { background: var(--surface-2); color: var(--ink-3); }
+    .td-name { font-weight: 500; color: var(--ink); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .td-actions { display: flex; gap: 0.35rem; }
+
+    /* MODAL / DRAWER */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; justify-content: flex-end; }
+    .drawer { background: var(--surface); border-left: 1px solid var(--border); width: 580px; max-width: 95vw; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; }
+    .drawer-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .drawer-title { font-size: 1rem; font-weight: 600; }
+    .drawer-body { flex: 1; padding: 1.25rem 1.5rem; overflow-y: auto; }
+    .drawer-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; justify-content: flex-end; flex-shrink: 0; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .form-grid .span-2 { grid-column: 1 / -1; }
+    .form-section { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); padding: 0.5rem 0 0.3rem; border-bottom: 1px solid var(--border); margin: 0.5rem 0; grid-column: 1 / -1; }
+
+    /* CONFIRM DIALOG */
+    .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; }
+    .dialog { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; width: 360px; }
+    .dialog-title { font-weight: 600; margin-bottom: 0.5rem; }
+    .dialog-msg { color: var(--ink-2); font-size: 0.88rem; margin-bottom: 1.25rem; line-height: 1.5; }
+    .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.75rem 1.1rem; font-size: 0.85rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 300; animation: slideIn 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
+    .toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
+    .toast.error   { border-color: rgba(239,68,68,0.4); color: var(--red); }
+    @keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    .loading { text-align: center; padding: 3rem; color: var(--ink-3); }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <div class="login-title">⚙ Admin Panel</div>
+    <div class="login-sub">Church History Archive</div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="loginPassword" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="error-msg" id="loginError"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:0.75rem" onclick="doLogin()">Sign In →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="app" style="display:none">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-title">⚙ Admin</div>
+      <div class="sidebar-logo-sub">Church History Archive</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+      <button class="nav-item" id="nav-figures" onclick="showPage('figures')">📚 Figures</button>
+      <button class="nav-item" id="nav-beliefs" onclick="showPage('beliefs')">🏷 Beliefs</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-full btn-sm" onclick="doLogout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions" id="topbarActions"></div>
+    </div>
+    <div class="content" id="content">
+      <div class="loading"><div class="spinner"></div>Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawer" style="display:none" onclick="closeDrawerOnOverlay(event)">
+  <div class="drawer" id="drawerPanel">
+    <div class="drawer-header">
+      <div class="drawer-title" id="drawerTitle">Figure</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-footer" id="drawerFooter"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="dialog-overlay" id="confirmDialog" style="display:none">
+  <div class="dialog">
+    <div class="dialog-title" id="confirmTitle">Confirm</div>
+    <div class="dialog-msg" id="confirmMsg"></div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'https://historyapi.bbs1.net';
+  let token = sessionStorage.getItem('adminToken') || '';
+  let allFigures = [];
+  let filterText = '';
+  let currentPage = 'dashboard';
+
+  // ── AUTH ────────────────────────────────────────
+  async function doLogin() {
+    const pw = document.getElementById('loginPassword').value;
+    document.getElementById('loginError').textContent = '';
+    try {
+      const res = await fetch(`${API}/admin/login`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ password: pw })
+      });
+      if (!res.ok) { document.getElementById('loginError').textContent = 'Incorrect password.'; return; }
+      const data = await res.json();
+      token = data.token;
+      sessionStorage.setItem('adminToken', token);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      showPage('dashboard');
+    } catch(e) { document.getElementById('loginError').textContent = 'Could not reach API.'; }
+  }
+
+  async function doLogout() {
+    await fetch(`${API}/admin/logout`, { method:'POST', headers:{'x-admin-token': token} }).catch(()=>{});
+    token = ''; sessionStorage.removeItem('adminToken');
+    location.reload();
+  }
+
+  function authHeaders() { return { 'Content-Type':'application/json', 'x-admin-token': token }; }
+
+  async function apiFetch(url, opts={}) {
+    opts.headers = { ...authHeaders(), ...(opts.headers||{}) };
+    const res = await fetch(`${API}${url}`, opts);
+    if (res.status === 401) { doLogout(); return null; }
+    return res;
+  }
+
+  // ── NAVIGATION ──────────────────────────────────
+  function showPage(page) {
+    currentPage = page;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById(`nav-${page}`).classList.add('active');
+    if (page === 'dashboard') loadDashboard();
+    else if (page === 'figures') loadFigures();
+    else if (page === 'beliefs') loadBeliefs();
+  }
+
+  // ── DASHBOARD ───────────────────────────────────
+  async function loadDashboard() {
+    document.getElementById('topbarTitle').textContent = 'Dashboard';
+    document.getElementById('topbarActions').innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="runCacheWarmer()">🔄 Refresh Image Cache</button>`;
+    document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div>Loading stats…</div>';
+    const res = await apiFetch('/admin/stats');
+    if (!res) return;
+    const s = await res.json();
+
+    const maxCentury = Math.max(...(s.by_century||[]).map(r=>r.count), 1);
+    const centuryBars = (s.by_century||[]).map(r => {
+      const pct = Math.round((r.count/maxCentury)*100);
+      return `<div class="century-row">
+        <div class="century-label">${r.century}</div>
+        <div class="century-bar-wrap"><div class="century-bar" style="width:${pct}%"><span class="century-bar-num">${r.count}</span></div></div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('content').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card info"><div class="stat-value">${s.total}</div><div class="stat-label">Total Records</div></div>
+        <div class="stat-card"><div class="stat-value">${s.persons}</div><div class="stat-label">Persons</div></div>
+        <div class="stat-card"><div class="stat-value">${s.events}</div><div class="stat-label">Events</div></div>
+        <div class="stat-card"><div class="stat-value">${s.groups}</div><div class="stat-label">Groups</div></div>
+        <div class="stat-card"><div class="stat-value">${s.martyrs}</div><div class="stat-label">Martyred</div></div>
+        <div class="stat-card good"><div class="stat-value">${s.cached_images}</div><div class="stat-label">Images Cached</div></div>
+        <div class="stat-card good"><div class="stat-value">${s.has_coordinates}</div><div class="stat-label">Map Pins</div></div>
+        <div class="stat-card warn"><div class="stat-value">${s.missing_description}</div><div class="stat-label">Missing Description</div></div>
+        <div class="stat-card warn"><div class="stat-value">${s.missing_dates}</div><div class="stat-label">Missing Dates</div></div>
+        <div class="stat-card warn"><div class="stat-value">${s.missing_image}</div><div class="stat-label">No Image Source</div></div>
+        <div class="stat-card warn"><div class="stat-value">${s.missing_century}</div><div class="stat-label">Missing Century</div></div>
+      </div>
+      <div class="section-title">Records by Century</div>
+      <div class="century-bars">${centuryBars}</div>`;
+  }
+
+  async function runCacheWarmer() {
+    showToast('⏳ Running image cache warmer…', 'info');
+    const res = await apiFetch('/admin/cache-images', { method:'POST' });
+    if (!res) return;
+    const data = await res.json();
+    showToast(`✓ Cache done: ${data.updated} updated, ${data.skipped} skipped, ${data.failed} failed`, 'success');
+    loadDashboard();
+  }
+
+  // ── FIGURES TABLE ───────────────────────────────
+  async function loadFigures() {
+    document.getElementById('topbarTitle').textContent = 'Figures';
+    document.getElementById('topbarActions').innerHTML = `<button class="btn btn-primary btn-sm" onclick="openNewFigure()">+ New Figure</button>`;
+    document.getElementById('content').innerHTML = `
+      <div class="table-toolbar">
+        <input class="search-input" id="figureSearch" placeholder="Search figures…" oninput="filterText=this.value;renderFiguresTable()" />
+        <span id="figureCount" style="color:var(--ink-3);font-size:0.82rem;align-self:center"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Name</th><th>Type</th><th>Century</th><th>Born</th><th>Died</th><th>Image</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="figureTableBody"><tr><td colspan="7" style="text-align:center;color:var(--ink-3);padding:2rem"><div class="spinner" style="margin:0 auto"></div></td></tr></tbody>
+        </table>
+      </div>`;
+    const res = await apiFetch('/admin/figures');
+    if (!res) return;
+    allFigures = await res.json();
+    renderFiguresTable();
+  }
+
+  function renderFiguresTable() {
+    const filtered = allFigures.filter(f =>
+      !filterText || (f.name||'').toLowerCase().includes(filterText.toLowerCase()) ||
+      (f.type||'').toLowerCase().includes(filterText.toLowerCase()) ||
+      (f.century||'').toLowerCase().includes(filterText.toLowerCase())
+    );
+
+    const countEl = document.getElementById('figureCount');
+    if (countEl) countEl.textContent = `${filtered.length} of ${allFigures.length} records`;
+
+    const rows = filtered.map(f => {
+      const typeClass = (f.type||'default').toLowerCase();
+      const hasImage = f.cached_image_url || f.wikipedia_name;
+      return `<tr>
+        <td class="td-name">${f.name||'—'}</td>
+        <td><span class="badge badge-${typeClass}">${f.type||'—'}</span></td>
+        <td>${f.century||'—'}</td>
+        <td>${f.born||'—'}</td>
+        <td>${f.death||'—'}</td>
+        <td>${hasImage ? '✓' : '<span style="color:var(--ink-3)">—</span>'}</td>
+        <td class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openEditFigure(${f.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDelete(${f.id},'${(f.name||'').replace(/'/g,"\\'")}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    const tbody = document.getElementById('figureTableBody');
+    if (tbody) tbody.innerHTML = rows || '<tr><td colspan="7" style="text-align:center;color:var(--ink-3);padding:2rem">No records found</td></tr>';
+  }
+
+  // ── FIGURE FORM ─────────────────────────────────
+  function figureForm(f={}) {
+    const v = k => f[k] ?? '';
+    return `
+    <div class="form-grid">
+      <div class="form-section">Core Information</div>
+      <div class="span-2 form-group">
+        <label class="form-label">Name / Event *</label>
+        <input class="form-input" name="name" value="${v('name')}" placeholder="e.g. Augustine of Hippo" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" name="type">
+          <option value="">— Select —</option>
+          ${['Person','Event','Group'].map(t=>`<option value="${t}" ${v('type')===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gender</label>
+        <select class="form-select" name="gender">
+          <option value="">— Select —</option>
+          ${['Male','Female'].map(g=>`<option value="${g}" ${v('gender')===g?'selected':''}>${g}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Century</label>
+        <select class="form-select" name="century">
+          <option value="">— Select —</option>
+          ${['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th'].map(c=>`<option value="${c}" ${v('century')===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Era Type (BC/AD)</label>
+        <select class="form-select" name="era_type">
+          <option value="AD" ${v('era_type')==='AD'?'selected':''}>AD</option>
+          <option value="BC" ${v('era_type')==='BC'?'selected':''}>BC</option>
+          <option value="BC,AD" ${v('era_type')==='BC,AD'?'selected':''}>BC & AD</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Born / Start Year</label>
+        <input class="form-input" name="born" type="number" value="${v('born')}" placeholder="e.g. 354" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Death / End Year</label>
+        <input class="form-input" name="death" type="number" value="${v('death')}" placeholder="e.g. 430" />
+      </div>
+
+      <div class="form-section">Role & Background</div>
+      <div class="form-group">
+        <label class="form-label">Role / Office</label>
+        <input class="form-input" name="role_office" value="${v('role_office')}" placeholder="e.g. Bishop, Apostle" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Denomination / Tradition</label>
+        <input class="form-input" name="denomination" value="${v('denomination_tradition') ?? v('denomination')}" placeholder="e.g. Catholic" />
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Alternative Names / Titles</label>
+        <input class="form-input" name="alternative_names" value="${v('alternative_names')}" placeholder="e.g. Augustine of Hippo, Saint Augustine" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Birthplace (or lat;lng)</label>
+        <input class="form-input" name="birthplace" value="${v('birthplace')}" placeholder="e.g. Thagaste or 36.46;7.47" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Region / Location</label>
+        <input class="form-input" name="primary_region" value="${v('primary_region')}" placeholder="e.g. North Africa" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Martyred?</label>
+        <select class="form-select" name="is_martyr">
+          <option value="">Unknown</option>
+          <option value="Yes" ${v('is_martyr')==='Yes'?'selected':''}>Yes</option>
+          <option value="No" ${v('is_martyr')==='No'?'selected':''}>No</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Believer / Saved?</label>
+        <select class="form-select" name="believer_saved">
+          <option value="">Unknown</option>
+          <option value="Yes" ${v('believer_saved')==='Yes'?'selected':''}>Yes</option>
+          <option value="No" ${v('believer_saved')==='No'?'selected':''}>No</option>
+        </select>
+      </div>
+
+      <div class="form-section">Image</div>
+      <div class="form-group">
+        <label class="form-label">Wikipedia Name (for auto image)</label>
+        <input class="form-input" name="wikipedia_name" value="${v('wikipedia_name')}" placeholder="e.g. Augustine_of_Hippo" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cached Image URL</label>
+        <input class="form-input" name="cached_image_url" value="${v('cached_image_url')}" placeholder="Auto-filled by cache warmer" />
+      </div>
+
+      <div class="form-section">Content</div>
+      <div class="span-2 form-group">
+        <label class="form-label">Short Description</label>
+        <textarea class="form-textarea" name="short_description" placeholder="1–2 sentence overview shown on cards">${v('short_description')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Long Biography Notes</label>
+        <textarea class="form-textarea" name="long_biography" style="min-height:120px" placeholder="Full biography">${v('long_biography')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Key Life Events</label>
+        <textarea class="form-textarea" name="key_life_events">${v('key_life_events')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Primary Contributions / Accomplishments</label>
+        <textarea class="form-textarea" name="primary_contributions">${v('primary_contributions')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Major Works / Writings</label>
+        <textarea class="form-textarea" name="major_works">${v('major_works')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Famous Quotes</label>
+        <textarea class="form-textarea" name="famous_quotes">${v('famous_quotes')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Associated Movements</label>
+        <textarea class="form-textarea" name="associated_movements">${v('associated_movements')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Scripture References</label>
+        <textarea class="form-textarea" name="scripture_references">${v('scripture_references')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Biblical Books Mentioned In</label>
+        <input class="form-input" name="biblical_books" value="${v('biblical_books')}" />
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">External References / Sources</label>
+        <textarea class="form-textarea" name="external_references">${v('external_references')}</textarea>
+      </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" name="notes">${v('notes')}</textarea>
+      </div>
+    </div>`;
+  }
+
+  function collectFormData(form) {
+    const fd = new FormData(form);
+    const data = {};
+    for (const [k,v] of fd.entries()) data[k] = v || null;
+    // coerce numeric fields
+    if (data.born) data.born = parseInt(data.born) || null;
+    if (data.death) data.death = parseInt(data.death) || null;
+    return data;
+  }
+
+  function openNewFigure() {
+    document.getElementById('drawerTitle').textContent = 'New Figure';
+    document.getElementById('drawerBody').innerHTML = `<form id="figureForm">${figureForm()}</form>`;
+    document.getElementById('drawerFooter').innerHTML = `
+      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFigure(null)">Create Figure</button>`;
+    document.getElementById('drawer').style.display = 'flex';
+  }
+
+  async function openEditFigure(id) {
+    document.getElementById('drawerTitle').textContent = 'Edit Figure';
+    document.getElementById('drawerBody').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    document.getElementById('drawerFooter').innerHTML = '';
+    document.getElementById('drawer').style.display = 'flex';
+    const res = await apiFetch(`/admin/figures/${id}`);
+    if (!res) return;
+    const f = await res.json();
+    document.getElementById('drawerBody').innerHTML = `<form id="figureForm">${figureForm(f)}</form>`;
+    document.getElementById('drawerFooter').innerHTML = `
+      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFigure(${id})">Save Changes</button>`;
+  }
+
+  async function saveFigure(id) {
+    const form = document.getElementById('figureForm');
+    if (!form) return;
+    const data = collectFormData(form);
+    if (!data.name) { showToast('Name is required', 'error'); return; }
+
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `/admin/figures/${id}` : '/admin/figures';
+    const res = await apiFetch(url, { method, body: JSON.stringify(data) });
+    if (!res || !res.ok) { showToast('Save failed', 'error'); return; }
+
+    showToast(id ? '✓ Figure updated' : '✓ Figure created', 'success');
+    closeDrawer();
+    loadFigures();
+  }
+
+  // ── BELIEFS PAGE ────────────────────────────────
+  let allBeliefs = [];
+
+  async function loadBeliefs() {
+    document.getElementById('topbarTitle').textContent = 'Beliefs';
+    document.getElementById('topbarActions').innerHTML = `<button class="btn btn-primary btn-sm" onclick="openNewBelief()">+ New Belief</button>`;
+    document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    const res = await apiFetch('/admin/beliefs');
+    if (!res) return;
+    allBeliefs = await res.json();
+    renderBeliefsTable();
+  }
+
+  function renderBeliefsTable() {
+    const rows = allBeliefs.map(b => `
+      <tr>
+        <td style="font-weight:500">${b.belief_name||'—'}</td>
+        <td style="color:var(--ink-3);font-size:0.82rem;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.description||'—'}</td>
+        <td class="td-actions">
+          <button class="btn btn-danger btn-sm" onclick="confirmDeleteBelief(${b.id},'${(b.belief_name||'').replace(/'/g,"\\'")}')">Delete</button>
+        </td>
+      </tr>`).join('');
+
+    document.getElementById('content').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Belief Name</th><th>Description</th><th>Actions</th></tr></thead>
+          <tbody>${rows||'<tr><td colspan="3" style="text-align:center;color:var(--ink-3);padding:2rem">No beliefs found</td></tr>'}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function openNewBelief() {
+    document.getElementById('drawerTitle').textContent = 'New Belief';
+    document.getElementById('drawerBody').innerHTML = `
+      <form id="beliefForm">
+        <div class="form-group">
+          <label class="form-label">Belief Name *</label>
+          <input class="form-input" name="name" placeholder="e.g. Orthodox Christianity" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" name="description" placeholder="Brief description of this belief or tradition" style="min-height:120px"></textarea>
+        </div>
+      </form>`;
+    document.getElementById('drawerFooter').innerHTML = `
+      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBelief()">Create Belief</button>`;
+    document.getElementById('drawer').style.display = 'flex';
+  }
+
+  async function saveBelief() {
+    const form = document.getElementById('beliefForm');
+    const fd = new FormData(form);
+    const name = fd.get('name');
+    const description = fd.get('description');
+    if (!name) { showToast('Name is required', 'error'); return; }
+    const res = await apiFetch('/admin/beliefs', {
+      method: 'POST', body: JSON.stringify({ name, description })
+    });
+    if (!res || !res.ok) { showToast('Failed to create belief', 'error'); return; }
+    showToast('✓ Belief created', 'success');
+    closeDrawer();
+    loadBeliefs();
+  }
+
+  function confirmDeleteBelief(id, name) {
+    document.getElementById('confirmTitle').textContent = 'Delete Belief';
+    document.getElementById('confirmMsg').innerHTML = `Delete <strong>${name}</strong>? This will remove it from all figures.`;
+    document.getElementById('confirmOk').onclick = async () => {
+      closeConfirm();
+      const res = await apiFetch(`/admin/beliefs/${id}`, { method:'DELETE' });
+      if (!res || !res.ok) { showToast('Delete failed', 'error'); return; }
+      showToast('✓ Belief deleted', 'success');
+      loadBeliefs();
+    };
+    document.getElementById('confirmDialog').style.display = 'flex';
+  }
+
+  // ── FIGURE EDIT WITH BELIEFS ────────────────────
+  async function openEditFigure(id) {
+    document.getElementById('drawerTitle').textContent = 'Edit Figure';
+    document.getElementById('drawerBody').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    document.getElementById('drawerFooter').innerHTML = '';
+    document.getElementById('drawer').style.display = 'flex';
+
+    const [figRes, beliefsRes, figBeliefsRes] = await Promise.all([
+      apiFetch(`/admin/figures/${id}`),
+      apiFetch('/admin/beliefs'),
+      apiFetch(`/admin/figures/${id}/beliefs`),
+    ]);
+    if (!figRes) return;
+    const f = await figRes.json();
+    allBeliefs = beliefsRes ? await beliefsRes.json() : [];
+    const linkedIds = figBeliefsRes ? await figBeliefsRes.json() : [];
+
+    const beliefCheckboxes = allBeliefs.map(b => `
+      <label style="display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;cursor:pointer;font-size:0.85rem">
+        <input type="checkbox" name="belief_${b.id}" value="${b.id}" ${linkedIds.includes(b.id)?'checked':''} style="width:14px;height:14px;cursor:pointer" />
+        ${b.belief_name}
+      </label>`).join('');
+
+    document.getElementById('drawerBody').innerHTML = `
+      <form id="figureForm">
+        ${figureForm(f)}
+        <div style="margin-top:1rem">
+          <div class="form-section" style="display:block;margin-bottom:0.75rem">Beliefs & Traditions</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.25rem 1rem">${beliefCheckboxes}</div>
+        </div>
+      </form>`;
+
+    document.getElementById('drawerFooter').innerHTML = `
+      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFigureWithBeliefs(${id})">Save Changes</button>`;
+  }
+
+  async function saveFigureWithBeliefs(id) {
+    const form = document.getElementById('figureForm');
+    if (!form) return;
+    const data = collectFormData(form);
+    if (!data.name) { showToast('Name is required', 'error'); return; }
+
+    // Collect checked belief IDs
+    const checkedBeliefs = [...form.querySelectorAll('input[type="checkbox"]:checked')]
+      .map(cb => parseInt(cb.value));
+
+    const [figRes, beliefsRes] = await Promise.all([
+      apiFetch(`/admin/figures/${id}`, { method:'PUT', body: JSON.stringify(data) }),
+      apiFetch(`/admin/figures/${id}/beliefs`, { method:'PUT', body: JSON.stringify({ belief_ids: checkedBeliefs }) }),
+    ]);
+
+    if (!figRes?.ok) { showToast('Save failed', 'error'); return; }
+    showToast('✓ Figure updated', 'success');
+    closeDrawer();
+    loadFigures();
+  }
+  function confirmDelete(id, name) {
+    document.getElementById('confirmTitle').textContent = 'Delete Figure';
+    document.getElementById('confirmMsg').innerHTML = `Are you sure you want to delete <strong>${name}</strong>? This cannot be undone.`;
+    document.getElementById('confirmOk').onclick = () => deleteFigure(id);
+    document.getElementById('confirmDialog').style.display = 'flex';
+  }
+
+  async function deleteFigure(id) {
+    closeConfirm();
+    const res = await apiFetch(`/admin/figures/${id}`, { method:'DELETE' });
+    if (!res || !res.ok) { showToast('Delete failed', 'error'); return; }
+    showToast('✓ Figure deleted', 'success');
+    loadFigures();
+  }
+
+  function closeConfirm() { document.getElementById('confirmDialog').style.display = 'none'; }
+
+  // ── DRAWER ──────────────────────────────────────
+  function closeDrawer() { document.getElementById('drawer').style.display = 'none'; }
+  function closeDrawerOnOverlay(e) { if(e.target===document.getElementById('drawer')) closeDrawer(); }
+  document.addEventListener('keydown', e => { if(e.key==='Escape') { closeDrawer(); closeConfirm(); } });
+
+  // ── TOAST ───────────────────────────────────────
+  function showToast(msg, type='success') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  // ── AUTO-LOGIN ──────────────────────────────────
+  if (token) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    showPage('dashboard');
+  }
+</script>
+</body>
+</html>

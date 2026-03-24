@@ -7,6 +7,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://miguel:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - NOCODB_BASE_URL=https://nocodb.bbs1.net
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     restart: unless-stopped
     networks:
       - postgres_postgres_net

@@ -287,3 +287,143 @@ def list_filter_options(db: Session = Depends(get_db)):
         "beliefs": [{"id": b["id"], "belief_name": b["belief_name"], "description": b["description"]} for b in beliefs],
         "eras": [{"id": e["id"], "name": e["name"], "time_span": e["time_span"]} for e in eras],
     }
+
+
+# ── ADMIN ROUTES ──────────────────────────────────────────────────────────────
+
+from fastapi import Header
+from fastapi.responses import JSONResponse
+from config import ADMIN_PASSWORD, create_token, validate_token, revoke_token
+from queries import (
+    admin_get_all_figures, admin_get_figure, admin_create_figure,
+    admin_update_figure, admin_delete_figure, admin_get_stats
+)
+from pydantic import BaseModel
+from typing import Any, Dict
+
+def require_admin(x_admin_token: str = Header(...)):
+    if not validate_token(x_admin_token):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    return x_admin_token
+
+
+class LoginRequest(BaseModel):
+    password: str
+
+class FigurePayload(BaseModel):
+    name: str
+    type: Optional[str] = None
+    gender: Optional[str] = None
+    century: Optional[str] = None
+    born: Optional[int] = None
+    death: Optional[int] = None
+    era_type: Optional[str] = None
+    role_office: Optional[str] = None
+    denomination: Optional[str] = None
+    alternative_names: Optional[str] = None
+    short_description: Optional[str] = None
+    long_biography: Optional[str] = None
+    famous_quotes: Optional[str] = None
+    major_works: Optional[str] = None
+    key_life_events: Optional[str] = None
+    primary_contributions: Optional[str] = None
+    scripture_references: Optional[str] = None
+    biblical_books: Optional[str] = None
+    associated_movements: Optional[str] = None
+    external_references: Optional[str] = None
+    notes: Optional[str] = None
+    birthplace: Optional[str] = None
+    primary_region: Optional[str] = None
+    wikipedia_name: Optional[str] = None
+    cached_image_url: Optional[str] = None
+    is_martyr: Optional[str] = None
+    believer_saved: Optional[str] = None
+
+
+@app.post("/admin/login")
+def admin_login(req: LoginRequest):
+    if req.password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Invalid password")
+    return {"token": create_token()}
+
+
+@app.post("/admin/logout")
+def admin_logout(token: str = Depends(require_admin)):
+    revoke_token(token)
+    return {"status": "logged out"}
+
+
+@app.get("/admin/stats")
+def admin_stats(db: Session = Depends(get_db), _=Depends(require_admin)):
+    return admin_get_stats(db)
+
+
+@app.get("/admin/figures")
+def admin_list_figures(db: Session = Depends(get_db), _=Depends(require_admin)):
+    rows = admin_get_all_figures(db)
+    return [dict(r) for r in rows]
+
+
+@app.get("/admin/figures/{figure_id}")
+def admin_get_figure_detail(figure_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
+    row = admin_get_figure(db, figure_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Not found")
+    return dict(row)
+
+
+@app.post("/admin/figures")
+def admin_create(payload: FigurePayload, db: Session = Depends(get_db), _=Depends(require_admin)):
+    new_id = admin_create_figure(db, payload.model_dump())
+    return {"id": new_id, "status": "created"}
+
+
+@app.put("/admin/figures/{figure_id}")
+def admin_update(figure_id: int, payload: FigurePayload, db: Session = Depends(get_db), _=Depends(require_admin)):
+    admin_update_figure(db, figure_id, payload.model_dump())
+    return {"status": "updated"}
+
+
+@app.delete("/admin/figures/{figure_id}")
+def admin_delete(figure_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
+    admin_delete_figure(db, figure_id)
+    return {"status": "deleted"}
+
+
+# ── ADMIN BELIEFS ─────────────────────────────────────────────────────────────
+
+from queries import (
+    admin_get_beliefs, admin_get_figure_belief_ids,
+    admin_set_figure_beliefs, admin_create_belief, admin_delete_belief
+)
+
+class BeliefCreatePayload(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class FigureBeliefsPayload(BaseModel):
+    belief_ids: list[int]
+
+@app.get("/admin/beliefs")
+def admin_list_beliefs(db: Session = Depends(get_db), _=Depends(require_admin)):
+    rows = admin_get_beliefs(db)
+    return [dict(r) for r in rows]
+
+@app.get("/admin/figures/{figure_id}/beliefs")
+def admin_figure_beliefs(figure_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
+    return admin_get_figure_belief_ids(db, figure_id)
+
+@app.put("/admin/figures/{figure_id}/beliefs")
+def admin_update_figure_beliefs(figure_id: int, payload: FigureBeliefsPayload, db: Session = Depends(get_db), _=Depends(require_admin)):
+    admin_set_figure_beliefs(db, figure_id, payload.belief_ids)
+    return {"status": "updated"}
+
+@app.post("/admin/beliefs")
+def admin_create_belief_route(payload: BeliefCreatePayload, db: Session = Depends(get_db), _=Depends(require_admin)):
+    new_id = admin_create_belief(db, payload.name, payload.description or "")
+    return {"id": new_id, "status": "created"}
+
+@app.delete("/admin/beliefs/{belief_id}")
+def admin_delete_belief_route(belief_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
+    admin_delete_belief(db, belief_id)
+    return {"status": "deleted"}
