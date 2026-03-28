@@ -103,6 +103,7 @@ async def get_random_figure(db: Session = Depends(get_db)):
         "associated_movements": row["associated_movements"],
         "external_references": row["external_references"],
         "notes": row["notes"],
+        "deathplace": row["deathplace"],
         "eras": [
             {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
             for e in eras
@@ -118,6 +119,7 @@ async def list_figures(
     century_keywords: Optional[str] = Query(None),
     gender: Optional[str] = Query(None),
     denomination: Optional[str] = Query(None),
+    role_office: Optional[str] = Query(None),
     belief_id: Optional[int] = Query(None),
     is_martyr: Optional[bool] = Query(None),
     sort: Optional[str] = Query(None),
@@ -128,7 +130,7 @@ async def list_figures(
     era_centuries = [k.strip() for k in century_keywords.split(",")] if century_keywords else None
     total, rows = get_figures(
         db, search, type_filter, century, era_centuries, gender,
-        denomination, belief_id, is_martyr, sort, page, page_size
+        denomination, role_office, belief_id, is_martyr, sort, page, page_size
     )
     results = []
     for row in rows:
@@ -163,34 +165,6 @@ async def get_figure_related(figure_id: int, db: Session = Depends(get_db)):
     return results
 
 
-@app.get("/figures/random")
-async def get_random_figure(db: Session = Depends(get_db)):
-    figure_id = get_random_figure_id(db)
-    if not figure_id:
-        raise HTTPException(status_code=404, detail="No figures found")
-    row = get_figure_by_id(db, figure_id)
-    beliefs = get_figure_beliefs(db, figure_id)
-    eras = get_figure_eras(db, figure_id)
-    image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
-    return {
-        **map_row_to_card(row, beliefs, image_url),
-        "long_biography": row["long_biography"],
-        "famous_quotes": row["famous_quotes"],
-        "major_works": row["major_works"],
-        "key_life_events": row["key_life_events"],
-        "primary_contributions": row["primary_contributions"],
-        "scripture_references": row["scripture_references"],
-        "biblical_books": row["biblical_books"],
-        "associated_movements": row["associated_movements"],
-        "external_references": row["external_references"],
-        "notes": row["notes"],
-        "eras": [
-            {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
-            for e in eras
-        ],
-    }
-
-
 @app.get("/figures/{figure_id}", response_model=FigureDetail)
 async def get_figure(figure_id: int, db: Session = Depends(get_db)):
     row = get_figure_by_id(db, figure_id)
@@ -213,6 +187,7 @@ async def get_figure(figure_id: int, db: Session = Depends(get_db)):
         "associated_movements": row["associated_movements"],
         "external_references": row["external_references"],
         "notes": row["notes"],
+        "deathplace": row["deathplace"],
         "eras": [
             {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
             for e in eras
@@ -286,6 +261,7 @@ def list_filter_options(db: Session = Depends(get_db)):
         **opts,
         "beliefs": [{"id": b["id"], "belief_name": b["belief_name"], "description": b["description"]} for b in beliefs],
         "eras": [{"id": e["id"], "name": e["name"], "time_span": e["time_span"]} for e in eras],
+        "role_offices": opts["role_offices"],
     }
 
 
@@ -333,6 +309,7 @@ class FigurePayload(BaseModel):
     external_references: Optional[str] = None
     notes: Optional[str] = None
     birthplace: Optional[str] = None
+    deathplace: Optional[str] = None
     primary_region: Optional[str] = None
     wikipedia_name: Optional[str] = None
     cached_image_url: Optional[str] = None
@@ -394,7 +371,7 @@ def admin_delete(figure_id: int, db: Session = Depends(get_db), _=Depends(requir
 
 from queries import (
     admin_get_beliefs, admin_get_figure_belief_ids,
-    admin_set_figure_beliefs, admin_create_belief, admin_delete_belief
+    admin_set_figure_beliefs, admin_create_belief, admin_update_belief, admin_delete_belief
 )
 
 class BeliefCreatePayload(BaseModel):
@@ -422,6 +399,11 @@ def admin_update_figure_beliefs(figure_id: int, payload: FigureBeliefsPayload, d
 def admin_create_belief_route(payload: BeliefCreatePayload, db: Session = Depends(get_db), _=Depends(require_admin)):
     new_id = admin_create_belief(db, payload.name, payload.description or "")
     return {"id": new_id, "status": "created"}
+
+@app.put("/admin/beliefs/{belief_id}")
+def admin_update_belief_route(belief_id: int, payload: BeliefCreatePayload, db: Session = Depends(get_db), _=Depends(require_admin)):
+    admin_update_belief(db, belief_id, payload.name, payload.description or "")
+    return {"status": "updated"}
 
 @app.delete("/admin/beliefs/{belief_id}")
 def admin_delete_belief_route(belief_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):

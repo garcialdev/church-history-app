@@ -110,7 +110,8 @@
 
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
     .form-grid .span-2 { grid-column: 1 / -1; }
-    .form-section { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); padding: 0.5rem 0 0.3rem; border-bottom: 1px solid var(--border); margin: 0.5rem 0; grid-column: 1 / -1; }
+    .form-section { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); padding: 0.75rem 0 0.4rem; border-bottom: 1px solid var(--border); margin: 0.75rem 0 0.25rem; grid-column: 1 / -1; display: flex; align-items: center; gap: 0.5rem; }
+    .form-section::before { content: ''; display: block; width: 3px; height: 14px; background: var(--accent); border-radius: 2px; flex-shrink: 0; }
 
     /* CONFIRM DIALOG */
     .dialog-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: flex; align-items: center; justify-content: center; }
@@ -120,9 +121,11 @@
     .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
 
     /* TOAST */
-    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 0.75rem 1.1rem; font-size: 0.85rem; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 300; animation: slideIn 0.2s ease; display: flex; align-items: center; gap: 0.5rem; }
-    .toast.success { border-color: rgba(34,197,94,0.4); color: var(--green); }
-    .toast.error   { border-color: rgba(239,68,68,0.4); color: var(--red); }
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; border-radius: var(--radius-lg); padding: 1rem 1.25rem; font-size: 0.9rem; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 300; animation: slideIn 0.2s ease; display: flex; align-items: center; gap: 0.6rem; min-width: 260px; }
+    .toast.success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #4ade80; }
+    .toast.error   { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #f87171; }
+    .toast.info    { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.4); color: #60a5fa; }
+    .btn-loading   { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
     @keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
     .loading { text-align: center; padding: 3rem; color: var(--ink-3); }
@@ -130,6 +133,73 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* BOTTOM NAV (mobile only) */
+    .bottom-nav { display: none; }
+
+    @media (max-width: 640px) {
+      /* Hide sidebar, use bottom nav instead */
+      .sidebar { display: none; }
+
+      /* Bottom nav bar */
+      .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 60px;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        z-index: 50;
+      }
+      .bottom-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: none;
+        border: none;
+        color: var(--ink-3);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.62rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.12s;
+        padding: 0;
+      }
+      .bottom-nav-item .nav-icon { font-size: 1.3rem; line-height: 1; }
+      .bottom-nav-item.active { color: var(--accent); }
+      .bottom-nav-item:hover { color: var(--ink); }
+
+      /* Push content up above bottom nav */
+      .main { padding-bottom: 60px; }
+      .content { padding-bottom: env(safe-area-inset-bottom, 0); }
+
+      /* Drawer goes full-width, slides up from bottom */
+      .drawer-overlay { align-items: flex-end; }
+      .drawer { width: 100vw; height: 92vh; border-left: none; border-top: 1px solid var(--border); border-radius: 12px 12px 0 0; }
+      .drawer-body { padding: 1rem; }
+      .drawer-header, .drawer-footer { padding: 0.85rem 1rem; }
+
+      /* Single-column form */
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .span-2 { grid-column: 1; }
+
+      /* Larger touch targets */
+      .form-input, .form-select, .form-textarea { font-size: 1rem; padding: 0.75rem; }
+      .btn { padding: 0.7rem 1rem; font-size: 0.9rem; min-height: 44px; }
+
+      /* Topbar */
+      .topbar { padding: 0 0.75rem; }
+      .topbar-actions .btn { min-width: 44px; }
+
+      /* Table */
+      .table-wrap { overflow-x: auto; }
+      .search-input { width: 100%; font-size: 1rem; padding: 0.65rem 0.75rem; }
+      .table-toolbar { flex-direction: column; }
+      td, th { white-space: nowrap; }
+    }
   </style>
 </head>
 <body>
@@ -174,7 +244,26 @@
       <div class="loading"><div class="spinner"></div>Loading…</div>
     </div>
   </div>
+
+  <!-- Bottom navigation bar (mobile only) -->
+  <nav class="bottom-nav">
+    <button class="bottom-nav-item active" id="bnav-dashboard" onclick="showPage('dashboard')">
+      <span class="nav-icon">📊</span>Dashboard
+    </button>
+    <button class="bottom-nav-item" id="bnav-figures" onclick="showPage('figures')">
+      <span class="nav-icon">📚</span>Figures
+    </button>
+    <button class="bottom-nav-item" id="bnav-beliefs" onclick="showPage('beliefs')">
+      <span class="nav-icon">🏷</span>Beliefs
+    </button>
+    <button class="bottom-nav-item" onclick="doLogout()">
+      <span class="nav-icon">↩</span>Sign Out
+    </button>
+  </nav>
 </div>
+
+<!-- Shared datalists for form inputs -->
+<datalist id="roleOptionsList"></datalist>
 
 <!-- DRAWER -->
 <div class="drawer-overlay" id="drawer" style="display:none" onclick="closeDrawerOnOverlay(event)">
@@ -206,6 +295,19 @@
   let allFigures = [];
   let filterText = '';
   let currentPage = 'dashboard';
+  let roleOfficeOptions = [];
+
+  async function loadFilterOptions() {
+    try {
+      const res = await fetch(`${API}/filters`);
+      if (!res.ok) return;
+      const data = await res.json();
+      roleOfficeOptions = data.role_offices || [];
+      const dl = document.getElementById('roleOptionsList');
+      if (dl) dl.innerHTML = roleOfficeOptions.map(r => `<option value="${r.replace(/"/g,'&quot;')}"></option>`).join('');
+    } catch(e) { /* non-critical */ }
+  }
+  loadFilterOptions();
 
   // ── AUTH ────────────────────────────────────────
   async function doLogin() {
@@ -246,6 +348,9 @@
     currentPage = page;
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     document.getElementById(`nav-${page}`).classList.add('active');
+    document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+    const bnavEl = document.getElementById(`bnav-${page}`);
+    if (bnavEl) bnavEl.classList.add('active');
     if (page === 'dashboard') loadDashboard();
     else if (page === 'figures') loadFigures();
     else if (page === 'beliefs') loadBeliefs();
@@ -352,8 +457,12 @@
   }
 
   // ── FIGURE FORM ─────────────────────────────────
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
   function figureForm(f={}) {
-    const v = k => f[k] ?? '';
+    const v = k => esc(f[k] ?? '');
     return `
     <div class="form-grid">
       <div class="form-section">Core Information</div>
@@ -379,7 +488,7 @@
         <label class="form-label">Century</label>
         <select class="form-select" name="century">
           <option value="">— Select —</option>
-          ${['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th'].map(c=>`<option value="${c}" ${v('century')===c?'selected':''}>${c}</option>`).join('')}
+          ${['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th','17th','18th','19th','20th','21st'].map(c=>`<option value="${c}" ${v('century')===c?'selected':''}>${c}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
@@ -402,11 +511,11 @@
       <div class="form-section">Role & Background</div>
       <div class="form-group">
         <label class="form-label">Role / Office</label>
-        <input class="form-input" name="role_office" value="${v('role_office')}" placeholder="e.g. Bishop, Apostle" />
+        <input class="form-input" name="role_office" list="roleOptionsList" autocomplete="off" value="${v('role_office')}" placeholder="e.g. Bishop, Apostle" />
       </div>
       <div class="form-group">
         <label class="form-label">Denomination / Tradition</label>
-        <input class="form-input" name="denomination" value="${v('denomination_tradition') ?? v('denomination')}" placeholder="e.g. Catholic" />
+        <input class="form-input" name="denomination" value="${esc(f['denomination_tradition'] || f['denomination'] || '')}" placeholder="e.g. Catholic" />
       </div>
       <div class="span-2 form-group">
         <label class="form-label">Alternative Names / Titles</label>
@@ -415,6 +524,10 @@
       <div class="form-group">
         <label class="form-label">Birthplace (or lat;lng)</label>
         <input class="form-input" name="birthplace" value="${v('birthplace')}" placeholder="e.g. Thagaste or 36.46;7.47" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deathplace</label>
+        <input class="form-input" name="deathplace" value="${v('deathplace')}" placeholder="e.g. Hippo Regius" />
       </div>
       <div class="form-group">
         <label class="form-label">Region / Location</label>
@@ -505,7 +618,8 @@
     return data;
   }
 
-  function openNewFigure() {
+  async function openNewFigure() {
+    await loadFilterOptions();
     document.getElementById('drawerTitle').textContent = 'New Figure';
     document.getElementById('drawerBody').innerHTML = `<form id="figureForm">${figureForm()}</form>`;
     document.getElementById('drawerFooter').innerHTML = `
@@ -514,32 +628,24 @@
     document.getElementById('drawer').style.display = 'flex';
   }
 
-  async function openEditFigure(id) {
-    document.getElementById('drawerTitle').textContent = 'Edit Figure';
-    document.getElementById('drawerBody').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
-    document.getElementById('drawerFooter').innerHTML = '';
-    document.getElementById('drawer').style.display = 'flex';
-    const res = await apiFetch(`/admin/figures/${id}`);
-    if (!res) return;
-    const f = await res.json();
-    document.getElementById('drawerBody').innerHTML = `<form id="figureForm">${figureForm(f)}</form>`;
-    document.getElementById('drawerFooter').innerHTML = `
-      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveFigure(${id})">Save Changes</button>`;
-  }
-
   async function saveFigure(id) {
     const form = document.getElementById('figureForm');
     if (!form) return;
     const data = collectFormData(form);
     if (!data.name) { showToast('Name is required', 'error'); return; }
 
+    const btn = document.querySelector('.drawer-footer .btn-primary');
+    const originalText = btn?.textContent;
+    if (btn) { btn.textContent = 'Saving…'; btn.classList.add('btn-loading'); }
+
     const method = id ? 'PUT' : 'POST';
     const url = id ? `/admin/figures/${id}` : '/admin/figures';
     const res = await apiFetch(url, { method, body: JSON.stringify(data) });
-    if (!res || !res.ok) { showToast('Save failed', 'error'); return; }
 
-    showToast(id ? '✓ Figure updated' : '✓ Figure created', 'success');
+    if (btn) { btn.textContent = originalText; btn.classList.remove('btn-loading'); }
+    if (!res || !res.ok) { showToast('❌ Save failed — check the console', 'error'); return; }
+
+    showToast(id ? '✓ Figure updated successfully' : '✓ Figure created successfully', 'success');
     closeDrawer();
     loadFigures();
   }
@@ -560,9 +666,10 @@
   function renderBeliefsTable() {
     const rows = allBeliefs.map(b => `
       <tr>
-        <td style="font-weight:500">${b.belief_name||'—'}</td>
-        <td style="color:var(--ink-3);font-size:0.82rem;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.description||'—'}</td>
+        <td style="font-weight:500">${esc(b.belief_name)||'—'}</td>
+        <td style="color:var(--ink-3);font-size:0.82rem;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(b.description)||'—'}</td>
         <td class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openEditBelief(${b.id})">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="confirmDeleteBelief(${b.id},'${(b.belief_name||'').replace(/'/g,"\\'")}')">Delete</button>
         </td>
       </tr>`).join('');
@@ -606,6 +713,42 @@
     });
     if (!res || !res.ok) { showToast('Failed to create belief', 'error'); return; }
     showToast('✓ Belief created', 'success');
+    closeDrawer();
+    loadBeliefs();
+  }
+
+  function openEditBelief(id) {
+    const b = allBeliefs.find(b => b.id === id);
+    if (!b) return;
+    document.getElementById('drawerTitle').textContent = 'Edit Belief';
+    document.getElementById('drawerBody').innerHTML = `
+      <form id="beliefForm">
+        <div class="form-group">
+          <label class="form-label">Belief Name *</label>
+          <input class="form-input" name="name" value="${esc(b.belief_name)}" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" name="description" style="min-height:120px">${esc(b.description)}</textarea>
+        </div>
+      </form>`;
+    document.getElementById('drawerFooter').innerHTML = `
+      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+      <button class="btn btn-primary" onclick="updateBelief(${id})">Save Changes</button>`;
+    document.getElementById('drawer').style.display = 'flex';
+  }
+
+  async function updateBelief(id) {
+    const form = document.getElementById('beliefForm');
+    const fd = new FormData(form);
+    const name = fd.get('name');
+    const description = fd.get('description');
+    if (!name) { showToast('Name is required', 'error'); return; }
+    const res = await apiFetch(`/admin/beliefs/${id}`, {
+      method: 'PUT', body: JSON.stringify({ name, description })
+    });
+    if (!res || !res.ok) { showToast('Failed to update belief', 'error'); return; }
+    showToast('✓ Belief updated', 'success');
     closeDrawer();
     loadBeliefs();
   }
@@ -666,7 +809,10 @@
     const data = collectFormData(form);
     if (!data.name) { showToast('Name is required', 'error'); return; }
 
-    // Collect checked belief IDs
+    const btn = document.querySelector('.drawer-footer .btn-primary');
+    const originalText = btn?.textContent;
+    if (btn) { btn.textContent = 'Saving…'; btn.classList.add('btn-loading'); }
+
     const checkedBeliefs = [...form.querySelectorAll('input[type="checkbox"]:checked')]
       .map(cb => parseInt(cb.value));
 
@@ -675,8 +821,10 @@
       apiFetch(`/admin/figures/${id}/beliefs`, { method:'PUT', body: JSON.stringify({ belief_ids: checkedBeliefs }) }),
     ]);
 
-    if (!figRes?.ok) { showToast('Save failed', 'error'); return; }
-    showToast('✓ Figure updated', 'success');
+    if (btn) { btn.textContent = originalText; btn.classList.remove('btn-loading'); }
+    if (!figRes?.ok) { showToast('❌ Save failed — check the console', 'error'); return; }
+
+    showToast('✓ Figure updated successfully', 'success');
     closeDrawer();
     loadFigures();
   }
@@ -708,7 +856,7 @@
     t.className = `toast ${type}`;
     t.textContent = msg;
     document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
+    setTimeout(() => t.remove(), 5000);
   }
 
   // ── AUTO-LOGIN ──────────────────────────────────

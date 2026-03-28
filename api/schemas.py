@@ -55,6 +55,7 @@ class FigureDetail(FigureCard):
     associated_movements: Optional[str] = None
     external_references: Optional[str] = None
     notes: Optional[str] = None
+    deathplace: Optional[str] = None
     eras: List[EraBase] = []
 
     class Config:
@@ -73,5 +74,6 @@ class FilterOptions(BaseModel):
     centuries: List[str]
     genders: List[str]
     denominations: List[str]
+    role_offices: List[str]
     beliefs: List[BeliefBase]
     eras: List[EraBase]

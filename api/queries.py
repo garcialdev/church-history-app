@@ -11,6 +11,7 @@ def get_figures(
     era_centuries: Optional[list] = None,
     gender: Optional[str] = None,
     denomination: Optional[str] = None,
+    role_office: Optional[str] = None,
     belief_id: Optional[int] = None,
     is_martyr: Optional[bool] = None,
     sort: Optional[str] = None,
@@ -45,13 +46,12 @@ def get_figures(
         params["century"] = century
 
     if era_centuries:
-        # Match any century keyword using ILIKE to handle compound values like '1st & 2nd'
-        ilike_parts = " OR ".join(
-            f'ch."Century" ILIKE :ec{i}' for i in range(len(era_centuries))
-        )
-        where_clauses.append(f'({ilike_parts})')
+        # Use exact equality via = ANY() to avoid partial matches
+        # e.g. ILIKE '%6th%' would wrongly match '16th'
+        placeholders = ", ".join(f":ec{i}" for i in range(len(era_centuries)))
+        where_clauses.append(f'ch."Century" IN ({placeholders})')
         for i, kw in enumerate(era_centuries):
-            params[f"ec{i}"] = f"%{kw}%"
+            params[f"ec{i}"] = kw
 
     if gender:
         where_clauses.append('ch."Gender" = :gender')
@@ -60,6 +60,10 @@ def get_figures(
     if denomination:
         where_clauses.append('ch."Denomination___Tradition" ILIKE :denomination')
         params["denomination"] = f"%{denomination}%"
+
+    if role_office:
+        where_clauses.append('ch."Role___Office" = :role_office')
+        params["role_office"] = role_office
 
     if is_martyr is not None:
         params["martyr"] = "Yes" if is_martyr else "No"
@@ -83,8 +87,8 @@ def get_figures(
         "name_desc":    'ch."Name_Event" DESC NULLS LAST',
         "date_asc":     'COALESCE(ch."Born___Start", ch."Death___End") ASC NULLS LAST',
         "date_desc":    'COALESCE(ch."Born___Start", ch."Death___End") DESC NULLS LAST',
-        "century_asc":  'ch."Century" ASC NULLS LAST',
-        "century_desc": 'ch."Century" DESC NULLS LAST',
+        "century_asc":  'CAST(REGEXP_REPLACE(ch."Century", \'[^0-9]\', \'\', \'g\') AS INTEGER) ASC NULLS LAST',
+        "century_desc": 'CAST(REGEXP_REPLACE(ch."Century", \'[^0-9]\', \'\', \'g\') AS INTEGER) DESC NULLS LAST',
         "type":         'ch."Type" ASC NULLS LAST, ch."Name_Event" ASC NULLS LAST',
     }
     order_clause = sort_map.get(sort, 'ch.nc_order ASC NULLS LAST, ch.id ASC')
@@ -134,34 +138,11 @@ def get_map_figures(db: Session):
             ch."Birthplace"         AS birthplace,
             ch."Thumbnail"          AS thumbnail_json,
             ch."Wikipedia_Name"     AS wikipedia_name,
-            ch."Cached_Image_URL"          AS cached_image_url,
+            ch."Cached_Image_URL"   AS cached_image_url,
             SPLIT_PART(ch."Birthplace", ';', 1)::float AS lat,
             SPLIT_PART(ch."Birthplace", ';', 2)::float AS lng
         FROM "Church History" ch
         WHERE ch."Birthplace" IS NOT NULL
-        AND ch."Birthplace" LIKE '%;%'
-        AND ch."Name_Event" IS NOT NULL
-        AND ch."Name_Event" != ''
-        ORDER BY ch."Name_Event" ASC
-    """)).mappings().all()
-
-
-def get_map_figures(db: Session):
-    """Fetch all figures that have coordinates in their Birthplace field."""
-    return db.execute(text("""
-        SELECT
-            ch.id,
-            ch."Name_Event"       AS name,
-            ch."Type"             AS type,
-            ch."Role___Office"    AS role_office,
-            ch."Century"          AS century,
-            ch."Birthplace"       AS birthplace,
-            ch."Thumbnail"        AS thumbnail_json,
-            ch."Wikipedia_Name"   AS wikipedia_name,
-        ch."Cached_Image_URL"  AS cached_image_url
-        FROM "Church History" ch
-        WHERE ch."Birthplace" IS NOT NULL
-        AND ch."Birthplace" != ''
         AND ch."Birthplace" ~ '^-?[0-9]+\.?[0-9]*;-?[0-9]+\.?[0-9]*$'
         AND ch."Name_Event" IS NOT NULL
         AND ch."Name_Event" != ''
@@ -267,6 +248,7 @@ def get_figure_by_id(db: Session, figure_id: int):
             ch."Era_Type__BC_AD_"                        AS era_type,
             ch."Century"                                 AS century,
             ch."Birthplace"                              AS birthplace,
+            ch."Deathplace"                              AS deathplace,
             ch."Region___Location"                        AS primary_region,
             ch."Short_Description"                       AS short_description,
             ch."Long_Biography_Notes"                    AS long_biography,
@@ -331,29 +313,17 @@ def get_era_range_counts(db: Session):
         ("Apostolic Age",         30,   100,  ["1st"]),
         ("Early Church",         100,   313,  ["2nd", "3rd"]),
         ("Medieval Church",      313,  1517,  ["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"]),
-        ("Reformation & Beyond", 1517, 1900,  ["16th"]),
+        ("Reformation & Beyond", 1517, 1900,  ["16th","17th","18th","19th","20th","21st"]),
     ]
     results = []
     for label, start, end, century_keywords in ranges:
-        ilike_clauses = " OR ".join(
-            f'"Century" ILIKE :kw{i}' for i in range(len(century_keywords))
-        )
-        ilike_params = {f"kw{i}": f"%{kw}%" for i, kw in enumerate(century_keywords)}
+        placeholders = ", ".join(f":kw{i}" for i in range(len(century_keywords)))
+        exact_params = {f"kw{i}": kw for i, kw in enumerate(century_keywords)}
 
         row = db.execute(text(f"""
             SELECT COUNT(DISTINCT id) FROM "Church History"
-            WHERE
-                -- Primary: Century field matches this era
-                ({ilike_clauses})
-                OR (
-                    -- Fallback: no Century set, but dates fall in range
-                    ("Century" IS NULL OR "Century" = '')
-                    AND (
-                        ("Born___Start" IS NOT NULL AND "Born___Start" >= :start AND "Born___Start" < :end)
-                        OR ("Death___End" IS NOT NULL AND "Death___End" >= :start AND "Death___End" < :end)
-                    )
-                )
-        """), {"start": start, "end": end, **ilike_params}).scalar()
+            WHERE "Century" IN ({placeholders})
+        """), exact_params).scalar()
         results.append({"label": label, "start": start, "end": end, "count": row or 0})
     return results
 
@@ -380,11 +350,18 @@ def get_filter_options(db: Session):
         'ORDER BY "Denomination___Tradition"'
     )).scalars().all()
 
+    role_offices = db.execute(text(
+        'SELECT DISTINCT "Role___Office" FROM "Church History" '
+        'WHERE "Role___Office" IS NOT NULL AND "Role___Office" != \'\' '
+        'ORDER BY "Role___Office"'
+    )).scalars().all()
+
     return {
         "types": list(types),
         "centuries": list(centuries),
         "genders": list(genders),
         "denominations": list(denominations),
+        "role_offices": list(role_offices),
     }
 
 
@@ -462,7 +439,7 @@ def admin_create_figure(db: Session, data: dict) -> int:
             "Primary_Contributions___Accomplishments",
             "Scripture_References", "Biblical_Books_Mentioned_In",
             "Associated_Movements", "External_References___Sources",
-            "Notes", "Birthplace", "Region___Location",
+            "Notes", "Birthplace", "Deathplace", "Region___Location",
             "Wikipedia_Name", "Cached_Image_URL",
             "Martyr___Yes_No_", "Believer_Saved",
             created_at, updated_at
@@ -476,7 +453,7 @@ def admin_create_figure(db: Session, data: dict) -> int:
             :primary_contributions,
             :scripture_references, :biblical_books,
             :associated_movements, :external_references,
-            :notes, :birthplace, :primary_region,
+            :notes, :birthplace, :deathplace, :primary_region,
             :wikipedia_name, :cached_image_url,
             :is_martyr, :believer_saved,
             NOW(), NOW()
@@ -514,6 +491,7 @@ def admin_update_figure(db: Session, figure_id: int, data: dict):
             "External_References___Sources" = :external_references,
             "Notes" = :notes,
             "Birthplace" = :birthplace,
+            "Deathplace" = :deathplace,
             "Region___Location" = :primary_region,
             "Wikipedia_Name" = :wikipedia_name,
             "Cached_Image_URL" = :cached_image_url,
@@ -601,6 +579,13 @@ def admin_create_belief(db: Session, name: str, description: str) -> int:
     ), {"name": name, "desc": description})
     db.commit()
     return result.scalar()
+
+
+def admin_update_belief(db: Session, belief_id: int, name: str, description: str):
+    db.execute(text(
+        'UPDATE "Beliefs" SET "Belief_Name" = :name, "Description" = :desc, updated_at = NOW() WHERE id = :id'
+    ), {"name": name, "desc": description, "id": belief_id})
+    db.commit()
 
 
 def admin_delete_belief(db: Session, belief_id: int):

@@ -772,6 +772,16 @@
     <div class="nav-section-label" style="margin-top:0.5rem">Filter by Gender</div>
     <div id="sidebarGenderChips" style="padding:0 0.25rem;display:flex;flex-direction:column;gap:0.15rem"></div>
 
+    <div class="nav-section-label" style="margin-top:0.5rem">Role / Office</div>
+    <select id="roleSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
+      <option value="">All Roles</option>
+    </select>
+
+    <div class="nav-section-label" style="margin-top:0.5rem">Denomination</div>
+    <select id="denominationSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
+      <option value="">All Denominations</option>
+    </select>
+
     <div class="nav-section-label" style="margin-top:0.5rem">Beliefs</div>
     <select id="beliefSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
       <option value="">All Beliefs</option>
@@ -922,6 +932,7 @@
   // ── STATE ──────────────────────────────────────
   let state = {
     search:'', type:'', century:'', gender:'',
+    denomination:'', role_office:'',
     belief_id:'', is_martyr:'', page:1, total:0,
     era_index:-1, sort:'default'
   };
@@ -1039,7 +1050,7 @@
 
   // ── TIMELINE BUILDER ───────────────────────────
   function centuryToYear(c) {
-    const map = {'1st':50,'2nd':150,'3rd':250,'4th':350,'5th':450,'6th':550,'7th':650,'8th':750,'9th':850,'10th':950,'11th':1050,'12th':1150,'13th':1250,'14th':1350,'15th':1450,'16th':1550};
+    const map = {'1st':50,'2nd':150,'3rd':250,'4th':350,'5th':450,'6th':550,'7th':650,'8th':750,'9th':850,'10th':950,'11th':1050,'12th':1150,'13th':1250,'14th':1350,'15th':1450,'16th':1550,'17th':1650,'18th':1750,'19th':1850,'20th':1950,'21st':2000};
     return map[c] || null;
   }
   function getFigureYear(f) { return f.born || f.death || centuryToYear(f.century); }
@@ -1085,11 +1096,11 @@
           const dates = formatDates(f.born, f.death, f.era_type);
           return `<div class="tl-card" onclick="openFigure(${f.id})">${f.is_martyr==='Yes'?'<div class="tl-martyr-dot"></div>':''}<div class="tl-card-inner">${imgHtml}<div class="tl-card-info"><div class="tl-card-type">${f.type||''}</div><div class="tl-card-name">${f.name||''}</div>${f.role_office?`<div class="tl-card-role">${f.role_office}</div>`:''} ${dates?`<div class="tl-card-dates">${dates}</div>`:''}</div></div></div>`;
         }).join('');
-        html += `<div class="tl-fig-col" style="left:${x}px" data-century="${group[0].century||''}">${cards}</div>`;
+        html += `<div class="tl-fig-col" style="left:${x}px" data-century="${group[0].century || deriveCentury(group[0].born, group[0].death) || ''}">${cards}</div>`;
       });
       html += `</div>`;
       if (noDate.length) {
-        html += `<div style="margin-top:1.5rem;padding:0.75rem 0;border-top:1px solid var(--border-light)"><div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:0.75rem">Date Unknown</div><div style="display:flex;flex-wrap:wrap;gap:0.5rem">${noDate.map(f=>{const initial=(f.name||'?').charAt(0);const imgHtml=f.image_url?`<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`:`<div class="tl-card-placeholder">${initial}</div>`;return `<div class="tl-card" style="width:200px" onclick="openFigure(${f.id})"><div class="tl-card-inner">${imgHtml}<div class="tl-card-info"><div class="tl-card-type">${f.type||''}</div><div class="tl-card-name">${f.name||''}</div>${f.century?`<div class="tl-card-dates">${f.century} c.</div>`:''}</div></div></div>`;}).join('')}</div></div>`;
+        html += `<div style="margin-top:1.5rem;padding:0.75rem 0;border-top:1px solid var(--border-light)"><div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:0.75rem">Date Unknown</div><div style="display:flex;flex-wrap:wrap;gap:0.5rem">${noDate.map(f=>{const initial=(f.name||'?').charAt(0);const imgHtml=f.image_url?`<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`:`<div class="tl-card-placeholder">${initial}</div>`;return `<div class="tl-card" style="width:200px" onclick="openFigure(${f.id})"><div class="tl-card-inner">${imgHtml}<div class="tl-card-info"><div class="tl-card-type">${f.type||''}</div><div class="tl-card-name">${f.name||''}</div>${(f.century||deriveCentury(f.born,f.death))?`<div class="tl-card-dates">${f.century||deriveCentury(f.born,f.death)} c.</div>`:''}</div></div></div>`;}).join('')}</div></div>`;
       }
       container.innerHTML = html;
       timelineLoaded = true;
@@ -1121,7 +1132,7 @@
     mapMarkers = [];
 
     // Era filter from global state
-    const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th"]];
+    const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th","17th","18th","19th","20th","21st"]];
     const eraKeywords = state.era_index >= 0 ? eraCenturyMap[state.era_index] : null;
 
     const filtered = allMapFigures.filter(f => {
@@ -1199,6 +1210,20 @@
         genderWrap.innerHTML += `<button class="nav-item" data-value="${g}" onclick="setGender(this,'${g}')"><span class="nav-icon">${g==='Male'?'♂':'♀'}</span> ${g}</button>`;
       });
 
+      // Role / Office select
+      const roleSelect = document.getElementById('roleSelect');
+      (data.role_offices || []).forEach(r => {
+        roleSelect.innerHTML += `<option value="${r.replace(/"/g,'&quot;')}">${r}</option>`;
+      });
+      roleSelect.addEventListener('change', e => { state.role_office = e.target.value; state.page=1; loadFigures(); });
+
+      // Denomination select
+      const denominationSelect = document.getElementById('denominationSelect');
+      (data.denominations || []).forEach(d => {
+        denominationSelect.innerHTML += `<option value="${d.replace(/"/g,'&quot;')}">${d}</option>`;
+      });
+      denominationSelect.addEventListener('change', e => { state.denomination = e.target.value; state.page=1; loadFigures(); });
+
       // Belief select
       const beliefSelect = document.getElementById('beliefSelect');
       data.beliefs.forEach(b => {
@@ -1213,15 +1238,17 @@
     const grid = document.getElementById('grid');
     grid.innerHTML = `<div class="loading"><div class="spinner"></div>Loading records…</div>`;
     const params = new URLSearchParams({ page:state.page, page_size:PAGE_SIZE });
-    if (state.search)    params.set('search', state.search);
-    if (state.type)      params.set('type', state.type);
-    if (state.century)   params.set('century', state.century);
-    if (state.gender)    params.set('gender', state.gender);
-    if (state.belief_id) params.set('belief_id', state.belief_id);
+    if (state.search)       params.set('search', state.search);
+    if (state.type)         params.set('type', state.type);
+    if (state.century)      params.set('century', state.century);
+    if (state.gender)       params.set('gender', state.gender);
+    if (state.denomination) params.set('denomination', state.denomination);
+    if (state.role_office)  params.set('role_office', state.role_office);
+    if (state.belief_id)    params.set('belief_id', state.belief_id);
     if (state.is_martyr !== '') params.set('is_martyr', state.is_martyr);
     if (state.sort && state.sort !== 'default') params.set('sort', state.sort);
     if (state.era_index >= 0 && eraRanges[state.era_index]) {
-      const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th"]];
+      const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th","17th","18th","19th","20th","21st"]];
       const keywords = eraCenturyMap[state.era_index];
       if (keywords) params.set('century_keywords', keywords.join(','));
     }
@@ -1251,7 +1278,8 @@
     const name = f.name || 'Unknown';
     const initial = name.charAt(0);
     const dates = formatDates(f.born, f.death, f.era_type);
-    const metaParts = [dates, f.century ? `${f.century} c.` : ''].filter(Boolean);
+    const effectiveCentury = f.century || deriveCentury(f.born, f.death);
+    const metaParts = [dates, effectiveCentury ? `${effectiveCentury} c.` : ''].filter(Boolean);
     const beliefs = (f.beliefs||[]).slice(0,3).map(b=>`<span class="belief-tag">${b.belief_name}</span>`).join('');
 
     const imgHtml = f.image_url
@@ -1259,7 +1287,7 @@
       : `<div class="arch-card-placeholder">${initial}</div>`;
 
     // Category label: type + era
-    const eraLabel = f.century ? `${f.century} Century` : (f.era_type||'');
+    const eraLabel = effectiveCentury ? `${effectiveCentury} Century` : (f.era_type||'');
     const categoryLabel = [f.type, eraLabel].filter(Boolean).join(' · ');
 
     return `
@@ -1282,6 +1310,15 @@
           </div>
         </div>
       </div>`;
+  }
+
+  function deriveCentury(born, death) {
+    const year = born || death;
+    if (!year || year <= 0) return null;
+    const n = Math.ceil(year / 100);
+    const suffixes = ['th','st','nd','rd'];
+    const suffix = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : (suffixes[n % 10] || 'th');
+    return `${n}${suffix}`;
   }
 
   function formatDates(born, death, eraType) {
@@ -1337,9 +1374,11 @@
       ? `<img class="modal-image" src="${f.image_url}" alt="${name}" onerror="this.parentElement.innerHTML='<div class=\\'modal-img-placeholder\\'>${initial}</div>'">`
       : `<div class="modal-img-placeholder">${initial}</div>`;
     const facts = [
-      ['Role / Office', f.role_office], ['Century', f.century ? `${f.century} Century` : null],
+      ['Role / Office', f.role_office], ['Century', (f.century || deriveCentury(f.born, f.death)) ? `${f.century || deriveCentury(f.born, f.death)} Century` : null],
       ['Born', f.born ? `${f.born} ${(f.era_type||'').includes('BC')?'BC':'AD'}` : null],
-      ['Died', f.death ? `${f.death} AD` : null], ['Birthplace', f.birthplace && !/^-?[\d.]+;-?[\d.]+$/.test(f.birthplace.trim()) ? f.birthplace : null],
+      ['Died', f.death ? `${f.death} AD` : null],
+      ['Birthplace', f.birthplace && !/^-?[\d.]+;-?[\d.]+$/.test(f.birthplace.trim()) ? f.birthplace : null],
+      ['Deathplace', f.deathplace || null],
       ['Region', f.primary_region], ['Denomination', f.denomination_tradition], ['Gender', f.gender],
     ].filter(([,v])=>v);
     const beliefs = (f.beliefs||[]).map(b=>`<span class="belief-tag">${b.belief_name}</span>`).join('');
