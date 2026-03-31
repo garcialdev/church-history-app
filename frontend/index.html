@@ -1434,6 +1434,7 @@
 
   function filterByMartyr() {
     state.is_martyr = state.is_martyr==='true' ? '' : 'true';
+    state.type = '';
     state.page=1;
     document.getElementById('nav-martyr').classList.toggle('active', state.is_martyr==='true');
     ['nav-all','nav-person','nav-event','nav-group'].forEach(id => {
