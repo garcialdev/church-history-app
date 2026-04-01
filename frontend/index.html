@@ -596,6 +596,82 @@
     .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 1rem; }
     .empty-state { grid-column: 1/-1; padding: 4rem; text-align: center; color: var(--ink-4); font-style: italic; }
 
+    /* ── DISCOVER LOADING ────────────────────────── */
+    .discover-loading {
+      padding: 4rem 2rem 4.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+    }
+    .discover-loading-icon {
+      font-size: 2.8rem;
+      color: var(--accent);
+      animation: discoverPulse 1.6s ease-in-out infinite;
+      line-height: 1;
+    }
+    @keyframes discoverPulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.9) rotate(0deg); }
+      50%       { opacity: 1;   transform: scale(1.2) rotate(180deg); }
+    }
+    .discover-loading-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--ink-2);
+      letter-spacing: 0.01em;
+    }
+    .discover-loading-era-wrap {
+      height: 1.4em;
+      overflow: hidden;
+      position: relative;
+      width: 300px;
+    }
+    .discover-loading-era {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .discover-loading-era.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .discover-loading-bar {
+      width: 220px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .discover-loading-bar-fill {
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(to right, transparent, var(--accent), transparent);
+      border-radius: 2px;
+      animation: discoverBar 1.4s ease-in-out infinite;
+    }
+    @keyframes discoverBar {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
+    }
+    .discover-loading-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+
     /* ── PAGINATION ───────────────────────────────── */
     .pagination { display: flex; justify-content: center; align-items: center; gap: 0.3rem; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light); }
     .page-btn { background: var(--surface); border: 1px solid var(--border); color: var(--ink-3); font-family: 'Source Serif 4', serif; font-size: 0.88rem; padding: 0.35rem 0.8rem; border-radius: var(--radius); cursor: pointer; transition: all 0.15s; min-width: 34px; }
@@ -1463,19 +1539,70 @@
   });
 
   // ── DISCOVER / RANDOM ──────────────────────────
+  let _discoverInterval = null;
+
+  function buildDiscoverLoadingEl() {
+    const eras = [
+      'Apostolic Age · 1st–2nd c.',
+      'Ante-Nicene · 2nd–3rd c.',
+      'Nicene Era · 4th–5th c.',
+      'Early Medieval · 6th–9th c.',
+      'High Medieval · 10th–13th c.',
+      'Late Medieval · 14th–15th c.',
+      'Reformation · 16th c.',
+      'Post-Reformation · 17th c.',
+      'Age of Revivals · 18th c.',
+      'Modern Era · 19th–20th c.',
+    ];
+
+    const wrap = document.createElement('div');
+    wrap.className = 'discover-loading';
+    wrap.innerHTML = `
+      <div class="discover-loading-icon">✦</div>
+      <div class="discover-loading-title">Consulting the Archives…</div>
+      <div class="discover-loading-era-wrap">
+        <span class="discover-loading-era visible" id="discoverEraLabel">${eras[0]}</span>
+      </div>
+      <div class="discover-loading-bar"><div class="discover-loading-bar-fill"></div></div>
+      <div class="discover-loading-sub">Searching across the centuries</div>
+    `;
+
+    let idx = 0;
+    _discoverInterval = setInterval(() => {
+      const el = document.getElementById('discoverEraLabel');
+      if (!el) { clearInterval(_discoverInterval); _discoverInterval = null; return; }
+      el.classList.remove('visible');
+      setTimeout(() => {
+        idx = (idx + 1) % eras.length;
+        el.textContent = eras[idx];
+        el.classList.add('visible');
+      }, 400);
+    }, 900);
+
+    return wrap;
+  }
+
+  function clearDiscoverLoading() {
+    if (_discoverInterval) { clearInterval(_discoverInterval); _discoverInterval = null; }
+  }
+
   async function openRandomFigure() {
     const btn = document.getElementById('discoverBtn');
-    btn.classList.add('spinning'); btn.disabled=true;
-    document.getElementById('modalInner').innerHTML=`<div style="padding:4rem;text-align:center"><div class="spinner"></div></div>`;
-    document.getElementById('modal').style.display='flex';
-    document.body.style.overflow='hidden';
+    btn.classList.add('spinning'); btn.disabled = true;
+    const modalInner = document.getElementById('modalInner');
+    modalInner.innerHTML = '';
+    modalInner.appendChild(buildDiscoverLoadingEl());
+    document.getElementById('modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     try {
       const f = await fetch(`${API}/figures/random`).then(r=>r.json());
       const related = await fetch(`${API}/figures/${f.id}/related`).then(r=>r.json()).catch(()=>[]);
+      clearDiscoverLoading();
       document.getElementById('modalInner').innerHTML = renderModal(f, related);
     } catch(e) {
-      document.getElementById('modalInner').innerHTML=`<div style="padding:2rem;color:var(--ink-3)">Failed to load.</div>`;
-    } finally { btn.classList.remove('spinning'); btn.disabled=false; }
+      clearDiscoverLoading();
+      document.getElementById('modalInner').innerHTML = `<div style="padding:2rem;color:var(--ink-3)">Failed to load.</div>`;
+    } finally { btn.classList.remove('spinning'); btn.disabled = false; }
   }
 
   boot();
