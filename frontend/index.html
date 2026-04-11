@@ -543,6 +543,7 @@
       line-height: 1.6;
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -729,34 +730,49 @@
     .map-popup-century { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--ink-3); }
     .map-popup-cta { font-size: 0.68rem; color: var(--ink-4); margin-top: 0.3rem; font-style: italic; border-top: 1px solid var(--border-light); padding-top: 0.3rem; }
 
-    /* ── MODAL ─────────────────────────────────────── */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; backdrop-filter: blur(4px); animation: fadeIn 0.18s ease; }
+    /* ── MODAL (editorial) ──────────────────────────── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; backdrop-filter: blur(6px); animation: fadeIn 0.18s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); max-width: 860px; width: 100%; position: relative; box-shadow: var(--shadow-lg); animation: slideUp 0.22s ease; overflow: hidden; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); max-width: 1120px; width: 100%; position: relative; box-shadow: var(--shadow-lg); animation: slideUp 0.22s ease; overflow: hidden; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink-3); width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; z-index: 10; transition: all 0.15s; line-height: 1; }
     .modal-close:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
-    .modal-hero { display: grid; grid-template-columns: 260px 1fr; }
-    .modal-img-wrap { background: var(--card-img-bg); position: relative; }
-    .modal-image { width: 100%; height: 100%; min-height: 300px; object-fit: cover; object-position: top center; display: block; }
-    .modal-img-placeholder { width: 100%; min-height: 300px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 5rem; font-style: italic; color: var(--ink-5); }
-    .modal-hero-body { padding: 1.75rem 2rem; border-left: 1px solid var(--border); display: flex; flex-direction: column; gap: 0.6rem; }
-    .modal-type-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: var(--radius); border: 1px solid var(--border); color: var(--ink-3); width: fit-content; }
-    .modal-name { font-family: 'Playfair Display', serif; font-size: 1.85rem; font-weight: 700; color: var(--ink); line-height: 1.2; }
-    .modal-alt { font-style: italic; color: var(--ink-3); font-size: 0.9rem; }
-    .modal-hr { border: none; border-top: 1px solid var(--border-light); }
-    .modal-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem 1rem; }
-    .fact-label { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-4); display: block; margin-bottom: 0.1rem; }
-    .fact-value { font-size: 0.88rem; color: var(--ink-2); }
-    .martyred-badge { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--red-dim); border: 1px solid rgba(248,113,113,0.25); color: var(--red); font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; padding: 0.25rem 0.65rem; border-radius: var(--radius); width: fit-content; }
-    .modal-content-body { padding: 1.75rem 2rem; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 1.5rem; }
-    .modal-section-head { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); padding-bottom: 0.4rem; border-bottom: 1px solid var(--border-light); margin-bottom: 0.65rem; }
-    .modal-text { font-size: 0.93rem; color: var(--ink-2); line-height: 1.8; white-space: pre-wrap; }
-    .modal-quote { border-left: 3px solid var(--gold-dim); padding: 0.75rem 1.25rem; background: var(--gold-glow); color: var(--ink-2); font-style: italic; font-size: 0.98rem; line-height: 1.75; white-space: pre-wrap; border-radius: 0 var(--radius) var(--radius) 0; }
+
+    /* Two-column editorial layout */
+    .mpro-layout { display: grid; grid-template-columns: 340px 1fr; }
+    .mpro-left { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+    .mpro-img-wrap { position: relative; aspect-ratio: 4/5; max-height: 400px; overflow: hidden; background: var(--card-img-bg); flex-shrink: 0; }
+    .mpro-image { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+    .mpro-img-placeholder { width: 100%; height: 100%; min-height: 280px; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 6rem; font-style: italic; color: var(--ink-5); }
+    .mpro-img-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.22), transparent 60%); pointer-events: none; }
+    .mpro-meta-panel { padding: 0 1.5rem; background: var(--surface-2); flex: 1; }
+    .mpro-meta-row { padding: 0.7rem 0; border-bottom: 1px solid var(--border-light); }
+    .mpro-meta-row:last-child { border-bottom: none; }
+    .mpro-meta-label { font-family: 'JetBrains Mono', monospace; font-size: 0.56rem; text-transform: uppercase; letter-spacing: 0.13em; color: var(--ink-4); display: block; margin-bottom: 0.2rem; }
+    .mpro-meta-value { font-size: 0.875rem; color: var(--ink-2); line-height: 1.4; }
+    .mpro-tags-wrap { padding: 1rem 1.5rem 1.25rem; background: var(--surface-2); border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.75rem; }
+
+    /* Right column */
+    .mpro-right { padding: 2.5rem 2.75rem; display: flex; flex-direction: column; gap: 1.75rem; }
+    .mpro-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    .mpro-name { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; color: var(--ink); line-height: 1.1; letter-spacing: -0.01em; margin: -0.25rem 0 0; }
+    .mpro-subtitle { font-family: 'Source Serif 4', serif; font-style: italic; color: var(--ink-3); font-size: 1.05rem; margin-top: -0.75rem; }
+    .mpro-alt { font-style: italic; color: var(--ink-4); font-size: 0.83rem; margin-top: -1rem; }
+    .mpro-martyr { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--red-dim); border: 1px solid rgba(248,113,113,0.25); color: var(--red); font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; padding: 0.22rem 0.6rem; border-radius: var(--radius); width: fit-content; margin-top: -0.5rem; }
+
+    /* Sections */
+    .mpro-section { display: flex; flex-direction: column; gap: 0.75rem; }
+    .mpro-section-head { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); display: flex; align-items: center; gap: 0.65rem; }
+    .mpro-section-head::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--border); flex-shrink: 0; }
+    .mpro-text { font-size: 0.93rem; color: var(--ink-2); line-height: 1.85; white-space: pre-wrap; }
+    .mpro-quote { border-left: 3px solid var(--gold-dim); padding: 0.85rem 1.25rem; background: var(--gold-glow); color: var(--ink-2); font-family: 'Source Serif 4', serif; font-style: italic; font-size: 1.02rem; line-height: 1.75; white-space: pre-wrap; border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
 
     /* Related figures */
+    .mpro-related { border-top: 1px solid var(--border); padding: 1.5rem 2rem 2rem; background: var(--surface-2); }
+    .mpro-related-head { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-4); display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1rem; }
+    .mpro-related-head::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--border); flex-shrink: 0; }
     .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.65rem; }
-    .related-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
+    .related-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: transform 0.15s, border-color 0.15s; }
     .related-card:hover { transform: translateY(-2px); border-color: var(--accent-dim); }
     .related-card-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; object-position: top center; display: block; }
     .related-card-placeholder { width: 100%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Playfair Display', serif; font-size: 2rem; font-style: italic; color: var(--ink-5); }
@@ -774,9 +790,10 @@
     @media (max-width: 960px) {
       .sidebar { width: 200px; }
       .card-grid { grid-template-columns: 1fr; }
-      .modal-hero { grid-template-columns: 1fr; }
-      .modal-img-wrap { min-height: 200px; }
-      .modal-hero-body { border-left: none; border-top: 1px solid var(--border); }
+      .mpro-layout { grid-template-columns: 1fr; }
+      .mpro-left { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; }
+      .mpro-img-wrap { width: 180px; flex-shrink: 0; aspect-ratio: auto; max-height: none; min-height: 220px; }
+      .mpro-meta-panel { flex: 1; }
       .stats-banner { grid-template-columns: repeat(2, 1fr); }
     }
 
@@ -791,8 +808,12 @@
     }
 
     @media (max-width: 640px) {
-      .stats-banner { grid-template-columns: 1fr 1fr; }
+      .topbar { flex-wrap: wrap; height: auto; padding: 0.6rem 0.75rem; gap: 0.5rem; }
+      .topbar-search { flex: 1 1 100%; max-width: 100%; }
       .era-chips { display: none; }
+      .topbar-right { flex: 1 1 100%; margin-left: 0; justify-content: space-between; }
+      .record-count { font-size: 0.72rem; }
+      .stats-banner { grid-template-columns: 1fr 1fr; }
       .timeline-view-scroll { overflow-x: auto; }
       .tl-canvas { display: flex !important; flex-direction: column !important; width: auto !important; gap: 0; }
       .tl-axis, .tl-marker { display: none; }
@@ -849,17 +870,17 @@
     <div id="sidebarGenderChips" style="padding:0 0.25rem;display:flex;flex-direction:column;gap:0.15rem"></div>
 
     <div class="nav-section-label" style="margin-top:0.5rem">Role / Office</div>
-    <select id="roleSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
+    <select id="roleSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-3);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
       <option value="">All Roles</option>
     </select>
 
     <div class="nav-section-label" style="margin-top:0.5rem">Denomination</div>
-    <select id="denominationSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
+    <select id="denominationSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-3);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
       <option value="">All Denominations</option>
     </select>
 
     <div class="nav-section-label" style="margin-top:0.5rem">Beliefs</div>
-    <select id="beliefSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
+    <select id="beliefSelect" style="margin:0 0.25rem;background:var(--surface-2);border:1px solid var(--border);color:var(--ink-3);font-family:'Source Serif 4',serif;font-size:0.82rem;padding:0.4rem 0.5rem;border-radius:var(--radius);outline:none;cursor:pointer;width:calc(100% - 0.5rem)">
       <option value="">All Beliefs</option>
     </select>
   </nav>
@@ -1444,54 +1465,89 @@
   }
 
   function renderModal(f, related=[]) {
-    const name = f.name||'Unknown';
+    const name = f.name || 'Unknown';
     const initial = name.charAt(0);
+
+    // Image
     const imgHtml = f.image_url
-      ? `<img class="modal-image" src="${f.image_url}" alt="${name}" onerror="this.parentElement.innerHTML='<div class=\\'modal-img-placeholder\\'>${initial}</div>'">`
-      : `<div class="modal-img-placeholder">${initial}</div>`;
-    const facts = [
-      ['Role / Office', f.role_office], ['Century', (f.century || deriveCentury(f.born, f.death)) ? `${f.century || deriveCentury(f.born, f.death)} Century` : null],
-      ['Born', f.born ? `${f.born} ${(f.era_type||'').includes('BC')?'BC':'AD'}` : null],
-      ['Died', f.death ? `${f.death} AD` : null],
+      ? `<img class="mpro-image" src="${f.image_url}" alt="${name}" onerror="this.parentElement.innerHTML='<div class=\\'mpro-img-placeholder\\'>${initial}</div>'">`
+      : `<div class="mpro-img-placeholder">${initial}</div>`;
+
+    // Left metadata rows
+    const metaItems = [
+      ['Born', f.born ? `${f.born} ${(f.era_type||'').includes('BC') ? 'BC' : 'AD'}` : null],
       ['Birthplace', f.birthplace && !/^-?[\d.]+;-?[\d.]+$/.test(f.birthplace.trim()) ? f.birthplace : null],
+      ['Died', f.death ? `${f.death} AD` : null],
       ['Deathplace', f.deathplace || null],
-      ['Region', f.primary_region], ['Denomination', f.denomination_tradition], ['Gender', f.gender],
-    ].filter(([,v])=>v);
+      ['Century', (f.century || deriveCentury(f.born, f.death)) ? `${f.century || deriveCentury(f.born, f.death)} Century` : null],
+      ['Region', f.primary_region || null],
+      ['Denomination', f.denomination_tradition || null],
+      ['Gender', f.gender || null],
+    ].filter(([,v]) => v);
+    const metaHtml = metaItems.map(([l,v]) =>
+      `<div class="mpro-meta-row"><span class="mpro-meta-label">${l}</span><span class="mpro-meta-value">${v}</span></div>`
+    ).join('');
+
+    // Tags
     const beliefs = (f.beliefs||[]).map(b=>`<span class="belief-tag">${b.belief_name}</span>`).join('');
     const eras = (f.eras||[]).map(e=>`<span class="belief-tag">${[e.name,e.time_span?`(${e.time_span})`:null].filter(Boolean).join(' ')}</span>`).join('');
-    let body='';
-    if (f.short_description)     body+=msec('Overview',`<p class="modal-text">${f.short_description}</p>`);
-    if (f.long_biography)        body+=msec('Biography',`<div class="modal-text">${f.long_biography}</div>`);
-    if (f.key_life_events)       body+=msec('Key Life Events',`<div class="modal-text">${f.key_life_events}</div>`);
-    if (f.primary_contributions) body+=msec('Contributions',`<div class="modal-text">${f.primary_contributions}</div>`);
-    if (f.major_works)           body+=msec('Major Works',`<div class="modal-text">${f.major_works}</div>`);
-    if (f.associated_movements)  body+=msec('Movements',`<div class="modal-text">${f.associated_movements}</div>`);
-    if (f.scripture_references)  body+=msec('Scripture',`<div class="modal-text">${f.scripture_references}</div>`);
-    if (f.famous_quotes)         body+=msec('Famous Quotes',`<blockquote class="modal-quote">${f.famous_quotes}</blockquote>`);
-    if (f.notes)                 body+=msec('Notes',`<div class="modal-text">${f.notes}</div>`);
-    let relatedHtml='';
-    if (related&&related.length>0) {
-      const cards=related.map(r=>{const ri=(r.name||'?').charAt(0);const rImg=r.image_url?`<img class="related-card-img" src="${r.image_url}" alt="${r.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'related-card-placeholder\\'>${ri}</div>'">`:`<div class="related-card-placeholder">${ri}</div>`;const meta=[r.role_office,r.century?`${r.century} c.`:''].filter(Boolean).join(' · ');return `<div class="related-card" onclick="closeModal();setTimeout(()=>openFigure(${r.id}),150)">${rImg}<div class="related-card-body"><div class="related-card-name">${r.name}</div>${meta?`<div class="related-card-meta">${meta}</div>`:''}</div></div>`;}).join('');
-      relatedHtml=`<div><div class="modal-section-head">Related Figures</div><div class="related-grid">${cards}</div></div>`;
+    const tagsHtml = (beliefs||eras) ? `<div class="mpro-tags-wrap">
+      ${beliefs?`<div><span class="mpro-meta-label" style="margin-bottom:0.35rem;display:block">Beliefs</span><div class="arch-card-beliefs">${beliefs}</div></div>`:''}
+      ${eras?`<div><span class="mpro-meta-label" style="margin-bottom:0.35rem;display:block">Era</span><div class="arch-card-beliefs">${eras}</div></div>`:''}
+    </div>` : '';
+
+    // Subtitle: role • denomination
+    const subtitleParts = [f.role_office, f.denomination_tradition].filter(Boolean);
+    const subtitle = subtitleParts.length ? `<p class="mpro-subtitle">${subtitleParts.join(' • ')}</p>` : '';
+
+    // Body sections
+    const sections = [];
+    if (f.short_description)     sections.push(mprosec('Overview',      `<div class="mpro-text">${f.short_description}</div>`));
+    if (f.long_biography)        sections.push(mprosec('Biography',     `<div class="mpro-text">${f.long_biography}</div>`));
+    if (f.key_life_events)       sections.push(mprosec('Key Life Events',`<div class="mpro-text">${f.key_life_events}</div>`));
+    if (f.primary_contributions) sections.push(mprosec('Contributions', `<div class="mpro-text">${f.primary_contributions}</div>`));
+    if (f.major_works)           sections.push(mprosec('Major Works',   `<div class="mpro-text">${f.major_works}</div>`));
+    if (f.associated_movements)  sections.push(mprosec('Movements',     `<div class="mpro-text">${f.associated_movements}</div>`));
+    if (f.scripture_references)  sections.push(mprosec('Scripture',     `<div class="mpro-text">${f.scripture_references}</div>`));
+    if (f.famous_quotes)         sections.push(mprosec('Famous Quotes', `<blockquote class="mpro-quote">${f.famous_quotes}</blockquote>`));
+    if (f.notes)                 sections.push(mprosec('Notes',         `<div class="mpro-text">${f.notes}</div>`));
+
+    // Related
+    let relatedHtml = '';
+    if (related && related.length > 0) {
+      const cards = related.map(r => {
+        const ri = (r.name||'?').charAt(0);
+        const rImg = r.image_url
+          ? `<img class="related-card-img" src="${r.image_url}" alt="${r.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'related-card-placeholder\\'>${ri}</div>'">`
+          : `<div class="related-card-placeholder">${ri}</div>`;
+        const meta = [r.role_office, r.century?`${r.century} c.`:''].filter(Boolean).join(' · ');
+        return `<div class="related-card" onclick="closeModal();setTimeout(()=>openFigure(${r.id}),150)">${rImg}<div class="related-card-body"><div class="related-card-name">${r.name}</div>${meta?`<div class="related-card-meta">${meta}</div>`:''}</div></div>`;
+      }).join('');
+      relatedHtml = `<div class="mpro-related"><div class="mpro-related-head">Related Figures</div><div class="related-grid">${cards}</div></div>`;
     }
+
     return `
-      <div class="modal-hero">
-        <div class="modal-img-wrap">${imgHtml}</div>
-        <div class="modal-hero-body">
-          <div class="modal-type-badge">${f.type||'Record'}</div>
-          <div class="modal-name">${name}</div>
-          ${f.alternative_names?`<div class="modal-alt">Also known as: ${f.alternative_names}</div>`:''}
-          ${f.is_martyr==='Yes'?`<div class="martyred-badge">✝ Died as a Martyr</div>`:''}
-          <hr class="modal-hr"/>
-          <div class="modal-facts">${facts.map(([l,v])=>`<div><span class="fact-label">${l}</span><span class="fact-value">${v}</span></div>`).join('')}</div>
-          ${beliefs?`<hr class="modal-hr"/><div class="modal-section-head">Beliefs</div><div class="arch-card-beliefs">${beliefs}</div>`:''}
-          ${eras?`<div style="margin-top:0.5rem"><div class="modal-section-head">Era</div><div class="arch-card-beliefs">${eras}</div></div>`:''}
+      <div class="mpro-layout">
+        <div class="mpro-left">
+          <div class="mpro-img-wrap">${imgHtml}<div class="mpro-img-gradient"></div></div>
+          ${metaHtml ? `<div class="mpro-meta-panel">${metaHtml}</div>` : ''}
+          ${tagsHtml}
+        </div>
+        <div class="mpro-right">
+          <div class="mpro-badge">${f.type || 'Historical Figure'}</div>
+          <h2 class="mpro-name">${name}</h2>
+          ${f.alternative_names ? `<p class="mpro-alt">Also known as: ${f.alternative_names}</p>` : ''}
+          ${subtitle}
+          ${f.is_martyr==='Yes' ? `<div class="mpro-martyr">✝ Died as a Martyr</div>` : ''}
+          ${sections.join('')}
         </div>
       </div>
-      ${(body||relatedHtml)?`<div class="modal-content-body">${body}${relatedHtml}</div>`:''}`;
+      ${relatedHtml}`;
   }
 
-  function msec(title, content) { return `<div><div class="modal-section-head">${title}</div>${content}</div>`; }
+  function mprosec(title, content) {
+    return `<div class="mpro-section"><h3 class="mpro-section-head">${title}</h3>${content}</div>`;
+  }
   function closeModal() { document.getElementById('modal').style.display='none'; document.body.style.overflow=''; }
   function closeOnOverlay(e) { if(e.target===document.getElementById('modal')) closeModal(); }
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
