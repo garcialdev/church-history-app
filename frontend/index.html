@@ -83,7 +83,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; height: 100%; }
+    html { scroll-behavior: smooth; height: 100%; max-width: 100%; overflow-x: hidden; }
     body {
       background: var(--bg);
       color: var(--ink);
@@ -477,6 +477,8 @@
       gap: 0.75rem;
       animation: fadeUp 0.3s ease both;
       position: relative;
+      overflow: hidden;
+      min-width: 0;
     }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .arch-card:hover { box-shadow: var(--shadow); border-color: var(--accent-dim); transform: translateY(-1px); }
@@ -554,6 +556,11 @@
       justify-content: space-between;
       padding-top: 0.6rem;
       border-top: 1px solid var(--border-light);
+      min-width: 0;
+    }
+    .arch-card-tags {
+      display: flex; gap: 0.4rem; align-items: center;
+      flex-wrap: wrap; min-width: 0; overflow: hidden;
     }
 
     .arch-card-cta {
@@ -681,34 +688,99 @@
     .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
     /* ── TIMELINE VIEW ────────────────────────────── */
-    .timeline-view-scroll {
-      overflow-x: auto; overflow-y: auto; padding: 0 1rem 2rem;
-      scroll-behavior: smooth; scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
-      height: calc(100vh - 180px); min-height: 500px; position: relative;
+    /* ── CHRONO VIEW ─────────────────────────────── */
+    .chrono-view {
+      position: relative; height: calc(100vh - 180px); min-height: 500px;
+      overflow: hidden; border-radius: var(--radius-lg);
     }
-    .timeline-view-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
-    .timeline-view-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    .timeline-scroll-hint { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--ink-4); margin-top: 0.5rem; }
-    .tl-canvas { position: relative; min-height: 120px; overflow: visible; }
-    .tl-axis { position: absolute; top: 52px; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, var(--accent-dim) 2%, var(--accent-dim) 98%, transparent); z-index: 1; }
-    .tl-marker { position: absolute; top: 0; display: flex; flex-direction: column; align-items: center; z-index: 2; }
-    .tl-marker-label { font-family: 'Playfair Display', serif; font-size: 0.75rem; font-weight: 600; color: var(--accent); background: var(--surface-2); border: 1px solid var(--accent-dim); border-radius: 20px; padding: 0.2rem 0.65rem; white-space: nowrap; margin-bottom: 0.3rem; }
-    .tl-marker-tick { width: 1px; height: 14px; background: var(--accent-dim); }
-    .tl-fig-col { position: absolute; top: 54px; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; z-index: 3; padding-top: 0.5rem; overflow: visible; }
-    .tl-fig-col:hover { z-index: 100; }
-    .tl-fig-col::before { content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: var(--surface); border: 2px solid var(--accent); border-radius: 50%; z-index: 4; }
-    .tl-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 200px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease, border-color 0.15s, box-shadow 0.2s ease; position: relative; flex-shrink: 0; z-index: 1; }
-    .tl-card:hover { transform: translateY(-4px) scale(1.03); border-color: var(--accent); box-shadow: 0 12px 32px rgba(0,0,0,0.6), 0 0 0 1px var(--accent-dim); z-index: 50; }
-    .tl-card-inner { display: flex; gap: 0.5rem; padding: 0.55rem; align-items: center; }
-    .tl-card-img { width: 40px; height: 40px; border-radius: var(--radius); object-fit: cover; object-position: top center; flex-shrink: 0; }
-    .tl-card-placeholder { width: 40px; height: 40px; border-radius: var(--radius); background: var(--card-img-bg); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic; color: var(--ink-5); flex-shrink: 0; }
-    .tl-card-info { min-width: 0; flex: 1; }
-    .tl-card-type { font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); }
-    .tl-card-name { font-family: 'Playfair Display', serif; font-size: 0.85rem; font-weight: 600; color: var(--ink); line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tl-card-role { font-size: 0.7rem; color: var(--accent); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tl-card-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--ink-2); margin-top: 0.1rem; }
-    .tl-martyr-dot { position: absolute; top: 0.35rem; right: 0.35rem; width: 5px; height: 5px; background: var(--red); border-radius: 50%; box-shadow: 0 0 4px rgba(248,113,113,0.7); }
+    #chronoMapBg { position: absolute; inset: 0; z-index: 0; background: var(--surface-2); }
+    .chrono-scroll {
+      position: absolute; top: 0; right: 0; width: 440px; height: 100%;
+      overflow-y: scroll; scroll-snap-type: y mandatory; z-index: 20; scrollbar-width: none;
+      overflow-x: visible;
+    }
+    .chrono-scroll::-webkit-scrollbar { display: none; }
+    .chrono-slide {
+      height: 100%; scroll-snap-align: start;
+      display: flex; align-items: center; padding: 1.5rem 1.5rem 1.5rem 0;
+    }
+    .chrono-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+      overflow: hidden; width: 100%; cursor: pointer; transition: border-color 0.2s, transform 0.2s;
+      display: flex; flex-direction: row;
+    }
+    .chrono-card:hover { border-color: var(--accent-dim); transform: translateY(-2px); }
+    .chrono-card-img { width: 135px; flex-shrink: 0; object-fit: cover; object-position: top center; display: block; align-self: stretch; }
+    .chrono-card-placeholder { width: 135px; flex-shrink: 0; min-height: 240px; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Playfair Display', serif; font-size: 3rem; font-style: italic; color: var(--ink-5); }
+    .chrono-card-body { flex: 1; min-width: 0; padding: 1.1rem 1.2rem 1.1rem; overflow: hidden; }
+    .chrono-card-type { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.3rem; }
+    .chrono-card-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); line-height: 1.15; margin-bottom: 0.2rem; }
+    .chrono-card-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--ink-3); margin-bottom: 0.4rem; }
+    .chrono-card-role { font-family: 'Source Serif 4', serif; font-size: 0.85rem; color: var(--ink-2); font-style: italic; margin-bottom: 0.45rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-card-desc { font-family: 'Source Serif 4', serif; font-size: 0.82rem; color: var(--ink-2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .chrono-card-loc { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.65rem; padding-top: 0.55rem; border-top: 1px solid var(--border-light); font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: var(--ink-3); letter-spacing: 0.05em; }
+    .chrono-card-loc-dot { width: 7px; height: 7px; background: #38bdf8; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 5px #38bdf8; }
+    .chrono-card-martyr { display: inline-flex; align-items: center; gap: 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.25); border-radius: 20px; padding: 0.15rem 0.5rem; margin-bottom: 0.3rem; width: fit-content; }
+    /* Gradient left edge blends card panel into map */
+    .chrono-scroll::before { content: ''; position: absolute; top: 0; left: -28px; width: 28px; height: 100%; background: linear-gradient(to right, transparent, var(--surface)); pointer-events: none; z-index: 1; }
+    /* Location unknown — sits above century label */
+    .chrono-no-loc {
+      position: absolute; bottom: 4.5rem; left: 50%; transform: translateX(-50%);
+      z-index: 25; pointer-events: none; display: flex; align-items: center; gap: 0.4rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: rgba(255,255,255,0.65);
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;
+      padding: 0.4rem 0.9rem; white-space: nowrap; transition: opacity 0.35s;
+    }
+    .chrono-no-loc.hidden { opacity: 0; }
+    /* Century label */
+    .chrono-era-label {
+      position: absolute; left: 50%; bottom: 1.5rem; transform: translateX(-50%);
+      z-index: 22; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600;
+      color: rgba(255,255,255,0.85); background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; padding: 0.35rem 1.1rem;
+      pointer-events: none; transition: opacity 0.3s; white-space: nowrap;
+    }
+    .chrono-era-label.hidden { opacity: 0; }
+    /* Keyboard hint */
+    .chrono-kbd-hint { position: absolute; bottom: 1.5rem; left: 1.5rem; z-index: 22; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; pointer-events: none; }
+    /* Left nav panel */
+    .chrono-progress {
+      position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%);
+      z-index: 22; display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
+    }
+    .chrono-nav-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; backdrop-filter: blur(4px); transition: background 0.15s; }
+    .chrono-nav-btn:hover { background: rgba(255,255,255,0.22); }
+    .chrono-count { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: rgba(255,255,255,0.45); text-align: center; }
+    /* Era dot buttons */
+    .chrono-era-dots { display: flex; flex-direction: column; gap: 0.4rem; align-items: center; padding: 0.3rem 0; }
+    .chrono-era-dot {
+      width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(4px); transition: all 0.2s; position: relative;
+      flex-shrink: 0;
+    }
+    .chrono-era-dot:hover { background: rgba(255,255,255,0.16); transform: scale(1.1); }
+    .chrono-era-dot.active { border-color: var(--dot-color, #fff); box-shadow: 0 0 10px var(--dot-color, #fff); background: rgba(255,255,255,0.12); }
+    .chrono-era-dot .dot-pip { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-color, rgba(255,255,255,0.5)); transition: all 0.2s; }
+    .chrono-era-dot.active .dot-pip { width: 10px; height: 10px; box-shadow: 0 0 6px var(--dot-color); }
+    .chrono-era-dot .dot-tip { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 0.25rem 0.6rem; font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(255,255,255,0.8); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+    .chrono-era-dot:hover .dot-tip { opacity: 1; }
+    /* Era intro card */
+    .chrono-era-intro-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: 0 8px 40px rgba(0,0,0,0.55); overflow: hidden; width: 100%; }
+    .chrono-era-intro-accent { height: 4px; }
+    .chrono-era-intro-body { padding: 1.75rem 1.5rem 1.75rem; }
+    .chrono-era-intro-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.5rem; opacity: 0.7; }
+    .chrono-era-intro-name { font-family: 'Playfair Display', serif; font-size: 1.65rem; font-weight: 700; line-height: 1.1; margin-bottom: 0.3rem; }
+    .chrono-era-intro-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--ink-3); margin-bottom: 0.9rem; }
+    .chrono-era-intro-desc { font-family: 'Source Serif 4', serif; font-size: 0.88rem; color: var(--ink-2); line-height: 1.6; }
+    @keyframes chrono-pulse { 0% { transform: scale(0.8); opacity: 1; } 70% { transform: scale(3.5); opacity: 0; } 100% { transform: scale(0.8); opacity: 0; } }
+    .cp-wrap { width: 20px; height: 20px; position: relative; }
+    .cp-ring { width: 20px; height: 20px; background: rgba(56,189,248,0.35); border-radius: 50%; position: absolute; top: 0; left: 0; animation: chrono-pulse 2s ease-out infinite; }
+    .cp-inner { width: 12px; height: 12px; background: #38bdf8; border-radius: 50%; position: absolute; top: 4px; left: 4px; box-shadow: 0 0 8px #38bdf8, 0 0 20px rgba(56,189,248,0.4); }
 
     /* ── MAP VIEW ─────────────────────────────────── */
     .map-info-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 0 0.75rem; font-size: 0.82rem; color: var(--ink-3); }
@@ -786,6 +858,11 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
 
+    /* ── MOBILE NAV (hidden by default) ──────────────── */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 499; }
+    .sidebar-overlay.open { display: block; }
+    .mobile-nav { display: none; }
+
     /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 960px) {
       .sidebar { width: 200px; }
@@ -798,28 +875,82 @@
     }
 
     @media (max-width: 700px) {
-      body { flex-direction: column; overflow: auto; }
-      .sidebar { width: 100%; height: auto; flex-direction: row; overflow-x: auto; }
-      .main-area { height: auto; overflow: visible; }
-      .content-area { overflow: visible; height: auto; }
-      .sidebar-nav { flex-direction: row; padding: 0.5rem; }
-      .sidebar-logo, .sidebar-stats, .sidebar-bottom { display: none; }
-      .timeline-view-scroll { height: 70vh; }
+      /* Switch body out of flex — removes sidebar from width calculation */
+      html { overflow-x: hidden; }
+      body { display: block; width: 100%; overflow-x: hidden; overflow-y: auto; height: auto; min-height: 100vh; }
+      /* Sidebar as slide-in drawer */
+      .sidebar { position: fixed; left: -260px; top: 0; width: 240px; height: 100vh; z-index: 500; transition: left 0.25s ease; overflow-y: auto; flex-direction: column; display: flex; }
+      .sidebar.open { left: 0; box-shadow: 4px 0 32px rgba(0,0,0,0.6); }
+      .sidebar-logo, .sidebar-stats, .sidebar-bottom { display: flex; }
+      .sidebar-nav { flex-direction: column; padding: 0.75rem; }
+      /* Main area fills the block body */
+      .main-area { width: 100%; height: auto; overflow-x: hidden; display: flex; flex-direction: column; }
+      .content-area { overflow-x: hidden; height: auto; padding: 0.75rem 0.75rem 72px; }
+      /* Topbar */
+      .view-tabs { display: none; }
+      .topbar { flex-wrap: wrap; height: auto; padding: 0.5rem 0.75rem; gap: 0.4rem; width: 100%; box-sizing: border-box; }
+      .topbar-search { flex: 1 1 100%; max-width: 100%; }
+      .topbar-right { flex: 1 1 100%; margin-left: 0; }
+      .era-chips { display: none; }
+      /* Results bar wraps on small screens */
+      .results-bar { flex-wrap: wrap; gap: 0.4rem; padding-bottom: 0.5rem; }
+      .chrono-view { height: calc(100vh - 140px); }
+      .chrono-scroll { width: 100%; }
+      .chrono-slide { padding: 1rem; align-items: flex-end; }
+      .chrono-progress { display: none; }
+      .chrono-kbd-hint { display: none; }
+      .chrono-era-label { bottom: 5rem; }
+      .chrono-card-img { width: 90px; }
+      .chrono-card-placeholder { width: 90px; min-height: 180px; font-size: 2.5rem; }
+      .chrono-card-name { font-size: 1rem; }
+      .chrono-card-desc { -webkit-line-clamp: 2; line-clamp: 2; }
+      .chrono-no-loc { bottom: 5.5rem; }
+      /* Tighter era bands */
+      .stats-banner { gap: 0.5rem; margin-bottom: 1rem; }
+      .era-band { padding: 0.65rem 0.75rem; }
+      .era-band-count { font-size: 1.5rem; }
+      .era-band-dates { font-size: 0.6rem; }
+      .era-band-label { font-size: 0.72rem; }
+      /* Tighter cards */
+      .arch-card { padding: 0.85rem; gap: 0.6rem; }
+      .arch-card-img, .arch-card-placeholder { width: 64px; height: 64px; }
+      .arch-card-name { font-size: 1rem; }
+      .arch-card-desc { font-size: 0.83rem; }
+      .arch-card-beliefs { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+      .arch-card-footer { gap: 0.4rem; }
+      .arch-card-tags { min-width: 0; overflow: hidden; }
+      /* Bottom nav */
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 60px;
+        background: var(--sidebar-bg);
+        border-top: 1px solid rgba(255,255,255,0.07);
+        z-index: 400;
+        align-items: stretch;
+      }
+      .mnav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.15rem;
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.38);
+        cursor: pointer;
+        transition: color 0.15s;
+        padding: 0.25rem 0;
+      }
+      .mnav-btn.active { color: var(--accent); }
+      .mnav-icon { font-size: 1.1rem; line-height: 1; }
+      .mnav-label { font-family: 'JetBrains Mono', monospace; font-size: 0.56rem; letter-spacing: 0.06em; text-transform: uppercase; }
     }
 
     @media (max-width: 640px) {
-      .topbar { flex-wrap: wrap; height: auto; padding: 0.6rem 0.75rem; gap: 0.5rem; }
-      .topbar-search { flex: 1 1 100%; max-width: 100%; }
-      .era-chips { display: none; }
-      .topbar-right { flex: 1 1 100%; margin-left: 0; justify-content: space-between; }
-      .record-count { font-size: 0.72rem; }
       .stats-banner { grid-template-columns: 1fr 1fr; }
-      .timeline-view-scroll { overflow-x: auto; }
-      .tl-canvas { display: flex !important; flex-direction: column !important; width: auto !important; gap: 0; }
-      .tl-axis, .tl-marker { display: none; }
-      .tl-fig-col { position: static !important; width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0 !important; border-bottom: 1px solid var(--border-light); margin-bottom: 0.5rem; }
-      .tl-card { width: 100% !important; }
-      .tl-fig-col::after { content: attr(data-century); font-family: 'Playfair Display', serif; font-size: 0.78rem; font-weight: 600; color: var(--accent); background: var(--surface-2); border: 1px solid var(--accent-dim); border-radius: 20px; padding: 0.2rem 0.65rem; display: block; width: fit-content; margin-bottom: 0.4rem; order: -1; flex-basis: 100%; }
     }
   </style>
 </head>
@@ -895,6 +1026,8 @@
     </button>
   </div>
 </aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
 <!-- ── MAIN AREA ───────────────────────────────── -->
 <div class="main-area">
@@ -983,10 +1116,9 @@
 
     <!-- Timeline View -->
     <div id="view-timeline" style="display:none">
-      <div class="timeline-view-scroll" id="timelineView">
-        <div class="loading"><div class="spinner"></div>Loading timeline…</div>
+      <div class="chrono-view" id="chronoView">
+        <div class="loading"><div class="spinner"></div>Loading…</div>
       </div>
-      <div class="timeline-scroll-hint">← Scroll to explore →</div>
     </div>
 
     <!-- Map View -->
@@ -1015,6 +1147,26 @@
   </div>
 </div>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <button class="mnav-btn active" id="mnav-grid" onclick="switchView('grid')">
+    <span class="mnav-icon">⊞</span>
+    <span class="mnav-label">Browse</span>
+  </button>
+  <button class="mnav-btn" id="mnav-timeline" onclick="switchView('timeline')">
+    <span class="mnav-icon">↔</span>
+    <span class="mnav-label">Timeline</span>
+  </button>
+  <button class="mnav-btn" id="mnav-map" onclick="switchView('map')">
+    <span class="mnav-icon">🌍</span>
+    <span class="mnav-label">Map</span>
+  </button>
+  <button class="mnav-btn" id="mnav-filters" onclick="openMobileSidebar()">
+    <span class="mnav-icon">☰</span>
+    <span class="mnav-label">Filter</span>
+  </button>
+</nav>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="closeOnOverlay(event)">
   <div class="modal">
@@ -1038,10 +1190,26 @@
   let timelineLoaded = false;
   let mapLoaded = false;
   let mapInstance = null;
+  let chronoMap = null;
+  let chronoMapLoaded = false;
+  let chronoPulseMarker = null;
+  let chronoObserver = null;
   let eraRanges = [];
   let currentView = 'grid';
 
   const CENTURY_ORDER = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th','17th','18th','19th','20th','21st'];
+  const ERA_CENTURY_MAP = [['1st'],['2nd','3rd'],['4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th'],['16th','17th','18th','19th','20th','21st']];
+  const CHRONO_ERAS = [
+    { color:'var(--era1)', hex:'#38bdf8', name:'Apostolic Age',       dates:'AD 30 – 100',       desc:'The period following the resurrection of Jesus, defined by the ministry of the twelve apostles, the founding of the early church at Pentecost, and the composition of the New Testament. The gospel spread rapidly through the Roman Empire despite early opposition.' },
+    { color:'var(--era2)', hex:'#a78bfa', name:'Early Church',         dates:'AD 100 – 313',       desc:'The age of the church fathers and apologists. Despite fierce Roman persecution, Christianity expanded dramatically. Brilliant theologians defended the faith against early heresies, clarifying the doctrines of the Trinity and the person of Christ.' },
+    { color:'var(--era3)', hex:'#f0c040', name:'Medieval Church',       dates:'AD 313 – 1517',      desc:"Constantine's Edict of Milan brought tolerance; Christianity eventually became the Roman state religion. This long era encompassed the great ecumenical councils, the rise of monasticism, the East–West Schism, the Crusades, and the flowering of scholastic theology." },
+    { color:'var(--era4)', hex:'#fb923c', name:'Reformation & Beyond', dates:'AD 1517 – present',   desc:"Luther's 95 Theses ignited a reformation that fractured and reshaped Western Christianity. Protestantism emerged alongside the Catholic Counter-Reformation. The following centuries brought global missions, the rise of evangelical movements, and the modern denominational landscape." },
+  ];
+  function getEraFromCentury(century) {
+    if (!century) return -1;
+    return ERA_CENTURY_MAP.findIndex(ks => ks.some(k => century.includes(k)));
+  }
+  let _chronoEraStartIdx = {}; // eraIdx → slide index of its intro card
 
   // ── THEME ──────────────────────────────────────
   function toggleTheme() {
@@ -1055,13 +1223,32 @@
   }
 
   // ── VIEW SWITCHING ─────────────────────────────
+  function openMobileSidebar() {
+    document.querySelector('.sidebar').classList.add('open');
+    document.getElementById('sidebarOverlay').classList.add('open');
+    document.getElementById('mnav-filters').classList.add('active');
+  }
+  function closeMobileSidebar() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+    document.getElementById('mnav-filters').classList.remove('active');
+  }
+
   function switchView(view) {
+    // Remove timeline keyboard listener when leaving that view
+    if (currentView === 'timeline' && view !== 'timeline') {
+      const cv = document.getElementById('chronoView');
+      if (cv && cv._keyHandler) document.removeEventListener('keydown', cv._keyHandler);
+    }
     currentView = view;
+    closeMobileSidebar();
     ['grid','timeline','map'].forEach(v => {
       document.getElementById(`view-${v}`).style.display = v === view ? 'block' : 'none';
       document.getElementById(`tab-${v}`).classList.toggle('active', v === view);
       const navEl = document.getElementById(`nav-${v}`);
       if (navEl) navEl.classList.toggle('active', v === view);
+      const mnavEl = document.getElementById(`mnav-${v}`);
+      if (mnavEl) mnavEl.classList.toggle('active', v === view);
     });
     // Remove active from type nav items when switching views
     if (view !== 'grid') {
@@ -1071,8 +1258,11 @@
       });
     }
     if (view === 'timeline') {
-      if (!timelineLoaded) loadTimeline();
-      // else already pre-loaded — instant display
+      if (!timelineLoaded) {
+        loadChronoView().then(() => initChronoMap());
+      } else {
+        initChronoMap();
+      }
     }
     if (view === 'map') {
       loadMap(); // initialises once, uses cache on repeat visits
@@ -1083,10 +1273,6 @@
   async function boot() {
     await Promise.all([loadFilters(), loadStats()]);
     await loadFigures();
-    // Pre-load timeline data in background after main content renders
-    setTimeout(() => {
-      if (!timelineLoaded) loadTimeline();
-    }, 1500);
   }
 
   // ── STATS ──────────────────────────────────────
@@ -1151,58 +1337,245 @@
     return map[c] || null;
   }
   function getFigureYear(f) { return f.born || f.death || centuryToYear(f.century); }
-
-  async function buildTimeline() {
-    // pre-loads data for the timeline without rendering yet
+  // Derive era index from numeric year — single source of truth, consistent with sort order
+  function getEraFromYear(year) {
+    if (year === null || year === undefined) return -1;
+    if (year <= 100)  return 0;  // Apostolic Age: AD 30–100
+    if (year <= 313)  return 1;  // Early Church: AD 100–313
+    if (year <= 1517) return 2;  // Medieval Church: AD 313–1517
+    return 3;                    // Reformation & Beyond: AD 1517+
   }
 
-  async function loadTimeline() {
-    const container = document.getElementById('timelineView');
-    container.innerHTML = `<div class="loading"><div class="spinner"></div>Loading timeline…</div>`;
+  // ── CHRONO VIEW (scrollable map+card) ──────────
+  function makePulseDot() {
+    return L.divIcon({
+      className: '',
+      html: `<div class="cp-wrap"><div class="cp-ring"></div><div class="cp-inner"></div></div>`,
+      iconSize: [20, 20], iconAnchor: [10, 10]
+    });
+  }
+
+  function updateChronoMap(bp, idx, total, century) {
+    const countEl = document.getElementById('chronoCount');
+    if (countEl) countEl.textContent = `${idx+1} / ${total}`;
+    // Era label
+    const eraEl = document.getElementById('chronoEraLabel');
+    if (eraEl) {
+      if (century) { eraEl.textContent = century + ' Century'; eraEl.classList.remove('hidden'); }
+      else eraEl.classList.add('hidden');
+    }
+    // Highlight active era dot
+    const eraIdx = getEraFromCentury(century);
+    document.querySelectorAll('.chrono-era-dot').forEach(d => {
+      d.classList.toggle('active', parseInt(d.dataset.era) === eraIdx);
+    });
+    const noLocEl = document.getElementById('chronoNoLoc');
+    if (chronoPulseMarker) { chronoPulseMarker.remove(); chronoPulseMarker = null; }
+    if (!chronoMap) return;
+    chronoMap.invalidateSize(false);
+    if (bp && bp.includes(';')) {
+      const [rawLat, rawLng] = bp.split(';');
+      const lat = parseFloat(rawLat), lng = parseFloat(rawLng);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        chronoMap.setView([lat, lng], 6, { animate: true, duration: 0.7 });
+        chronoPulseMarker = L.marker([lat, lng], { icon: makePulseDot() }).addTo(chronoMap);
+        if (noLocEl) noLocEl.classList.add('hidden');
+        return;
+      }
+    }
+    if (noLocEl) noLocEl.classList.remove('hidden');
+  }
+
+  function initChronoMap() {
+    if (!chronoMapLoaded) {
+      chronoMap = L.map('chronoMapBg', {
+        center: [35, 30], zoom: 5,
+        zoomControl: false, attributionControl: false,
+        dragging: false, scrollWheelZoom: false,
+        doubleClickZoom: false, boxZoom: false, keyboard: false
+      });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd', maxZoom: 19
+      }).addTo(chronoMap);
+      chronoMapLoaded = true;
+    }
+    // Container is now visible — tell Leaflet its real size then show first card location
+    setTimeout(() => {
+      chronoMap.invalidateSize(false);
+      const first = document.querySelector('#chronoScroll .chrono-slide');
+      if (first) {
+        const total = document.querySelectorAll('#chronoScroll .chrono-slide').length;
+        updateChronoMap(first.dataset.bp || '', 0, total, first.dataset.century || '');
+      }
+    }, 80);
+  }
+
+  // Exposed to nav button onclick — delegates to the throttled chronoStep if available
+  let _chronoStep = null;
+  function chronoNav(dir) {
+    if (_chronoStep) { _chronoStep(dir); return; }
+    const scroll = document.getElementById('chronoScroll');
+    if (scroll) scroll.scrollBy({ top: dir * scroll.clientHeight, behavior: 'smooth' });
+  }
+  function chronoJumpEra(eraIdx) {
+    const scroll = document.getElementById('chronoScroll');
+    if (!scroll) return;
+    const slideIdx = _chronoEraStartIdx[eraIdx];
+    if (slideIdx === undefined) return;
+    const slide = scroll.querySelector(`.chrono-slide[data-idx="${slideIdx}"]`);
+    if (slide) slide.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function loadChronoView() {
+    const container = document.getElementById('chronoView');
+    if (!container) return;
     try {
-      const res = await fetch(`${API}/figures?page=1&page_size=500&sort=date_asc`);
-      const data = await res.json();
-      const START_YEAR=1, END_YEAR=1600, PX_PER_YEAR=5, CARD_WIDTH=200, PADDING=80;
-      const TOTAL_WIDTH = Math.round((END_YEAR-START_YEAR)*PX_PER_YEAR);
-      const BUCKET_SIZE = CARD_WIDTH+16;
-      const buckets = {};
-      const figures = data.results.filter(f => getFigureYear(f) !== null);
-      const noDate  = data.results.filter(f => getFigureYear(f) === null);
+      // Fetch figures list and map coordinates in parallel
+      const [figRes, mapData] = await Promise.all([
+        fetch(`${API}/figures?page=1&page_size=500&sort=date_asc`).then(r => r.json()),
+        fetch(`${API}/figures/map`).then(r => r.json()).catch(() => [])
+      ]);
+      const data = figRes;
+      // Build a lookup of id → birthplace from map endpoint
+      const bpMap = {};
+      if (Array.isArray(mapData)) {
+        mapData.forEach(f => { if (f.id && f.birthplace) bpMap[f.id] = f.birthplace; });
+      }
+      // Merge birthplace into figures
+      data.results.forEach(f => { if (!f.birthplace && bpMap[f.id]) f.birthplace = bpMap[f.id]; });
+      // Sort chronologically; undated figures go at the end
+      const figures = data.results.slice().sort((a, b) => {
+        const ay = getFigureYear(a), by = getFigureYear(b);
+        if (ay === null && by === null) return 0;
+        if (ay === null) return 1;
+        if (by === null) return -1;
+        return ay - by;
+      });
+      // Build slide list — inject era intro cards before first figure of each era.
+      // Use numeric year (same as sort key) so era order matches sort order exactly.
+      _chronoEraStartIdx = {};
+      let slideIdx = 0, seenEra = -1;
+      const allSlides = [];
       figures.forEach(f => {
         const year = getFigureYear(f);
-        const x = Math.round((year-START_YEAR)*PX_PER_YEAR);
-        const bucket = Math.floor(x/BUCKET_SIZE)*BUCKET_SIZE;
-        if (!buckets[bucket]) buckets[bucket] = [];
-        buckets[bucket].push({...f, _x:x});
+        const eraIdx = getEraFromYear(year);
+        if (eraIdx !== -1 && eraIdx !== seenEra) {
+          _chronoEraStartIdx[eraIdx] = slideIdx;
+          allSlides.push({ type: 'era', eraIdx, slideIdx: slideIdx++ });
+          seenEra = eraIdx;
+        }
+        allSlides.push({ type: 'figure', figure: f, slideIdx: slideIdx++ });
       });
-      let html = `<div class="tl-canvas" style="width:${TOTAL_WIDTH+PADDING*2}px"><div class="tl-axis"></div>`;
-      for (let yr=100; yr<=END_YEAR; yr+=100) {
-        const x = PADDING+Math.round((yr-START_YEAR)*PX_PER_YEAR);
-        const label = CENTURY_ORDER[Math.floor(yr/100)-1];
-        if (!label) continue;
-        html += `<div class="tl-marker" style="left:${x}px"><div class="tl-marker-label">${label} c.</div><div class="tl-marker-tick"></div></div>`;
+      const total = allSlides.length;
+      const slidesHtml = allSlides.map(item => {
+        if (item.type === 'era') {
+          const era = CHRONO_ERAS[item.eraIdx];
+          return `<div class="chrono-slide" data-idx="${item.slideIdx}" data-bp="" data-century="${ERA_CENTURY_MAP[item.eraIdx][0]}">
+            <div class="chrono-era-intro-card">
+              <div class="chrono-era-intro-accent" style="background:${era.hex}"></div>
+              <div class="chrono-era-intro-body">
+                <div class="chrono-era-intro-badge" style="color:${era.hex}">Era ${item.eraIdx + 1} of ${CHRONO_ERAS.length}</div>
+                <div class="chrono-era-intro-name" style="color:${era.hex}">${era.name}</div>
+                <div class="chrono-era-intro-dates">${era.dates}</div>
+                <div class="chrono-era-intro-desc">${era.desc}</div>
+              </div>
+            </div>
+          </div>`;
+        }
+        const f = item.figure;
+        const initial = (f.name||'?').charAt(0);
+        const imgHtml = f.image_url
+          ? `<img class="chrono-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` +
+            `<div class="chrono-card-placeholder" style="display:none">${initial}</div>`
+          : `<div class="chrono-card-placeholder">${initial}</div>`;
+        const dates = formatDates(f.born, f.death, f.era_type);
+        const hasLoc = f.birthplace && f.birthplace.includes(';');
+        const locHtml = hasLoc
+          ? `<div class="chrono-card-loc"><div class="chrono-card-loc-dot"></div>Birth location shown on map</div>`
+          : `<div class="chrono-card-loc" style="color:var(--ink-4)">⊘ Location not recorded</div>`;
+        // Derive century from the same numeric year used for sorting — no mismatch
+        const figYear = getFigureYear(f);
+        const century = figYear ? (deriveCentury(figYear, null) || '') : '';
+        const martyrHtml = f.is_martyr === 'Yes' ? `<div class="chrono-card-martyr">✝ Martyr</div>` : '';
+        return `<div class="chrono-slide" data-idx="${item.slideIdx}" data-bp="${f.birthplace||''}" data-century="${century}">
+          <div class="chrono-card" onclick="openFigure(${f.id})">
+            ${imgHtml}
+            <div class="chrono-card-body">
+              ${martyrHtml}
+              <div class="chrono-card-type">${f.type||''}</div>
+              <div class="chrono-card-name">${f.name||''}</div>
+              ${dates ? `<div class="chrono-card-dates">${dates}</div>` : ''}
+              ${f.role_office ? `<div class="chrono-card-role">${f.role_office}</div>` : ''}
+              ${f.short_description ? `<div class="chrono-card-desc">${f.short_description}</div>` : ''}
+              ${locHtml}
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+      // Era dot buttons HTML
+      const eraDotsHtml = CHRONO_ERAS.map((era, i) =>
+        `<button class="chrono-era-dot" data-era="${i}" style="--dot-color:${era.hex}" onclick="chronoJumpEra(${i})" title="${era.name}">
+          <div class="dot-pip"></div>
+          <span class="dot-tip">${era.name}</span>
+        </button>`
+      ).join('');
+      container.innerHTML = `
+        <div id="chronoMapBg"></div>
+        <div class="chrono-no-loc hidden" id="chronoNoLoc">⊘ Location unknown</div>
+        <div class="chrono-era-label hidden" id="chronoEraLabel"></div>
+        <div class="chrono-kbd-hint">↑ ↓ to navigate</div>
+        <div class="chrono-scroll" id="chronoScroll">${slidesHtml}</div>
+        <div class="chrono-progress">
+          <button class="chrono-nav-btn" onclick="chronoNav(-1)" title="Previous">▲</button>
+          <div class="chrono-era-dots">${eraDotsHtml}</div>
+          <div class="chrono-count" id="chronoCount">1 / ${total}</div>
+          <button class="chrono-nav-btn" onclick="chronoNav(1)" title="Next">▼</button>
+        </div>`;
+      // Wire up IntersectionObserver for slide changes
+      if (chronoObserver) chronoObserver.disconnect();
+      const scrollEl = document.getElementById('chronoScroll');
+      chronoObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            const el = entry.target;
+            updateChronoMap(el.dataset.bp || '', parseInt(el.dataset.idx) || 0, total, el.dataset.century || '');
+          }
+        });
+      }, { root: scrollEl, threshold: 0.5 });
+      document.querySelectorAll('#chronoScroll .chrono-slide').forEach(s => chronoObserver.observe(s));
+      // Scroll throttle: lock for 700ms + 30px delta accumulator to absorb trackpad micro-events
+      let _scrollLock = false, _deltaAccum = 0;
+      function chronoStep(dir) {
+        if (_scrollLock) return;
+        _scrollLock = true;
+        _deltaAccum = 0;
+        scrollEl.scrollBy({ top: dir * scrollEl.clientHeight, behavior: 'smooth' });
+        setTimeout(() => { _scrollLock = false; }, 700);
       }
-      Object.values(buckets).forEach(group => {
-        const x = PADDING+group[0]._x;
-        const cards = group.map(f => {
-          const initial = (f.name||'?').charAt(0);
-          // Use image_url if available, otherwise render placeholder and lazy-load
-          const imgHtml = f.image_url
-            ? `<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`
-            : `<div class="tl-card-placeholder" data-id="${f.id}" data-initial="${initial}">${initial}</div>`;
-          const dates = formatDates(f.born, f.death, f.era_type);
-          return `<div class="tl-card" onclick="openFigure(${f.id})">${f.is_martyr==='Yes'?'<div class="tl-martyr-dot"></div>':''}<div class="tl-card-inner">${imgHtml}<div class="tl-card-info"><div class="tl-card-type">${f.type||''}</div><div class="tl-card-name">${f.name||''}</div>${f.role_office?`<div class="tl-card-role">${f.role_office}</div>`:''} ${dates?`<div class="tl-card-dates">${dates}</div>`:''}</div></div></div>`;
-        }).join('');
-        html += `<div class="tl-fig-col" style="left:${x}px" data-century="${group[0].century || deriveCentury(group[0].born, group[0].death) || ''}">${cards}</div>`;
-      });
-      html += `</div>`;
-      if (noDate.length) {
-        html += `<div style="margin-top:1.5rem;padding:0.75rem 0;border-top:1px solid var(--border-light)"><div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:0.75rem">Date Unknown</div><div style="display:flex;flex-wrap:wrap;gap:0.5rem">${noDate.map(f=>{const initial=(f.name||'?').charAt(0);const imgHtml=f.image_url?`<img class="tl-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'tl-card-placeholder\\'>${initial}</div>'">`:`<div class="tl-card-placeholder">${initial}</div>`;return `<div class="tl-card" style="width:200px" onclick="openFigure(${f.id})"><div class="tl-card-inner">${imgHtml}<div class="tl-card-info"><div class="tl-card-type">${f.type||''}</div><div class="tl-card-name">${f.name||''}</div>${(f.century||deriveCentury(f.born,f.death))?`<div class="tl-card-dates">${f.century||deriveCentury(f.born,f.death)} c.</div>`:''}</div></div></div>`;}).join('')}</div></div>`;
-      }
-      container.innerHTML = html;
+      _chronoStep = chronoStep;
+      // Forward wheel anywhere on the view (delta accumulator absorbs trackpad micro-events)
+      const view = document.getElementById('chronoView');
+      view.addEventListener('wheel', e => {
+        e.preventDefault();
+        _deltaAccum += e.deltaY;
+        if (Math.abs(_deltaAccum) >= 30) chronoStep(_deltaAccum > 0 ? 1 : -1);
+      }, { passive: false });
+      // Touch swipe
+      let _touchY = 0;
+      view.addEventListener('touchstart', e => { _touchY = e.touches[0].clientY; }, { passive: true });
+      view.addEventListener('touchend', e => {
+        const dy = _touchY - e.changedTouches[0].clientY;
+        if (Math.abs(dy) > 40) chronoStep(dy > 0 ? 1 : -1);
+      }, { passive: true });
+      // Keyboard arrows
+      view._keyHandler = e => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); chronoStep(1); }
+        if (e.key === 'ArrowUp')   { e.preventDefault(); chronoStep(-1); }
+      };
+      document.addEventListener('keydown', view._keyHandler);
       timelineLoaded = true;
     } catch(e) {
-      container.innerHTML = `<div class="empty-state">Could not load timeline: ${e.message}</div>`;
+      container.innerHTML = `<div class="empty-state">Could not load: ${e.message}</div>`;
     }
   }
 
@@ -1401,7 +1774,7 @@
         ${f.short_description ? `<div class="arch-card-desc">${f.short_description}</div>` : ''}
         <div class="arch-card-footer">
           <div class="arch-card-cta">View Details <span>→</span></div>
-          <div style="display:flex;gap:0.4rem;align-items:center">
+          <div class="arch-card-tags">
             ${f.is_martyr==='Yes' ? '<span class="martyr-badge">✝ Martyr</span>' : ''}
             ${beliefs ? `<div class="arch-card-beliefs">${beliefs}</div>` : ''}
           </div>
