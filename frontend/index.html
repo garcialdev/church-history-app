@@ -10,29 +10,29 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    /* ── DARK THEME (default) — Candlelit Archive ─── */
+    /* ── DARK THEME (default) — Deep Codex ─── */
     :root, [data-theme="dark"] {
-      --bg:           #100e0a;
-      --bg-alt:       #181510;
-      --surface:      #1f1b16;
-      --surface-2:    #26211a;
-      --raised:       #2e2820;
-      --border:       #3a3228;
-      --border-light: #302b23;
-      --ink:          #f2e8d8;
-      --ink-2:        #c9b89a;
-      --ink-3:        #8c7a62;
-      --ink-4:        #5c4e3b;
-      --ink-5:        #3a3028;
+      --bg:           #08080d;
+      --bg-alt:       #0e0e17;
+      --surface:      #13131f;
+      --surface-2:    #1a1a2a;
+      --raised:       #202035;
+      --border:       #2a2a42;
+      --border-light: #1e1e32;
+      --ink:          #e8e4f0;
+      --ink-2:        #b0aac8;
+      --ink-3:        #706a88;
+      --ink-4:        #3e3858;
+      --ink-5:        #272440;
       --accent:       #d4903a;
       --accent-dim:   #c07e2a;
       --accent-2:     #a06520;
       --accent-glow:  rgba(212,144,58,0.12);
-      --sidebar-bg:   #0c0a08;
+      --sidebar-bg:   #06060d;
       --sidebar-active: rgba(212,144,58,0.12);
-      --sidebar-text: #6b5e4e;
+      --sidebar-text: #504b6e;
       --sidebar-active-text: #d4903a;
-      --card-img-bg:  #2e2820;
+      --card-img-bg:  #1a1a2e;
       --gold:         #e8c56a;
       --gold-dim:     #8a6e25;
       --gold-glow:    rgba(232,197,106,0.1);
@@ -40,7 +40,7 @@
       --red-dim:      rgba(192,57,43,0.15);
       --green:        #5a9a6a;
       --era1: #6db3d4; --era2: #9b7fd4; --era3: #d4903a; --era4: #c96a3a;
-      --radius: 4px; --radius-lg: 8px; --radius-xl: 12px;
+      --radius: 10px; --radius-lg: 16px; --radius-xl: 22px;
       --shadow-sm: 0 1px 4px rgba(0,0,0,0.5);
       --shadow:    0 4px 20px rgba(0,0,0,0.6);
       --shadow-lg: 0 16px 56px rgba(0,0,0,0.8);
@@ -76,7 +76,7 @@
       --red-dim:      rgba(155,28,28,0.1);
       --green:        #2d6a4f;
       --era1: #2980b9; --era2: #6c3483; --era3: #a07820; --era4: #8b4513;
-      --radius: 4px; --radius-lg: 8px; --radius-xl: 12px;
+      --radius: 10px; --radius-lg: 16px; --radius-xl: 22px;
       --shadow-sm: 0 1px 4px rgba(0,0,0,0.08);
       --shadow:    0 4px 16px rgba(0,0,0,0.12);
       --shadow-lg: 0 16px 48px rgba(0,0,0,0.18);
@@ -523,7 +523,11 @@
       min-width: 0;
     }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .arch-card:hover { box-shadow: var(--shadow); border-left-color: var(--accent); border-color: var(--border); transform: translateY(-2px); }
+    .arch-card::before { content: ''; position: absolute; inset: 0; background: var(--accent); opacity: 0; transition: opacity 0.3s; pointer-events: none; border-radius: inherit; }
+    .arch-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--accent); opacity: 0; transition: opacity 0.3s; border-radius: 0 0 var(--radius) var(--radius); }
+    .arch-card:hover { box-shadow: 0 8px 32px rgba(233,193,118,0.13), 0 2px 10px rgba(0,0,0,0.35); border-left-color: var(--accent); border-color: var(--border); transform: translateY(-4px); }
+    .arch-card:hover::before { opacity: 0.055; }
+    .arch-card:hover::after { opacity: 1; }
 
     .arch-card-header {
       display: flex;
@@ -532,7 +536,7 @@
     }
 
     .arch-card-img {
-      width: 80px; height: 80px;
+      width: 120px; height: 120px;
       border-radius: var(--radius);
       object-fit: cover;
       object-position: top center;
@@ -541,7 +545,7 @@
     }
 
     .arch-card-placeholder {
-      width: 80px; height: 80px;
+      width: 120px; height: 120px;
       border-radius: var(--radius);
       background: var(--card-img-bg);
       display: flex; align-items: center; justify-content: center;
@@ -571,7 +575,7 @@
     .arch-card-role {
       font-family: 'EB Garamond', Georgia, serif;
       font-size: 0.88rem;
-      color: var(--ink-3);
+      color: var(--ink-2);
       font-style: italic;
       margin-top: 0.1rem;
     }
@@ -579,14 +583,14 @@
     .arch-card-meta {
       font-family: 'DM Mono', monospace;
       font-size: 0.62rem;
-      color: var(--ink-4);
+      color: var(--ink-3);
       margin-top: 0.15rem;
     }
 
     .arch-card-desc {
       font-family: 'EB Garamond', Georgia, serif;
       font-size: 0.95rem;
-      color: var(--ink-3);
+      color: var(--ink-2);
       line-height: 1.65;
       display: -webkit-box;
       -webkit-line-clamp: 3;
@@ -757,8 +761,8 @@
     /* Era color top accent bar */
     .chrono-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--chrono-era-color, var(--accent)); }
     .chrono-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 16px 64px rgba(0,0,0,0.7); }
-    .chrono-card-img { width: 140px; flex-shrink: 0; object-fit: cover; object-position: top center; display: block; align-self: stretch; }
-    .chrono-card-placeholder { width: 140px; flex-shrink: 0; min-height: 260px; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-style: italic; color: var(--ink-4); }
+    .chrono-card-img { width: 180px; flex-shrink: 0; object-fit: cover; object-position: top center; display: block; align-self: stretch; }
+    .chrono-card-placeholder { width: 180px; flex-shrink: 0; min-height: 260px; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-style: italic; color: var(--ink-4); }
     .chrono-card-body { flex: 1; min-width: 0; padding: 1.3rem 1.4rem 1.3rem; overflow: hidden; }
     .chrono-card-type { font-family: 'DM Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.3rem; }
     .chrono-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: var(--ink); line-height: 1.1; margin-bottom: 0.25rem; }
@@ -840,16 +844,20 @@
     .leaflet-popup-tip { background: var(--surface) !important; }
     .leaflet-popup-content { margin: 0 !important; width: 242px !important; overflow: hidden !important; }
     .leaflet-popup-close-button { color: var(--ink-3) !important; top: 6px !important; right: 6px !important; }
-    .map-popup { display: flex; flex-direction: row; gap: 0.65rem; padding: 0.75rem; align-items: center; width: 242px; cursor: pointer; overflow: hidden; box-sizing: border-box; }
+    .map-popup { display: flex; flex-direction: column; width: 280px; cursor: pointer; overflow: hidden; box-sizing: border-box; }
     .map-popup:hover .map-popup-name { color: var(--accent); }
-    .map-popup-img { width: 52px !important; height: 52px !important; min-width: 52px !important; max-width: 52px !important; object-fit: cover; object-position: top center; display: block; flex-shrink: 0; border-radius: var(--radius-lg); }
-    .map-popup-placeholder { width: 52px !important; height: 52px !important; min-width: 52px !important; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-style: italic; color: var(--ink-5); flex-shrink: 0; border-radius: var(--radius-lg); }
-    .map-popup-info { display: flex; flex-direction: column; gap: 0.1rem; overflow: hidden; flex: 1; min-width: 0; }
-    .map-popup-type { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); }
-    .map-popup-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; font-weight: 600; color: var(--ink); line-height: 1.2; transition: color 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .map-popup-role { font-size: 0.75rem; color: var(--accent); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .map-popup-century { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-3); }
-    .map-popup-cta { font-size: 0.68rem; color: var(--ink-4); margin-top: 0.3rem; font-style: italic; border-top: 1px solid var(--border-light); padding-top: 0.3rem; }
+    .map-popup-hero { position: relative; width: 100%; height: 140px; overflow: hidden; flex-shrink: 0; }
+    .map-popup-img { width: 100% !important; height: 140px !important; min-width: unset !important; max-width: unset !important; object-fit: cover; object-position: top center; display: block; }
+    .map-popup-placeholder { width: 100% !important; height: 140px !important; min-width: unset !important; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-style: italic; color: var(--ink-4); }
+    .map-popup-hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(13,13,26,0.9) 0%, transparent 55%); pointer-events: none; }
+    .map-popup-hero-badge { position: absolute; top: 0.5rem; left: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(13,13,26,0.7); color: var(--ink-3); padding: 0.2rem 0.45rem; border-radius: var(--radius); }
+    .map-popup-info { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.8rem 0.9rem 0.7rem; }
+    .map-popup-type { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); }
+    .map-popup-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--ink); line-height: 1.2; transition: color 0.15s; }
+    .map-popup-role { font-size: 0.78rem; color: var(--accent); font-style: italic; }
+    .map-popup-century { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--ink-3); margin-top: 0.1rem; }
+    .map-popup-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.82rem; color: var(--ink-2); line-height: 1.55; margin-top: 0.3rem; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .map-popup-cta { font-size: 0.7rem; color: var(--ink-4); margin-top: 0.45rem; font-style: italic; border-top: 1px solid var(--border-light); padding-top: 0.45rem; }
 
     /* ── MODAL (editorial) ──────────────────────────── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 10000; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; backdrop-filter: blur(8px); animation: fadeIn 0.2s ease; }
@@ -940,7 +948,7 @@
 
     /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 960px) {
-      .sidebar { width: 200px; }
+      .sidebar { width: 500px; }
       .card-grid { grid-template-columns: 1fr; }
       .mpro-layout { grid-template-columns: 1fr; }
       .mpro-left { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; }
@@ -975,8 +983,8 @@
       .chrono-progress { display: none; }
       .chrono-kbd-hint { display: none; }
       .chrono-era-label { bottom: 5rem; }
-      .chrono-card-img { width: 90px; }
-      .chrono-card-placeholder { width: 90px; min-height: 180px; font-size: 2.5rem; }
+      .chrono-card-img { width: 120px; }
+      .chrono-card-placeholder { width: 120px; min-height: 180px; font-size: 2.5rem; }
       .chrono-card-name { font-size: 1rem; }
       .chrono-card-desc { -webkit-line-clamp: 2; line-clamp: 2; }
       .chrono-no-loc { bottom: 5.5rem; }
@@ -988,7 +996,7 @@
       .era-band-label { font-size: 0.72rem; }
       /* Tighter cards */
       .arch-card { padding: 0.85rem; gap: 0.6rem; }
-      .arch-card-img, .arch-card-placeholder { width: 64px; height: 64px; }
+      .arch-card-img, .arch-card-placeholder { width: 88px; height: 88px; }
       .arch-card-name { font-size: 1rem; }
       .arch-card-desc { font-size: 0.83rem; }
       .arch-card-beliefs { display: flex; flex-wrap: wrap; gap: 0.25rem; }
@@ -1178,10 +1186,10 @@
         <div class="sort-wrap">
           <span class="sort-label">Sort</span>
           <select class="sort-select" id="sortSelect" onchange="setSort(this.value)">
-            <option value="default">Default</option>
+            <option value="date_asc" selected>Oldest first</option>
+            <option value="date_desc">Newest first</option>
             <option value="name_asc">Name A → Z</option>
             <option value="name_desc">Name Z → A</option>
-            <option value="date_asc">Oldest first</option>
             <option value="date_desc">Newest first</option>
             <option value="century_asc">Century ↑</option>
             <option value="century_desc">Century ↓</option>
@@ -1265,9 +1273,10 @@
     search:'', type:'', century:'', gender:'',
     denomination:'', role_office:'',
     belief_id:'', is_martyr:'', page:1, total:0,
-    era_index:-1, sort:'default'
+    era_index:-1, sort:'date_asc'
   };
-  const PAGE_SIZE = 24;
+  const PAGE_SIZE = 20;
+  let allFigures = [];   // full sorted dataset — pagination is client-side
   let searchTimer;
   let timelineLoaded = false;
   let mapLoaded = false;
@@ -1289,7 +1298,7 @@
   ];
   function getEraFromCentury(century) {
     if (!century) return -1;
-    return ERA_CENTURY_MAP.findIndex(ks => ks.some(k => century.includes(k)));
+    return ERA_CENTURY_MAP.findIndex(ks => ks.includes(century));
   }
   let _chronoEraStartIdx = {}; // eraIdx → slide index of its intro card
 
@@ -1690,7 +1699,7 @@
 
     const filtered = allMapFigures.filter(f => {
       if (mapTypeFilter && f.type !== mapTypeFilter) return false;
-      if (eraKeywords && f.century && !eraKeywords.some(k => f.century.includes(k))) return false;
+      if (eraKeywords && f.century && !eraKeywords.includes(f.century)) return false;
       return true;
     });
 
@@ -1708,7 +1717,9 @@
         ? `<img class="map-popup-img" src="${f.image_url}" alt="${f.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` +
           `<div class="map-popup-placeholder" style="display:none">${initial}</div>`
         : `<div class="map-popup-placeholder">${initial}</div>`;
-      marker.bindPopup(`<div class="map-popup" onclick="closeMapPopup();openFigure(${f.id})">${imgHtml}<div class="map-popup-info"><div class="map-popup-type">${f.type||''}</div><div class="map-popup-name">${f.name}</div>${f.role_office?`<div class="map-popup-role">${f.role_office}</div>`:''} ${f.century?`<div class="map-popup-century">${f.century} c.</div>`:''}<div class="map-popup-cta">Tap to view profile →</div></div></div>`, {maxWidth:244});
+      const martyrBadge = f.is_martyr==='Yes' ? '<span class="martyr-badge">✝ Martyr</span>' : '';
+      marker.bindPopup(`<div class="map-popup" onclick="closeMapPopup();openFigure(${f.id})"><div class="map-popup-hero">${imgHtml}<div class="map-popup-hero-gradient"></div><div class="map-popup-hero-badge">${f.type||''}</div></div><div class="map-popup-info"><div class="map-popup-name">${f.name}</div>${f.role_office?`<div class="map-popup-role">${f.role_office}</div>`:''}<div class="map-popup-century">${[f.century?f.century+' c.':'', martyrBadge].filter(Boolean).join(' · ')}</div>${f.short_description?`<div class="map-popup-desc">${f.short_description}</div>`:''}<div class="map-popup-cta">Click to view profile →</div></div></div>`, {maxWidth:300});
+      marker.on('mouseover', function() { this.openPopup(); });
       marker.addTo(mapInstance);
       mapMarkers.push(marker);
       plotted++;
@@ -1787,10 +1798,12 @@
   }
 
   // ── FIGURES ────────────────────────────────────
+  // Fetch ALL matching records once, sort client-side, paginate locally.
+  // This lets us place century-only figures correctly within the sort order.
   async function loadFigures() {
     const grid = document.getElementById('grid');
     grid.innerHTML = `<div class="loading"><div class="spinner"></div>Loading records…</div>`;
-    const params = new URLSearchParams({ page:state.page, page_size:PAGE_SIZE });
+    const params = new URLSearchParams({ page:1, page_size:500 });
     if (state.search)       params.set('search', state.search);
     if (state.type)         params.set('type', state.type);
     if (state.century)      params.set('century', state.century);
@@ -1799,35 +1812,42 @@
     if (state.role_office)  params.set('role_office', state.role_office);
     if (state.belief_id)    params.set('belief_id', state.belief_id);
     if (state.is_martyr !== '') params.set('is_martyr', state.is_martyr);
-    if (state.sort && state.sort !== 'default') params.set('sort', state.sort);
     if (state.era_index >= 0 && eraRanges[state.era_index]) {
       const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th","17th","18th","19th","20th","21st"]];
       const keywords = eraCenturyMap[state.era_index];
       if (keywords) params.set('century_keywords', keywords.join(','));
     }
     try {
-      const res = await fetch(`${API}/figures?${params}`);
-      const data = await res.json();
-      state.total = data.total;
-      const start = (state.page-1)*PAGE_SIZE+1;
-      const end = Math.min(state.page*PAGE_SIZE, data.total);
-      document.getElementById('resultsInfo').innerHTML = data.total > 0
-        ? `Showing <strong>${start}–${end}</strong> of <strong>${data.total}</strong> records`
-        : 'No records found';
-      if (!data.results.length) {
-        grid.innerHTML = `<div class="empty-state">No records match your current filters.</div>`;
-        document.getElementById('pagination').innerHTML = '';
-        return;
-      }
-      grid.innerHTML = data.results.map((f,i) => renderCard(f,i)).join('');
-      renderPagination(data.total);
+      const data = await fetch(`${API}/figures?${params}`).then(r=>r.json());
+      allFigures = data.results || [];
+      state.total = allFigures.length;
+      state.page = 1;
+      clientSort(allFigures, state.sort);
+      renderCurrentPage();
     } catch(e) {
       grid.innerHTML = `<div class="empty-state">Could not reach the API. Is the backend running?</div>`;
     }
   }
 
+  function renderCurrentPage() {
+    const grid = document.getElementById('grid');
+    const start = (state.page - 1) * PAGE_SIZE;
+    const pageItems = allFigures.slice(start, start + PAGE_SIZE);
+    const total = allFigures.length;
+    document.getElementById('resultsInfo').innerHTML = total > 0
+      ? `Showing <strong>${start+1}–${Math.min(start+PAGE_SIZE, total)}</strong> of <strong>${total}</strong> records`
+      : 'No records found';
+    if (!pageItems.length) {
+      grid.innerHTML = `<div class="empty-state">No records match your current filters.</div>`;
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+    grid.innerHTML = pageItems.map((f,i) => renderCard(f,i)).join('');
+    renderPagination(total);
+  }
+
   function renderCard(f, i) {
-    const delay = (i%PAGE_SIZE)*22;
+    const delay = i < 5 ? i * 55 : 0;
     const name = f.name || 'Unknown';
     const initial = name.charAt(0);
     const dates = formatDates(f.born, f.death, f.era_type);
@@ -1863,6 +1883,26 @@
           </div>
         </div>
       </div>`;
+  }
+
+  // Maps century label → representative year for sorting when no exact date exists
+  const CENTURY_TO_YEAR = {
+    '1st':50,'2nd':150,'3rd':250,'4th':350,'5th':450,'6th':550,'7th':650,
+    '8th':750,'9th':850,'10th':950,'11th':1050,'12th':1150,'13th':1250,
+    '14th':1350,'15th':1450,'16th':1550,'17th':1650,'18th':1750,
+    '19th':1850,'20th':1950,'21st':2010
+  };
+  function figureYear(f) {
+    if (f.born != null) return f.born;
+    if (f.death != null) return f.death - 35;
+    const c = f.century || deriveCentury(f.born, f.death);
+    return CENTURY_TO_YEAR[c] ?? 9999;
+  }
+  function clientSort(results, sortKey) {
+    if (sortKey === 'name_asc') return results.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    if (sortKey === 'name_desc') return results.sort((a,b) => (b.name||'').localeCompare(a.name||''));
+    const desc = sortKey === 'date_desc';
+    return results.sort((a,b) => desc ? figureYear(b)-figureYear(a) : figureYear(a)-figureYear(b));
   }
 
   function deriveCentury(born, death) {
@@ -1902,7 +1942,7 @@
     if (cur>=total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
     return [1,'…',cur-1,cur,cur+1,'…',total];
   }
-  function goPage(p) { state.page=p; loadFigures(); document.getElementById('contentArea').scrollTo({top:0,behavior:'smooth'}); }
+  function goPage(p) { state.page=p; renderCurrentPage(); document.getElementById('contentArea').scrollTo({top:0,behavior:'smooth'}); }
 
   // ── MODAL ──────────────────────────────────────
   async function openFigure(id) {
@@ -2038,7 +2078,7 @@
     loadFigures();
   }
 
-  function setSort(value) { state.sort=value; state.page=1; loadFigures(); }
+  function setSort(value) { state.sort=value; state.page=1; clientSort(allFigures, state.sort); renderCurrentPage(); }
 
   function clearSearch() {
     document.getElementById('searchInput').value='';
