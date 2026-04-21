@@ -542,7 +542,9 @@
       object-position: top center;
       flex-shrink: 0;
       background: var(--card-img-bg);
+      transition: transform 0.45s ease;
     }
+    .arch-card:hover .arch-card-img { transform: scale(1.08); }
 
     .arch-card-placeholder {
       width: 120px; height: 120px;
@@ -737,103 +739,79 @@
 
     /* ── TIMELINE VIEW ────────────────────────────── */
     /* ── CHRONO VIEW ─────────────────────────────── */
-    .chrono-view {
-      position: relative; height: calc(100vh - 180px); min-height: 500px;
-      overflow: hidden; border-radius: var(--radius-lg);
+    /* ── TIMELINE VIEW ───────────────────────────── */
+    .chrono-view { position: relative; }
+    .chrono-layout { display: grid; grid-template-columns: 52px 1fr 52px; }
+    /* Left sticky era-nav column */
+    .chrono-side-nav {
+      position: sticky; top: 0; height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 2rem 0; gap: 0.4rem; pointer-events: none;
     }
-    #chronoMapBg { position: absolute; inset: 0; z-index: 0; background: var(--surface-2); }
-    .chrono-scroll {
-      position: absolute; top: 0; right: 0; width: 440px; height: 100%;
-      overflow-y: scroll; scroll-snap-type: y mandatory; z-index: 20; scrollbar-width: none;
-      overflow-x: visible;
-    }
-    .chrono-scroll::-webkit-scrollbar { display: none; }
-    .chrono-slide {
-      height: 100%; scroll-snap-align: start;
-      display: flex; align-items: center; padding: 1.5rem 1.5rem 1.5rem 0;
-    }
-    .chrono-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); box-shadow: 0 8px 48px rgba(0,0,0,0.65);
-      overflow: hidden; width: 100%; cursor: pointer; transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
-      display: flex; flex-direction: row; position: relative;
-    }
-    /* Era color top accent bar */
-    .chrono-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--chrono-era-color, var(--accent)); }
-    .chrono-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 16px 64px rgba(0,0,0,0.7); }
-    .chrono-card-img { width: 180px; flex-shrink: 0; object-fit: cover; object-position: top center; display: block; align-self: stretch; }
-    .chrono-card-placeholder { width: 180px; flex-shrink: 0; min-height: 260px; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-style: italic; color: var(--ink-4); }
-    .chrono-card-body { flex: 1; min-width: 0; padding: 1.3rem 1.4rem 1.3rem; overflow: hidden; }
-    .chrono-card-type { font-family: 'DM Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.3rem; }
-    .chrono-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: var(--ink); line-height: 1.1; margin-bottom: 0.25rem; }
-    .chrono-card-dates { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-3); margin-bottom: 0.45rem; }
-    .chrono-card-role { font-family: 'EB Garamond', Georgia, serif; font-size: 0.92rem; color: var(--ink-2); font-style: italic; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .chrono-card-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.9rem; color: var(--ink-2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .chrono-card-loc { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--border-light); font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--ink-3); letter-spacing: 0.05em; }
-    .chrono-card-loc-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 6px var(--accent); }
-    .chrono-card-martyr { display: inline-flex; align-items: center; gap: 0.25rem; font-family: 'DM Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); border-radius: 2px; padding: 0.15rem 0.5rem; margin-bottom: 0.3rem; width: fit-content; }
-    /* Gradient left edge blends card panel into map */
-    .chrono-scroll::before { content: ''; position: absolute; top: 0; left: -28px; width: 28px; height: 100%; background: linear-gradient(to right, transparent, var(--surface)); pointer-events: none; z-index: 1; }
-    /* Location unknown — sits above century label */
-    .chrono-no-loc {
-      position: absolute; bottom: 4.5rem; left: 50%; transform: translateX(-50%);
-      z-index: 25; pointer-events: none; display: flex; align-items: center; gap: 0.4rem;
-      font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em;
-      text-transform: uppercase; color: rgba(255,255,255,0.6);
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 2px;
-      padding: 0.4rem 1rem; white-space: nowrap; transition: opacity 0.35s;
-    }
-    .chrono-no-loc.hidden { opacity: 0; }
-    /* Century label */
-    .chrono-era-label {
-      position: absolute; left: 50%; bottom: 1.5rem; transform: translateX(-50%);
-      z-index: 22; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-style: italic; font-weight: 500;
-      color: rgba(255,255,255,0.9); background: rgba(0,0,0,0.55); backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; padding: 0.4rem 1.2rem;
-      pointer-events: none; transition: opacity 0.3s; white-space: nowrap;
-    }
-    .chrono-era-label.hidden { opacity: 0; }
-    /* Keyboard hint */
-    .chrono-kbd-hint { position: absolute; bottom: 1.5rem; left: 1.5rem; z-index: 22; font-family: 'DM Mono', monospace; font-size: 0.58rem; color: rgba(255,255,255,0.35); letter-spacing: 0.05em; pointer-events: none; }
-    /* Left nav panel */
-    .chrono-progress {
-      position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%);
-      z-index: 22; display: flex; flex-direction: column; align-items: center; gap: 0.55rem;
-    }
-    .chrono-nav-btn { background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; backdrop-filter: blur(6px); transition: all 0.2s; }
-    .chrono-nav-btn:hover { background: rgba(212,144,58,0.25); border-color: rgba(212,144,58,0.5); color: var(--accent); }
-    .chrono-count { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: rgba(255,255,255,0.4); text-align: center; }
-    /* Era dot buttons (Roman numeral style) */
-    .chrono-era-dots { display: flex; flex-direction: column; gap: 0.35rem; align-items: center; padding: 0.3rem 0; }
+    .chrono-side-nav > * { pointer-events: all; }
+    .chrono-side-line { width: 1px; flex: 1; max-height: 64px; background: linear-gradient(to bottom, transparent, rgba(212,144,58,0.2), transparent); }
+    .chrono-side-label { writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'DM Mono', monospace; font-size: 0.48rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--ink-4); margin: 0.25rem 0; }
+    .chrono-era-dots { display: flex; flex-direction: column; gap: 0.3rem; align-items: center; padding: 0.25rem 0; }
     .chrono-era-dot {
-      width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+      width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(4px); transition: all 0.2s; position: relative;
-      flex-shrink: 0;
-      font-family: 'Cormorant Garamond', serif; font-size: 0.78rem; font-style: italic;
-      color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.04); border: 1.5px solid rgba(255,255,255,0.08);
+      transition: all 0.2s; position: relative; flex-shrink: 0;
+      font-family: 'Cormorant Garamond', serif; font-size: 0.72rem; font-style: italic;
+      color: rgba(255,255,255,0.35);
     }
-    .chrono-era-dot:hover { background: rgba(255,255,255,0.14); transform: scale(1.1); color: rgba(255,255,255,0.9); }
-    .chrono-era-dot.active { border-color: var(--dot-color, #fff); box-shadow: 0 0 12px var(--dot-color, #fff), 0 0 0 3px rgba(255,255,255,0.05); background: rgba(255,255,255,0.1); color: var(--dot-color, #fff); animation: warmGlow 2.5s ease-in-out infinite; }
-    @keyframes warmGlow { 0%, 100% { box-shadow: 0 0 8px var(--dot-color, #fff); } 50% { box-shadow: 0 0 16px var(--dot-color, #fff), 0 0 30px rgba(212,144,58,0.2); } }
-    .chrono-era-dot .dot-tip { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.12); border-radius: 2px; padding: 0.25rem 0.65rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(255,255,255,0.8); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+    .chrono-era-dot:hover { background: rgba(255,255,255,0.1); transform: scale(1.12); color: rgba(255,255,255,0.85); }
+    .chrono-era-dot.active { border-color: var(--dot-color, var(--accent)); box-shadow: 0 0 10px var(--dot-color, var(--accent)); background: rgba(255,255,255,0.07); color: var(--dot-color, var(--accent)); }
+    .chrono-era-dot .dot-tip { position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.88); border: 1px solid rgba(255,255,255,0.1); padding: 0.2rem 0.6rem; font-family: 'DM Mono', monospace; font-size: 0.58rem; color: rgba(255,255,255,0.8); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 100; }
     .chrono-era-dot:hover .dot-tip { opacity: 1; }
-    /* Era intro card */
-    .chrono-era-intro-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 8px 48px rgba(0,0,0,0.65); overflow: hidden; width: 100%; position: relative; }
-    .chrono-era-intro-accent { height: 5px; }
-    .chrono-era-intro-body { padding: 2rem 1.75rem 2rem; position: relative; z-index: 1; }
-    /* Watermark era number */
-    .chrono-era-intro-body::before { content: attr(data-num); position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 9rem; font-weight: 700; font-style: italic; opacity: 0.04; color: currentColor; line-height: 1; pointer-events: none; z-index: 0; }
-    .chrono-era-intro-badge { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 0.6rem; opacity: 0.65; }
-    .chrono-era-intro-name { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; font-style: italic; line-height: 1.05; margin-bottom: 0.35rem; }
-    .chrono-era-intro-dates { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--ink-3); margin-bottom: 1rem; letter-spacing: 0.05em; }
-    .chrono-era-intro-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.95rem; color: var(--ink-2); line-height: 1.7; }
-    @keyframes chrono-pulse { 0% { transform: scale(0.8); opacity: 1; } 70% { transform: scale(3.5); opacity: 0; } 100% { transform: scale(0.8); opacity: 0; } }
-    .cp-wrap { width: 20px; height: 20px; position: relative; }
-    .cp-ring { width: 20px; height: 20px; background: rgba(212,144,58,0.3); border-radius: 50%; position: absolute; top: 0; left: 0; animation: chrono-pulse 2s ease-out infinite; }
-    .cp-inner { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: absolute; top: 4px; left: 4px; box-shadow: 0 0 8px var(--accent), 0 0 20px rgba(212,144,58,0.4); }
+    /* Main scroll area */
+    .chrono-main { padding: 2rem 0.5rem 5rem 0.5rem; max-width: 860px; width: 100%; margin: 0 auto; }
+    /* Header */
+    .chrono-header { text-align: center; padding: 1rem 0 3rem; max-width: 560px; margin: 0 auto; }
+    .chrono-header-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--accent); display: block; margin-bottom: 0.7rem; }
+    .chrono-header-title { font-family: 'Cormorant Garamond', serif; font-size: 2.75rem; font-weight: 600; font-style: italic; color: var(--ink); margin-bottom: 0.75rem; line-height: 1.1; }
+    .chrono-header-sub { font-family: 'EB Garamond', Georgia, serif; font-size: 0.95rem; color: var(--ink-2); line-height: 1.75; }
+    /* Timeline layout */
+    .chrono-timeline-wrap { position: relative; }
+    .chrono-center-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; transform: translateX(-50%); background: linear-gradient(to bottom, transparent 0%, rgba(212,144,58,0.28) 6%, rgba(212,144,58,0.28) 94%, transparent 100%); pointer-events: none; }
+    .chrono-entries { display: flex; flex-direction: column; gap: 2.25rem; }
+    /* Era intro cards — full width */
+    .chrono-era-block { margin: 0.5rem 0 0; }
+    .chrono-era-intro-card { background: var(--surface); border: 1px solid var(--border); box-shadow: 0 8px 40px rgba(0,0,0,0.55); overflow: hidden; width: 100%; position: relative; }
+    .chrono-era-intro-accent { height: 4px; }
+    .chrono-era-intro-body { padding: 1.65rem 1.5rem; position: relative; z-index: 1; }
+    .chrono-era-intro-body::before { content: attr(data-num); position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); font-family: 'Cormorant Garamond', serif; font-size: 8rem; font-weight: 700; font-style: italic; opacity: 0.04; color: currentColor; line-height: 1; pointer-events: none; z-index: 0; }
+    .chrono-era-intro-badge { font-family: 'DM Mono', monospace; font-size: 0.57rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.45rem; opacity: 0.7; }
+    .chrono-era-intro-name { font-family: 'Cormorant Garamond', serif; font-size: 1.85rem; font-weight: 600; font-style: italic; line-height: 1.05; margin-bottom: 0.3rem; }
+    .chrono-era-intro-dates { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-3); margin-bottom: 0.85rem; letter-spacing: 0.05em; }
+    .chrono-era-intro-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.92rem; color: var(--ink-2); line-height: 1.75; }
+    /* Figure entries — alternating left/right */
+    .chrono-entry { position: relative; display: flex; align-items: stretch; justify-content: space-between; transition: transform 0.4s ease, opacity 0.4s ease; will-change: transform, opacity; transform-origin: center top; }
+    .chrono-era-block { transition: transform 0.4s ease, opacity 0.4s ease; will-change: transform, opacity; transform-origin: center top; }
+    .chrono-entry-slot { width: 46%; }
+    .chrono-entry-slot.empty { pointer-events: none; }
+    .chrono-node { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--accent); box-shadow: 0 0 8px rgba(212,144,58,0.3); flex-shrink: 0; }
+    /* Figure cards */
+    .chrono-card { background: var(--surface); border: 1px solid var(--border); box-shadow: 0 6px 32px rgba(0,0,0,0.5); overflow: hidden; cursor: pointer; transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s; display: flex; flex-direction: row; height: 100%; }
+    .chrono-card-left { border-right: 3px solid var(--era-color, var(--border)); }
+    .chrono-card-right { border-left: 3px solid var(--era-color, var(--border)); }
+    .chrono-card:hover { transform: translateY(-3px); box-shadow: 0 14px 52px rgba(0,0,0,0.7); }
+    .chrono-card-left:hover { border-right-color: var(--era-color, var(--accent)); }
+    .chrono-card-right:hover { border-left-color: var(--era-color, var(--accent)); }
+    .chrono-card-img-wrap { width: 90px; flex-shrink: 0; overflow: hidden; position: relative; align-self: stretch; }
+    .chrono-card-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; filter: grayscale(0.6) opacity(0.7); transition: filter 0.5s, transform 0.6s; display: block; }
+    .chrono-card:hover .chrono-card-img { filter: grayscale(0) opacity(1); transform: scale(1.05); }
+    .chrono-card-img-gradient { position: absolute; inset: 0; background: linear-gradient(to right, transparent 60%, rgba(8,8,13,0.6)); pointer-events: none; }
+    .chrono-card-placeholder { width: 90px; flex-shrink: 0; align-self: stretch; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-style: italic; color: var(--ink-4); }
+    .chrono-card-body { flex: 1; min-width: 0; padding: 0.85rem 0.9rem; overflow: hidden; }
+    .chrono-card-type { font-family: 'DM Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); margin-bottom: 0.2rem; }
+    .chrono-card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--ink); line-height: 1.1; margin-bottom: 0.18rem; }
+    .chrono-card-dates { font-family: 'DM Mono', monospace; font-size: 0.58rem; color: var(--ink-3); margin-bottom: 0.3rem; }
+    .chrono-card-role { font-family: 'EB Garamond', Georgia, serif; font-size: 0.87rem; color: var(--ink-2); font-style: italic; margin-bottom: 0.35rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chrono-card-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.85rem; color: var(--ink-2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .chrono-card-loc { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.55rem; padding-top: 0.45rem; border-top: 1px solid var(--border-light); font-family: 'DM Mono', monospace; font-size: 0.55rem; color: var(--ink-4); letter-spacing: 0.05em; }
+    .chrono-card-loc-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; flex-shrink: 0; }
+    .chrono-card-martyr { display: inline-flex; align-items: center; gap: 0.25rem; font-family: 'DM Mono', monospace; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--red); background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); border-radius: 2px; padding: 0.12rem 0.45rem; margin-bottom: 0.25rem; width: fit-content; }
 
     /* ── MAP VIEW ─────────────────────────────────── */
     .map-info-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 0 0.75rem; font-size: 0.82rem; color: var(--ink-3); }
@@ -885,20 +863,20 @@
     .mpro-right { padding: 2.75rem 3rem; display: flex; flex-direction: column; gap: 2rem; max-width: 100%; }
     .mpro-badge { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
     .mpro-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; font-style: italic; color: var(--ink); line-height: 1.05; letter-spacing: 0.01em; margin: -0.25rem 0 0; }
-    .mpro-subtitle { font-family: 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-3); font-size: 1.1rem; margin-top: -0.9rem; }
-    .mpro-alt { font-family: 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-4); font-size: 0.88rem; margin-top: -1.2rem; }
+    .mpro-subtitle { font-family: 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-2); font-size: 1.15rem; margin-top: -0.9rem; }
+    .mpro-alt { font-family: 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-3); font-size: 0.95rem; margin-top: -1.1rem; }
     .mpro-martyr { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); color: var(--red); font-size: 0.7rem; font-family: 'DM Mono', monospace; letter-spacing: 0.06em; padding: 0.25rem 0.65rem; border-radius: var(--radius); width: fit-content; margin-top: -0.5rem; }
 
     /* Sections */
     .mpro-section { display: flex; flex-direction: column; gap: 0.85rem; }
     .mpro-section-head {
       font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase;
-      letter-spacing: 0.14em; color: var(--ink-3);
+      letter-spacing: 0.14em; color: var(--ink-2);
       padding-bottom: 0.55rem;
-      border-bottom: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border);
       width: 60%;
     }
-    .mpro-text { font-family: 'EB Garamond', Georgia, serif; font-size: 1rem; color: var(--ink-2); line-height: 1.9; white-space: pre-wrap; max-width: 72ch; }
+    .mpro-text { font-family: 'EB Garamond', Georgia, serif; font-size: 1.05rem; color: var(--ink); line-height: 1.9; white-space: pre-wrap; max-width: 72ch; }
     .mpro-quote {
       position: relative;
       border-left: 3px solid var(--gold-dim);
@@ -977,17 +955,15 @@
       .era-chips { display: none; }
       /* Results bar wraps on small screens */
       .results-bar { flex-wrap: wrap; gap: 0.4rem; padding-bottom: 0.5rem; }
-      .chrono-view { height: calc(100vh - 140px); }
-      .chrono-scroll { width: 100%; }
-      .chrono-slide { padding: 1rem; align-items: flex-end; }
-      .chrono-progress { display: none; }
-      .chrono-kbd-hint { display: none; }
-      .chrono-era-label { bottom: 5rem; }
-      .chrono-card-img { width: 120px; }
-      .chrono-card-placeholder { width: 120px; min-height: 180px; font-size: 2.5rem; }
-      .chrono-card-name { font-size: 1rem; }
-      .chrono-card-desc { -webkit-line-clamp: 2; line-clamp: 2; }
-      .chrono-no-loc { bottom: 5.5rem; }
+      .chrono-layout { grid-template-columns: 0 1fr 0; }
+      .chrono-side-nav { display: none; }
+      .chrono-main { padding: 1rem; }
+      .chrono-header-title { font-size: 2rem; }
+      .chrono-entry { flex-direction: column; gap: 0.5rem; }
+      .chrono-entry-slot { width: 100%; }
+      .chrono-entry-slot.empty { display: none; }
+      .chrono-node { display: none; }
+      .chrono-center-line { display: none; }
       /* Tighter era bands */
       .stats-banner { gap: 0.5rem; margin-bottom: 1rem; }
       .era-band { padding: 0.65rem 0.75rem; }
@@ -1039,7 +1015,81 @@
 
     @media (max-width: 640px) {
       .stats-banner { grid-template-columns: 1fr 1fr; }
+      .era-scrubber { display: none; }
+      .scroll-top-btn { bottom: 4.5rem; right: 0.75rem; }
     }
+
+    /* ── RELATIONSHIP GRAPH ────────────────────────── */
+    .graph-overlay { position: fixed; inset: 0; background: rgba(4,4,10,0.97); z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; }
+    .graph-header { position: absolute; top: 0; left: 0; right: 0; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(8,8,13,0.6); backdrop-filter: blur(8px); }
+    .graph-title { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-style: italic; color: var(--ink-2); }
+    .graph-title strong { color: var(--ink); font-style: normal; }
+    .graph-subtitle { font-family: 'DM Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-4); margin-top: 0.15rem; }
+    .graph-close { background: none; border: 1px solid var(--border); color: var(--ink-3); width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .graph-close:hover { border-color: var(--red); color: var(--red); }
+    .graph-svg { max-width: 100%; max-height: calc(100vh - 100px); }
+    .graph-node { cursor: pointer; transition: all 0.2s; }
+    .graph-node:hover .graph-node-ring { r: 46; opacity: 1; }
+    .graph-node-img { clip-path: circle(); }
+    .graph-edge { stroke: var(--accent); stroke-width: 1.5; opacity: 0.35; transition: opacity 0.2s; }
+    .graph-edge:hover { opacity: 0.7; }
+    .graph-node-label { font-family: 'Cormorant Garamond', serif; font-size: 15px; fill: #e8e4f0; text-anchor: middle; pointer-events: none; transition: fill 0.2s; font-weight: 600; }
+    .graph-node-sublabel { font-family: 'DM Mono', monospace; font-size: 10px; fill: #9090b0; text-anchor: middle; pointer-events: none; text-transform: uppercase; letter-spacing: 0.06em; }
+    .graph-node:hover .graph-node-label { fill: #ffffff; }
+    .graph-btn { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.35rem 0.85rem; border: 1px solid var(--border); border-left: 2px solid var(--accent); color: var(--accent); background: var(--surface-2); cursor: pointer; border-radius: 2px; transition: all 0.2s; }
+    .graph-btn:hover { background: var(--raised); }
+    .graph-empty { font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-3); font-size: 1rem; text-align: center; }
+
+    /* ── VIEW TRANSITIONS ──────────────────────────── */
+    @keyframes viewReveal { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    .view-entering { animation: viewReveal 0.28s ease forwards; }
+
+    /* ── FILTER PILLS ──────────────────────────────── */
+    .filter-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.7rem; }
+    .filter-pills:empty { display: none; }
+    .filter-pill { display: inline-flex; align-items: center; gap: 0.3rem; background: var(--surface-2); border: 1px solid var(--border); border-left: 2px solid var(--accent); padding: 0.2rem 0.5rem 0.2rem 0.55rem; font-family: 'DM Mono', monospace; font-size: 0.57rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); cursor: pointer; transition: all 0.18s; border-radius: 2px; }
+    .filter-pill:hover { background: var(--raised); }
+    .filter-pill-x { color: var(--ink-3); font-size: 0.8rem; margin-left: 0.15rem; line-height: 1; transition: color 0.15s; }
+    .filter-pill:hover .filter-pill-x { color: var(--ink); }
+    .filter-pill-clearall { border-left-color: var(--ink-3); color: var(--ink-3); }
+    .filter-pill-clearall:hover { color: var(--ink-2); border-left-color: var(--ink-2); }
+
+    /* ── ERA STATS BANNER ──────────────────────────── */
+    .era-stats-banner { display: none; align-items: center; flex-wrap: wrap; gap: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-left: 4px solid currentColor; padding: 0.85rem 1.25rem; margin-bottom: 1rem; border-radius: var(--radius); animation: viewReveal 0.25s ease forwards; }
+    .era-stats-banner.visible { display: flex; }
+    .era-stats-name { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; font-weight: 600; line-height: 1.1; }
+    .era-stats-dates { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.65; margin-top: 0.15rem; }
+    .era-stats-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+    .era-stats-chip { font-family: 'DM Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; background: var(--surface); border: 1px solid var(--border); padding: 0.3rem 0.7rem; color: var(--ink-3); border-radius: 2px; white-space: nowrap; }
+    .era-stats-chip strong { color: var(--ink); font-size: 0.85rem; font-weight: 600; font-family: 'Cormorant Garamond', serif; font-style: normal; margin-right: 0.2rem; }
+
+    /* ── SCROLL-TO-TOP ─────────────────────────────── */
+    .scroll-top-btn { position: fixed; bottom: 2rem; right: 1.25rem; width: 38px; height: 38px; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-3); font-size: 0.9rem; border-radius: var(--radius-lg); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 90; box-shadow: var(--shadow-sm); }
+    .scroll-top-btn.visible { opacity: 1; pointer-events: auto; }
+    .scroll-top-btn:hover { background: var(--raised); color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); }
+
+    /* ── SEARCH AUTOCOMPLETE ───────────────────────── */
+    .search-autocomplete { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); z-index: 300; max-height: 310px; overflow-y: auto; box-shadow: var(--shadow); display: none; }
+    .search-autocomplete.open { display: block; animation: viewReveal 0.18s ease forwards; }
+    .search-ac-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0.75rem; cursor: pointer; transition: background 0.12s; border-bottom: 1px solid var(--border-light); }
+    .search-ac-item:last-child { border-bottom: none; }
+    .search-ac-item:hover, .search-ac-item.focused { background: var(--raised); }
+    .search-ac-img { width: 32px; height: 32px; object-fit: cover; object-position: top center; flex-shrink: 0; border-radius: var(--radius); }
+    .search-ac-placeholder { width: 32px; height: 32px; background: var(--card-img-bg); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-style: italic; color: var(--ink-4); flex-shrink: 0; border-radius: var(--radius); }
+    .search-ac-name { font-family: 'Cormorant Garamond', serif; font-size: 0.95rem; color: var(--ink); line-height: 1.2; }
+    .search-ac-meta { font-family: 'DM Mono', monospace; font-size: 0.54rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.1rem; }
+    .search-ac-empty { padding: 0.75rem; font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-3); font-size: 0.9rem; text-align: center; }
+
+    /* ── ERA SCRUBBER ──────────────────────────────── */
+    .era-scrubber { position: fixed; right: 0.5rem; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 0.2rem; z-index: 80; padding: 0.5rem 0; }
+    .era-scrub-item { display: flex; align-items: center; justify-content: flex-end; gap: 0.45rem; padding: 0.3rem 0.35rem; cursor: pointer; border-radius: var(--radius); transition: background 0.2s; }
+    .era-scrub-item:hover { background: rgba(255,255,255,0.05); }
+    .era-scrub-label { font-family: 'DM Mono', monospace; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); white-space: nowrap; opacity: 0; transform: translateX(4px); transition: all 0.2s; pointer-events: none; }
+    .era-scrub-item:hover .era-scrub-label { opacity: 1; transform: translateX(0); }
+    .era-scrub-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; transition: all 0.25s; flex-shrink: 0; opacity: 0.45; }
+    .era-scrub-item:hover .era-scrub-dot { opacity: 0.85; transform: scale(1.3); }
+    .era-scrub-item.active .era-scrub-dot { width: 10px; height: 10px; opacity: 1; box-shadow: 0 0 8px currentColor; }
+    .era-scrub-item.active .era-scrub-label { opacity: 0.8; transform: translateX(0); }
   </style>
 </head>
 <body>
@@ -1128,6 +1178,7 @@
       <span class="search-icon">⚲</span>
       <input type="text" id="searchInput" placeholder="Search figures, councils, locations…" autocomplete="off" />
       <button class="search-clear" onclick="clearSearch()">×</button>
+      <div id="searchAC" class="search-autocomplete"></div>
     </div>
 
     <div class="era-chips">
@@ -1198,6 +1249,8 @@
         </div>
       </div>
 
+      <div id="filterPills" class="filter-pills"></div>
+      <div id="eraStatsBanner" class="era-stats-banner"></div>
       <div class="card-grid" id="grid">
         <div class="loading"><div class="spinner"></div>Loading records…</div>
       </div>
@@ -1257,6 +1310,15 @@
   </button>
 </nav>
 
+<!-- ERA SCRUBBER -->
+<div class="era-scrubber" id="eraScrubber"></div>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Back to top">↑</button>
+
+<!-- RELATIONSHIP GRAPH -->
+<div class="graph-overlay" id="graphOverlay" style="display:none"></div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modal" style="display:none" onclick="closeOnOverlay(event)">
   <div class="modal">
@@ -1278,6 +1340,8 @@
   const PAGE_SIZE = 20;
   let allFigures = [];   // full sorted dataset — pagination is client-side
   let searchTimer;
+  let acTimer;
+  let acFocusIdx = -1;
   let timelineLoaded = false;
   let mapLoaded = false;
   let mapInstance = null;
@@ -1290,6 +1354,7 @@
 
   const CENTURY_ORDER = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th','17th','18th','19th','20th','21st'];
   const ERA_CENTURY_MAP = [['1st'],['2nd','3rd'],['4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th'],['16th','17th','18th','19th','20th','21st']];
+  const ERA_HEX = ['#6db3d4','#9b7fd4','#d4903a','#c96a3a'];
   const CHRONO_ERAS = [
     { color:'var(--era1)', hex:'#38bdf8', name:'Apostolic Age',       dates:'AD 30 – 100',       desc:'The period following the resurrection of Jesus, defined by the ministry of the twelve apostles, the founding of the early church at Pentecost, and the composition of the New Testament. The gospel spread rapidly through the Roman Empire despite early opposition.' },
     { color:'var(--era2)', hex:'#a78bfa', name:'Early Church',         dates:'AD 100 – 313',       desc:'The age of the church fathers and apologists. Despite fierce Roman persecution, Christianity expanded dramatically. Brilliant theologians defended the faith against early heresies, clarifying the doctrines of the Trinity and the person of Christ.' },
@@ -1326,15 +1391,19 @@
   }
 
   function switchView(view) {
-    // Remove timeline keyboard listener when leaving that view
+    // Clean up timeline listeners when leaving
     if (currentView === 'timeline' && view !== 'timeline') {
       const cv = document.getElementById('chronoView');
       if (cv && cv._keyHandler) document.removeEventListener('keydown', cv._keyHandler);
+      const ca = document.getElementById('contentArea');
+      if (ca) ca.removeEventListener('scroll', chronoScrollListener);
     }
     currentView = view;
     closeMobileSidebar();
     ['grid','timeline','map'].forEach(v => {
-      document.getElementById(`view-${v}`).style.display = v === view ? 'block' : 'none';
+      const el = document.getElementById(`view-${v}`);
+      el.style.display = v === view ? 'block' : 'none';
+      if (v === view) { el.classList.remove('view-entering'); void el.offsetWidth; el.classList.add('view-entering'); }
       document.getElementById(`tab-${v}`).classList.toggle('active', v === view);
       const navEl = document.getElementById(`nav-${v}`);
       if (navEl) navEl.classList.toggle('active', v === view);
@@ -1349,11 +1418,9 @@
       });
     }
     if (view === 'timeline') {
-      if (!timelineLoaded) {
-        loadChronoView().then(() => initChronoMap());
-      } else {
-        initChronoMap();
-      }
+      const ca = document.getElementById('contentArea');
+      if (ca) ca.addEventListener('scroll', chronoScrollListener);
+      if (!timelineLoaded) loadChronoView(); else setTimeout(applyChronoFocus, 50);
     }
     if (view === 'map') {
       loadMap(); // initialises once, uses cache on repeat visits
@@ -1362,6 +1429,8 @@
 
   // ── BOOT ───────────────────────────────────────
   async function boot() {
+    restoreState();
+    initEraScrubber();
     await Promise.all([loadFilters(), loadStats()]);
     await loadFigures();
   }
@@ -1392,12 +1461,29 @@
 
       const maxCount = Math.max(...eraRanges.map(e => e.count), 1);
       eraRanges.forEach((era, i) => {
-        document.getElementById(`era-count-${i}`).textContent = era.count;
+        animateCount(document.getElementById(`era-count-${i}`), era.count, i * 120);
         document.getElementById(`era-bar-${i}`).style.width = `${Math.round((era.count/maxCount)*100)}%`;
       });
 
       await buildTimeline();
     } catch(e) { console.error('Stats error', e); }
+  }
+
+  // ── ANIMATED COUNTERS ──────────────────────────
+  function animateCount(el, target, delay = 0) {
+    const duration = 900;
+    const start = performance.now() + delay;
+    el.textContent = '0';
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+    function tick(now) {
+      if (now < start) { requestAnimationFrame(tick); return; }
+      const elapsed = Math.min(now - start, duration);
+      const value = Math.round(easeOut(elapsed / duration) * target);
+      el.textContent = value;
+      if (elapsed < duration) requestAnimationFrame(tick);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(tick);
   }
 
   // ── ERA ACTIONS ────────────────────────────────
@@ -1408,6 +1494,7 @@
     document.querySelectorAll('.era-band').forEach((el, i) => el.classList.toggle('active', i === state.era_index));
     document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === (state.era_index === -1 ? '' : String(state.era_index))));
     state.century = '';
+    updateEraScrubber();
     loadFigures();
     if (currentView === 'map') renderMapPins();
   }
@@ -1418,6 +1505,7 @@
     document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c === el));
     document.querySelectorAll('.era-band').forEach((b, i) => b.classList.toggle('active', i === index));
     state.century = '';
+    updateEraScrubber();
     loadFigures();
     if (currentView === 'map') renderMapPins();
   }
@@ -1446,59 +1534,38 @@
     });
   }
 
-  function updateChronoMap(bp, idx, total, century) {
-    const countEl = document.getElementById('chronoCount');
-    if (countEl) countEl.textContent = `${idx+1} / ${total}`;
-    // Era label
-    const eraEl = document.getElementById('chronoEraLabel');
-    if (eraEl) {
-      if (century) { eraEl.textContent = century + ' Century'; eraEl.classList.remove('hidden'); }
-      else eraEl.classList.add('hidden');
-    }
-    // Highlight active era dot
-    const eraIdx = getEraFromCentury(century);
+  function updateChronoEra(eraIdx) {
     document.querySelectorAll('.chrono-era-dot').forEach(d => {
       d.classList.toggle('active', parseInt(d.dataset.era) === eraIdx);
     });
-    const noLocEl = document.getElementById('chronoNoLoc');
-    if (chronoPulseMarker) { chronoPulseMarker.remove(); chronoPulseMarker = null; }
-    if (!chronoMap) return;
-    chronoMap.invalidateSize(false);
-    if (bp && bp.includes(';')) {
-      const [rawLat, rawLng] = bp.split(';');
-      const lat = parseFloat(rawLat), lng = parseFloat(rawLng);
-      if (!isNaN(lat) && !isNaN(lng)) {
-        chronoMap.setView([lat, lng], 6, { animate: true, duration: 0.7 });
-        chronoPulseMarker = L.marker([lat, lng], { icon: makePulseDot() }).addTo(chronoMap);
-        if (noLocEl) noLocEl.classList.add('hidden');
-        return;
-      }
-    }
-    if (noLocEl) noLocEl.classList.remove('hidden');
   }
 
-  function initChronoMap() {
-    if (!chronoMapLoaded) {
-      chronoMap = L.map('chronoMapBg', {
-        center: [35, 30], zoom: 5,
-        zoomControl: false, attributionControl: false,
-        dragging: false, scrollWheelZoom: false,
-        doubleClickZoom: false, boxZoom: false, keyboard: false
-      });
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd', maxZoom: 19
-      }).addTo(chronoMap);
-      chronoMapLoaded = true;
-    }
-    // Container is now visible — tell Leaflet its real size then show first card location
-    setTimeout(() => {
-      chronoMap.invalidateSize(false);
-      const first = document.querySelector('#chronoScroll .chrono-slide');
-      if (first) {
-        const total = document.querySelectorAll('#chronoScroll .chrono-slide').length;
-        updateChronoMap(first.dataset.bp || '', 0, total, first.dataset.century || '');
-      }
-    }, 80);
+  function initChronoMap() { /* map removed from timeline — no-op */ }
+
+  // ── TIMELINE SCROLL FOCUS ──────────────────────
+  let _chronoScrollRAF = null;
+  function applyChronoFocus() {
+    const contentArea = document.getElementById('contentArea');
+    if (!contentArea) return;
+    const items = document.querySelectorAll('#chronoEntries > .chrono-entry, #chronoEntries > .chrono-era-block');
+    if (!items.length) return;
+    const areaRect = contentArea.getBoundingClientRect();
+    const center = areaRect.top + areaRect.height * 0.46; // slightly above midpoint feels more natural
+    items.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      const itemCenter = rect.top + rect.height * 0.5;
+      const dist = Math.abs(itemCenter - center);
+      const t = Math.min(dist / (areaRect.height * 0.78), 1); // 0 = centred, 1 = at edge
+      const ease = t * t * (3 - 2 * t); // smoothstep
+      const scale   = 1 - ease * 0.14;
+      const opacity = 1 - ease * 0.62;
+      item.style.transform = `scale(${scale.toFixed(4)})`;
+      item.style.opacity   = Math.max(opacity, 0.12).toFixed(4);
+    });
+  }
+  function chronoScrollListener() {
+    if (_chronoScrollRAF) cancelAnimationFrame(_chronoScrollRAF);
+    _chronoScrollRAF = requestAnimationFrame(applyChronoFocus);
   }
 
   // Exposed to nav button onclick — delegates to the throttled chronoStep if available
@@ -1509,12 +1576,8 @@
     if (scroll) scroll.scrollBy({ top: dir * scroll.clientHeight, behavior: 'smooth' });
   }
   function chronoJumpEra(eraIdx) {
-    const scroll = document.getElementById('chronoScroll');
-    if (!scroll) return;
-    const slideIdx = _chronoEraStartIdx[eraIdx];
-    if (slideIdx === undefined) return;
-    const slide = scroll.querySelector(`.chrono-slide[data-idx="${slideIdx}"]`);
-    if (slide) slide.scrollIntoView({ behavior: 'smooth' });
+    const el = document.querySelector(`#chronoEntries .chrono-era-block[data-era="${eraIdx}"]`);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   async function loadChronoView() {
@@ -1557,115 +1620,97 @@
         }
         allSlides.push({ type: 'figure', figure: f, slideIdx: slideIdx++ });
       });
-      const total = allSlides.length;
+      // Build HTML — era blocks full-width, figure cards alternating left/right
+      const ERA_ROMAN = ['I', 'II', 'III', 'IV'];
+      let figCardIdx = 0;
       const slidesHtml = allSlides.map(item => {
         if (item.type === 'era') {
           const era = CHRONO_ERAS[item.eraIdx];
-          return `<div class="chrono-slide" data-idx="${item.slideIdx}" data-bp="" data-century="${ERA_CENTURY_MAP[item.eraIdx][0]}">
-            <div class="chrono-era-intro-card" style="border-top: 3px solid ${era.hex}">
+          return `<div class="chrono-era-block" data-era="${item.eraIdx}">
+            <div class="chrono-era-intro-card">
               <div class="chrono-era-intro-accent" style="background:${era.hex}"></div>
-              <div class="chrono-era-intro-body" data-num="${['I','II','III','IV'][item.eraIdx] || (item.eraIdx+1)}" style="color:${era.hex}">
-                <div class="chrono-era-intro-badge" style="color:${era.hex}">Era ${item.eraIdx + 1} of ${CHRONO_ERAS.length}</div>
+              <div class="chrono-era-intro-body" data-num="${ERA_ROMAN[item.eraIdx]||''}" style="color:${era.hex}">
+                <div class="chrono-era-intro-badge" style="color:${era.hex}">Era ${item.eraIdx+1} of ${CHRONO_ERAS.length}</div>
                 <div class="chrono-era-intro-name" style="color:${era.hex}">${era.name}</div>
-                <div class="chrono-era-intro-dates" style="color:var(--ink-3)">${era.dates}</div>
-                <div class="chrono-era-intro-desc" style="color:var(--ink-2)">${era.desc}</div>
+                <div class="chrono-era-intro-dates">${era.dates}</div>
+                <div class="chrono-era-intro-desc">${era.desc}</div>
               </div>
             </div>
           </div>`;
         }
         const f = item.figure;
-        const initial = (f.name||'?').charAt(0);
-        const imgHtml = f.image_url
-          ? `<img class="chrono-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` +
-            `<div class="chrono-card-placeholder" style="display:none">${initial}</div>`
-          : `<div class="chrono-card-placeholder">${initial}</div>`;
-        const dates = formatDates(f.born, f.death, f.era_type);
-        const hasLoc = f.birthplace && f.birthplace.includes(';');
-        const locHtml = hasLoc
-          ? `<div class="chrono-card-loc"><div class="chrono-card-loc-dot"></div>Birth location shown on map</div>`
-          : `<div class="chrono-card-loc" style="color:var(--ink-4)">⊘ Location not recorded</div>`;
-        // Derive century from the same numeric year used for sorting — no mismatch
         const figYear = getFigureYear(f);
-        const century = figYear ? (deriveCentury(figYear, null) || '') : '';
+        const eraIdx = getEraFromYear(figYear);
+        const eraHex = ERA_HEX[eraIdx] || ERA_HEX[2];
+        const initial = (f.name||'?').charAt(0);
+        const dates = formatDates(f.born, f.death, f.era_type);
         const martyrHtml = f.is_martyr === 'Yes' ? `<div class="chrono-card-martyr">✝ Martyr</div>` : '';
-        return `<div class="chrono-slide" data-idx="${item.slideIdx}" data-bp="${f.birthplace||''}" data-century="${century}">
-          <div class="chrono-card" onclick="openFigure(${f.id})">
-            ${imgHtml}
-            <div class="chrono-card-body">
-              ${martyrHtml}
-              <div class="chrono-card-type">${f.type||''}</div>
-              <div class="chrono-card-name">${f.name||''}</div>
-              ${dates ? `<div class="chrono-card-dates">${dates}</div>` : ''}
-              ${f.role_office ? `<div class="chrono-card-role">${f.role_office}</div>` : ''}
-              ${f.short_description ? `<div class="chrono-card-desc">${f.short_description}</div>` : ''}
-              ${locHtml}
-            </div>
+        const hasLoc = f.birthplace && f.birthplace.includes(';');
+        const locHtml = `<div class="chrono-card-loc">${hasLoc ? `<div class="chrono-card-loc-dot"></div>Location on record` : `⊘ Location unrecorded`}</div>`;
+        const imgHtml = f.image_url
+          ? `<div class="chrono-card-img-wrap"><img class="chrono-card-img" src="${f.image_url}" alt="${f.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=chrono-card-placeholder>${initial}</div>'"><div class="chrono-card-img-gradient"></div></div>`
+          : `<div class="chrono-card-placeholder">${initial}</div>`;
+        const isLeft = figCardIdx % 2 === 0;
+        figCardIdx++;
+        const cardHtml = `<div class="chrono-card ${isLeft ? 'chrono-card-left' : 'chrono-card-right'}" style="--era-color:${eraHex}" onclick="openFigure(${f.id})">
+          ${imgHtml}
+          <div class="chrono-card-body">
+            ${martyrHtml}
+            <div class="chrono-card-type">${f.type||''}</div>
+            <div class="chrono-card-name">${f.name||''}</div>
+            ${dates ? `<div class="chrono-card-dates">${dates}</div>` : ''}
+            ${f.role_office ? `<div class="chrono-card-role">${f.role_office}</div>` : ''}
+            ${f.short_description ? `<div class="chrono-card-desc">${f.short_description}</div>` : ''}
+            ${locHtml}
           </div>
         </div>`;
+        return isLeft
+          ? `<div class="chrono-entry" data-era="${eraIdx}"><div class="chrono-entry-slot">${cardHtml}</div><div class="chrono-node"></div><div class="chrono-entry-slot empty"></div></div>`
+          : `<div class="chrono-entry" data-era="${eraIdx}"><div class="chrono-entry-slot empty"></div><div class="chrono-node"></div><div class="chrono-entry-slot">${cardHtml}</div></div>`;
       }).join('');
-      // Era dot buttons HTML
-      const ERA_ROMAN = ['I', 'II', 'III', 'IV'];
+
       const eraDotsHtml = CHRONO_ERAS.map((era, i) =>
         `<button class="chrono-era-dot" data-era="${i}" style="--dot-color:${era.hex}" onclick="chronoJumpEra(${i})" title="${era.name}">
-          ${ERA_ROMAN[i] || (i+1)}
-          <span class="dot-tip">${era.name}</span>
-        </button>`
-      ).join('');
+          ${ERA_ROMAN[i]||i+1}<span class="dot-tip">${era.name}</span>
+        </button>`).join('');
+
       container.innerHTML = `
-        <div id="chronoMapBg"></div>
-        <div class="chrono-no-loc hidden" id="chronoNoLoc">⊘ Location unknown</div>
-        <div class="chrono-era-label hidden" id="chronoEraLabel"></div>
-        <div class="chrono-kbd-hint">↑ ↓ to navigate</div>
-        <div class="chrono-scroll" id="chronoScroll">${slidesHtml}</div>
-        <div class="chrono-progress">
-          <button class="chrono-nav-btn" onclick="chronoNav(-1)" title="Previous">▲</button>
-          <div class="chrono-era-dots">${eraDotsHtml}</div>
-          <div class="chrono-count" id="chronoCount">1 / ${total}</div>
-          <button class="chrono-nav-btn" onclick="chronoNav(1)" title="Next">▼</button>
+        <div class="chrono-layout">
+          <div class="chrono-side-nav">
+            <div class="chrono-side-line"></div>
+            <div class="chrono-side-label">Anno Domini</div>
+            <div class="chrono-era-dots">${eraDotsHtml}</div>
+            <div class="chrono-side-line"></div>
+          </div>
+          <div class="chrono-main">
+
+            <div class="chrono-header">
+              <span class="chrono-header-label">Chronological Records</span>
+              <h2 class="chrono-header-title">The Grand Timeline</h2>
+              <p class="chrono-header-sub">Trace the historical progression of the Christian church — from the apostolic age through the modern era.</p>
+            </div>
+            <div class="chrono-timeline-wrap">
+              <div class="chrono-center-line"></div>
+              <div class="chrono-entries" id="chronoEntries">${slidesHtml}</div>
+            </div>
+          </div>
+          <div></div>
         </div>`;
-      // Wire up IntersectionObserver for slide changes
+
+      // IntersectionObserver: highlight active era dot as user scrolls
       if (chronoObserver) chronoObserver.disconnect();
-      const scrollEl = document.getElementById('chronoScroll');
       chronoObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            const el = entry.target;
-            updateChronoMap(el.dataset.bp || '', parseInt(el.dataset.idx) || 0, total, el.dataset.century || '');
+          if (entry.isIntersecting) {
+            const eraIdx = parseInt(entry.target.dataset.era);
+            if (!isNaN(eraIdx)) updateChronoEra(eraIdx);
           }
         });
-      }, { root: scrollEl, threshold: 0.5 });
-      document.querySelectorAll('#chronoScroll .chrono-slide').forEach(s => chronoObserver.observe(s));
-      // Scroll throttle: lock for 700ms + 30px delta accumulator to absorb trackpad micro-events
-      let _scrollLock = false, _deltaAccum = 0;
-      function chronoStep(dir) {
-        if (_scrollLock) return;
-        _scrollLock = true;
-        _deltaAccum = 0;
-        scrollEl.scrollBy({ top: dir * scrollEl.clientHeight, behavior: 'smooth' });
-        setTimeout(() => { _scrollLock = false; }, 700);
-      }
-      _chronoStep = chronoStep;
-      // Forward wheel anywhere on the view (delta accumulator absorbs trackpad micro-events)
-      const view = document.getElementById('chronoView');
-      view.addEventListener('wheel', e => {
-        e.preventDefault();
-        _deltaAccum += e.deltaY;
-        if (Math.abs(_deltaAccum) >= 30) chronoStep(_deltaAccum > 0 ? 1 : -1);
-      }, { passive: false });
-      // Touch swipe
-      let _touchY = 0;
-      view.addEventListener('touchstart', e => { _touchY = e.touches[0].clientY; }, { passive: true });
-      view.addEventListener('touchend', e => {
-        const dy = _touchY - e.changedTouches[0].clientY;
-        if (Math.abs(dy) > 40) chronoStep(dy > 0 ? 1 : -1);
-      }, { passive: true });
-      // Keyboard arrows
-      view._keyHandler = e => {
-        if (e.key === 'ArrowDown') { e.preventDefault(); chronoStep(1); }
-        if (e.key === 'ArrowUp')   { e.preventDefault(); chronoStep(-1); }
-      };
-      document.addEventListener('keydown', view._keyHandler);
+      }, { threshold: 0.3 });
+      document.querySelectorAll('#chronoEntries .chrono-entry, #chronoEntries .chrono-era-block')
+        .forEach(el => chronoObserver.observe(el));
       timelineLoaded = true;
+      setTimeout(applyChronoFocus, 80);
     } catch(e) {
       container.innerHTML = `<div class="empty-state">Could not load: ${e.message}</div>`;
     }
@@ -1801,6 +1846,8 @@
   // Fetch ALL matching records once, sort client-side, paginate locally.
   // This lets us place century-only figures correctly within the sort order.
   async function loadFigures() {
+    saveState();
+    updateEraScrubber();
     const grid = document.getElementById('grid');
     grid.innerHTML = `<div class="loading"><div class="spinner"></div>Loading records…</div>`;
     const params = new URLSearchParams({ page:1, page_size:500 });
@@ -1837,8 +1884,10 @@
     document.getElementById('resultsInfo').innerHTML = total > 0
       ? `Showing <strong>${start+1}–${Math.min(start+PAGE_SIZE, total)}</strong> of <strong>${total}</strong> records`
       : 'No records found';
+    updateFilterPills();
+    updateEraStatsBanner();
     if (!pageItems.length) {
-      grid.innerHTML = `<div class="empty-state">No records match your current filters.</div>`;
+      grid.innerHTML = `<div class="empty-state"><div style="font-size:1.5rem;margin-bottom:0.5rem;opacity:0.4">⚬</div>No records match your current filters.<br><button onclick="clearAllFilters()" style="margin-top:0.75rem;background:var(--surface-2);border:1px solid var(--border);color:var(--accent);font-family:'DM Mono',monospace;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;padding:0.4rem 1rem;cursor:pointer;border-radius:2px;">Clear all filters</button></div>`;
       document.getElementById('pagination').innerHTML = '';
       return;
     }
@@ -1862,9 +1911,11 @@
     // Category label: type + era
     const eraLabel = effectiveCentury ? `${effectiveCentury} Century` : (f.era_type||'');
     const categoryLabel = [f.type, eraLabel].filter(Boolean).join(' · ');
+    const eraIdx = getEraFromCentury(effectiveCentury);
+    const topColor = eraIdx >= 0 ? ERA_HEX[eraIdx] : 'var(--border)';
 
     return `
-      <div class="arch-card" style="animation-delay:${delay}ms" onclick="openFigure(${f.id})">
+      <div class="arch-card" style="animation-delay:${delay}ms; border-top: 2px solid ${topColor}" onclick="openFigure(${f.id})">
         <div class="arch-card-header">
           ${imgHtml}
           <div class="arch-card-header-info">
@@ -2030,7 +2081,10 @@
           ${tagsHtml}
         </div>
         <div class="mpro-right">
-          <div class="mpro-badge">${f.type || 'Historical Figure'}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.1rem">
+            <div class="mpro-badge" style="margin-bottom:0">${f.type || 'Historical Figure'}</div>
+            <button class="graph-btn" onclick="openConnectionGraph(${f.id},'${name.replace(/'/g,"\\'")}')"> ${related.length} Connection${related.length !== 1 ? 's' : ''}</button>
+          </div>
           <h2 class="mpro-name">${name}</h2>
           ${f.alternative_names ? `<p class="mpro-alt">Also known as: ${f.alternative_names}</p>` : ''}
           ${subtitle}
@@ -2086,8 +2140,20 @@
   }
 
   document.getElementById('searchInput').addEventListener('input', e => {
+    const val = e.target.value.trim();
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(()=>{ state.search=e.target.value.trim(); state.page=1; loadFigures(); }, 350);
+    clearTimeout(acTimer);
+    if (val.length >= 2) {
+      acTimer = setTimeout(async () => {
+        try {
+          const data = await fetch(`${API}/figures?page=1&page_size=8&search=${encodeURIComponent(val)}`).then(r=>r.json());
+          if (val === document.getElementById('searchInput').value.trim()) openAC(data.results || []);
+        } catch(e) {}
+      }, 200);
+    } else {
+      closeAC();
+    }
+    searchTimer = setTimeout(()=>{ state.search=val; state.page=1; loadFigures(); }, 350);
   });
 
   // ── DISCOVER / RANDOM ──────────────────────────
@@ -2155,6 +2221,310 @@
       clearDiscoverLoading();
       document.getElementById('modalInner').innerHTML = `<div style="padding:2rem;color:var(--ink-3)">Failed to load.</div>`;
     } finally { btn.classList.remove('spinning'); btn.disabled = false; }
+  }
+
+  // ── RELATIONSHIP GRAPH ─────────────────────────
+  async function openConnectionGraph(id, name) {
+    const overlay = document.getElementById('graphOverlay');
+    overlay.style.display = 'flex';
+    overlay.innerHTML = `
+      <div class="graph-header">
+        <div><div class="graph-title">Connections — <strong>${name}</strong></div>
+        <div class="graph-subtitle">Loading network…</div></div>
+        <button class="graph-close" onclick="closeGraph()">×</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;flex:1">
+        <div class="spinner"></div>
+      </div>`;
+    document.body.style.overflow = 'hidden';
+    try {
+      const [focal, related] = await Promise.all([
+        fetch(`${API}/figures/${id}`).then(r=>r.json()),
+        fetch(`${API}/figures/${id}/related`).then(r=>r.json()).catch(()=>[])
+      ]);
+      renderConnectionGraph(focal, related);
+    } catch(e) {
+      overlay.innerHTML = `<div class="graph-header"><div class="graph-title">Connections</div><button class="graph-close" onclick="closeGraph()">×</button></div><div class="graph-empty" style="padding:4rem">Failed to load connections.</div>`;
+    }
+  }
+
+  function closeGraph() {
+    document.getElementById('graphOverlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function renderConnectionGraph(focal, related) {
+    const overlay = document.getElementById('graphOverlay');
+    const W = Math.min(window.innerWidth, 1000);
+    const H = Math.max(window.innerHeight - 100, 500);
+    const cx = W / 2, cy = H / 2;
+    const R_FOCAL = 52, R_NODE = 36, ORBIT = Math.min(W, H) * 0.34;
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    const bgColor = isDark ? '#08080d' : '#f5efe3';
+
+    // Build nodes
+    const nodes = related.map((r, i) => {
+      const angle = (2 * Math.PI * i / Math.max(related.length, 1)) - Math.PI / 2;
+      return { ...r, x: cx + ORBIT * Math.cos(angle), y: cy + ORBIT * Math.sin(angle), r: R_NODE };
+    });
+
+    // Defs (clip paths for images)
+    const defs = [
+      `<clipPath id="clip-focal"><circle cx="${cx}" cy="${cy}" r="${R_FOCAL}"/></clipPath>`,
+      ...nodes.map((n,i) => `<clipPath id="clip-${i}"><circle cx="${n.x}" cy="${n.y}" r="${R_NODE}"/></clipPath>`)
+    ].join('');
+
+    // Edges
+    const edges = nodes.map(n =>
+      `<line class="graph-edge" x1="${cx}" y1="${cy}" x2="${n.x}" y2="${n.y}"/>`
+    ).join('');
+
+    // Era rings
+    function eraRing(century, x, y, r) {
+      const idx = getEraFromCentury(century);
+      const color = idx >= 0 ? ERA_HEX[idx] : '#4e4639';
+      return `<circle cx="${x}" cy="${y}" r="${r + 5}" fill="none" stroke="${color}" stroke-width="2.5" opacity="0.7"/>`;
+    }
+
+    // Focal node
+    const focalImg = focal.image_url
+      ? `<image href="${focal.image_url}" x="${cx-R_FOCAL}" y="${cy-R_FOCAL}" width="${R_FOCAL*2}" height="${R_FOCAL*2}" clip-path="url(#clip-focal)" preserveAspectRatio="xMidYMin slice"/>`
+      : `<circle cx="${cx}" cy="${cy}" r="${R_FOCAL}" fill="var(--card-img-bg)"/><text x="${cx}" y="${cy+8}" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="28" fill="var(--ink-3)" font-style="italic">${(focal.name||'?').charAt(0)}</text>`;
+    const focalCentury = focal.century || deriveCentury(focal.born, focal.death);
+    const focalEraIdx = getEraFromCentury(focalCentury);
+    const focalEraColor = focalEraIdx >= 0 ? ERA_HEX[focalEraIdx] : '#d4903a';
+
+    const focalNode = `
+      <g class="graph-node" onclick="closeGraph();setTimeout(()=>openFigure(${focal.id}),100)">
+        <circle cx="${cx}" cy="${cy}" r="${R_FOCAL+8}" fill="${focalEraColor}" opacity="0.12"/>
+        <circle cx="${cx}" cy="${cy}" r="${R_FOCAL+4}" fill="none" stroke="${focalEraColor}" stroke-width="2.5"/>
+        ${focalImg}
+        <circle cx="${cx}" cy="${cy}" r="${R_FOCAL}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <text class="graph-node-label" x="${cx}" y="${cy + R_FOCAL + 20}" font-size="16" font-weight="700" fill="#ffffff">${focal.name}</text>
+        <text class="graph-node-sublabel" x="${cx}" y="${cy + R_FOCAL + 35}" font-size="11" fill="#a0a0c0">${[focal.role_office, focalCentury ? focalCentury+' c.' : ''].filter(Boolean).join(' · ')}</text>
+      </g>`;
+
+    // Related nodes
+    const relatedNodes = nodes.map((n, i) => {
+      const century = n.century || deriveCentury(n.born, n.death);
+      const img = n.image_url
+        ? `<image href="${n.image_url}" x="${n.x-n.r}" y="${n.y-n.r}" width="${n.r*2}" height="${n.r*2}" clip-path="url(#clip-${i})" preserveAspectRatio="xMidYMin slice"/>`
+        : `<circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="var(--card-img-bg)"/><text x="${n.x}" y="${n.y+7}" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-size="20" fill="var(--ink-3)" font-style="italic">${(n.name||'?').charAt(0)}</text>`;
+      const meta = [n.role_office?.split(',')[0], century ? century+' c.' : ''].filter(Boolean).join(' · ');
+      return `
+        <g class="graph-node" onclick="openConnectionGraph(${n.id},'${(n.name||'').replace(/'/g,"\\'")}')">
+          ${eraRing(century, n.x, n.y, n.r)}
+          ${img}
+          <circle cx="${n.x}" cy="${n.y}" r="${n.r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <rect x="${n.x - 70}" y="${n.y + n.r + 6}" width="140" height="32" rx="3" fill="rgba(8,8,13,0.65)"/>
+          <text class="graph-node-label" x="${n.x}" y="${n.y + n.r + 20}">${n.name}</text>
+          <text class="graph-node-sublabel" x="${n.x}" y="${n.y + n.r + 32}">${meta}</text>
+        </g>`;
+    }).join('');
+
+    const emptyMsg = related.length === 0
+      ? `<text x="${cx}" y="${cy + R_FOCAL + 60}" text-anchor="middle" font-family="'EB Garamond',serif" font-size="14" fill="var(--ink-4)" font-style="italic">No connections recorded</text>`
+      : '';
+
+    overlay.innerHTML = `
+      <div class="graph-header">
+        <div>
+          <div class="graph-title">Connections — <strong>${focal.name}</strong></div>
+          <div class="graph-subtitle">${related.length} connection${related.length !== 1 ? 's' : ''} · Click any figure to explore their network</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center">
+          <button class="graph-btn" onclick="closeGraph();openFigure(${focal.id})">View Profile</button>
+          <button class="graph-close" onclick="closeGraph()">×</button>
+        </div>
+      </div>
+      <svg class="graph-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+        <defs>${defs}</defs>
+        ${edges}
+        ${relatedNodes}
+        ${focalNode}
+        ${emptyMsg}
+      </svg>`;
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('graphOverlay').style.display !== 'none') closeGraph(); });
+
+  // ── FILTER PILLS ───────────────────────────────
+  function updateFilterPills() {
+    const container = document.getElementById('filterPills');
+    if (!container) return;
+    const pills = [];
+    const FILTER_LABELS = { search:'Search', type:'Type', gender:'Gender', denomination:'Denomination', role_office:'Role', belief_id:'Belief', is_martyr:'Martyrs only' };
+    if (state.search)       pills.push({ key:'search',       label:`Search: "${state.search}"` });
+    if (state.type)         pills.push({ key:'type',         label:`Type: ${state.type}` });
+    if (state.gender)       pills.push({ key:'gender',       label:`Gender: ${state.gender}` });
+    if (state.denomination) pills.push({ key:'denomination', label:`Denom: ${state.denomination.slice(0,20)}` });
+    if (state.role_office)  pills.push({ key:'role_office',  label:`Role: ${state.role_office.slice(0,20)}` });
+    if (state.belief_id)    pills.push({ key:'belief_id',    label:'Belief filter' });
+    if (state.is_martyr==='true') pills.push({ key:'is_martyr', label:'Martyrs only' });
+    if (state.era_index >= 0) pills.push({ key:'era_index', label:`Era: ${CHRONO_ERAS[state.era_index]?.name || ''}` });
+    container.innerHTML = pills.map(p =>
+      `<span class="filter-pill" onclick="clearPill('${p.key}')">${p.label}<span class="filter-pill-x">×</span></span>`
+    ).join('') + (pills.length > 1 ? `<span class="filter-pill filter-pill-clearall" onclick="clearAllFilters()">Clear all<span class="filter-pill-x">×</span></span>` : '');
+  }
+
+  function clearPill(key) {
+    if (key === 'era_index') {
+      state.era_index = -1;
+      document.querySelectorAll('.era-band').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === ''));
+    } else if (key === 'is_martyr') {
+      state.is_martyr = '';
+      document.getElementById('nav-martyr')?.classList.remove('active');
+    } else if (key === 'type') {
+      state.type = '';
+    } else if (key === 'search') {
+      state.search = '';
+      document.getElementById('searchInput').value = '';
+    } else {
+      state[key] = '';
+    }
+    state.page = 1;
+    loadFigures();
+  }
+
+  function clearAllFilters() {
+    state.search = ''; state.type = ''; state.century = ''; state.gender = '';
+    state.denomination = ''; state.role_office = ''; state.belief_id = '';
+    state.is_martyr = ''; state.era_index = -1; state.page = 1;
+    document.getElementById('searchInput').value = '';
+    document.querySelectorAll('.era-band').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === '' || c.dataset.era === undefined));
+    document.querySelectorAll('#sidebarGenderChips .nav-item').forEach(c => c.classList.toggle('active', c.dataset.value === ''));
+    document.getElementById('roleSelect') && (document.getElementById('roleSelect').value = '');
+    document.getElementById('denominationSelect') && (document.getElementById('denominationSelect').value = '');
+    document.getElementById('beliefSelect') && (document.getElementById('beliefSelect').value = '');
+    loadFigures();
+  }
+
+  // ── ERA STATS BANNER ────────────────────────────
+  function updateEraStatsBanner() {
+    const banner = document.getElementById('eraStatsBanner');
+    if (!banner) return;
+    if (state.era_index < 0) { banner.classList.remove('visible'); return; }
+    const era = CHRONO_ERAS[state.era_index];
+    if (!era) return;
+    const color = ERA_HEX[state.era_index];
+    const persons = allFigures.filter(f => f.type === 'Person').length;
+    const events  = allFigures.filter(f => f.type === 'Event').length;
+    const groups  = allFigures.filter(f => f.type === 'Group').length;
+    const martyrs = allFigures.filter(f => f.is_martyr === 'Yes').length;
+    banner.style.color = color;
+    banner.style.borderLeftColor = color;
+    banner.innerHTML = `
+      <div>
+        <div class="era-stats-name">${era.name}</div>
+        <div class="era-stats-dates">${era.dates}</div>
+      </div>
+      <div class="era-stats-chips">
+        <span class="era-stats-chip"><strong>${allFigures.length}</strong> total</span>
+        ${persons ? `<span class="era-stats-chip"><strong>${persons}</strong> persons</span>` : ''}
+        ${events  ? `<span class="era-stats-chip"><strong>${events}</strong> events</span>` : ''}
+        ${groups  ? `<span class="era-stats-chip"><strong>${groups}</strong> groups</span>` : ''}
+        ${martyrs ? `<span class="era-stats-chip"><strong>${martyrs}</strong> martyrs</span>` : ''}
+      </div>`;
+    banner.classList.add('visible');
+  }
+
+  // ── ERA SCRUBBER ────────────────────────────────
+  function initEraScrubber() {
+    const container = document.getElementById('eraScrubber');
+    if (!container) return;
+    container.innerHTML = CHRONO_ERAS.map((era, i) => `
+      <div class="era-scrub-item ${state.era_index === i ? 'active' : ''}" onclick="clickEra(${i})" style="color:${ERA_HEX[i]}">
+        <span class="era-scrub-label">${era.name.split(' ')[0]}</span>
+        <span class="era-scrub-dot"></span>
+      </div>`).join('');
+  }
+
+  function updateEraScrubber() {
+    document.querySelectorAll('.era-scrub-item').forEach((el, i) =>
+      el.classList.toggle('active', i === state.era_index));
+  }
+
+  // ── SEARCH AUTOCOMPLETE ─────────────────────────
+  let acResults = [];
+  function openAC(items) {
+    const ac = document.getElementById('searchAC');
+    if (!items.length) {
+      ac.innerHTML = `<div class="search-ac-empty">No results found</div>`;
+    } else {
+      ac.innerHTML = items.map((f, i) => {
+        const imgHtml = f.image_url
+          ? `<img class="search-ac-img" src="${f.image_url}" alt="${f.name}" onerror="this.outerHTML='<div class=\\'search-ac-placeholder\\'>${(f.name||'?').charAt(0)}</div>'">`
+          : `<div class="search-ac-placeholder">${(f.name||'?').charAt(0)}</div>`;
+        const meta = [f.type, f.century ? f.century + ' c.' : '', f.role_office].filter(Boolean).join(' · ');
+        return `<div class="search-ac-item" data-id="${f.id}" onclick="acSelect(${f.id})">${imgHtml}<div><div class="search-ac-name">${f.name}</div><div class="search-ac-meta">${meta}</div></div></div>`;
+      }).join('');
+    }
+    acResults = items;
+    acFocusIdx = -1;
+    ac.classList.add('open');
+  }
+  function closeAC() {
+    document.getElementById('searchAC').classList.remove('open');
+    acFocusIdx = -1;
+  }
+  function acSelect(id) {
+    closeAC();
+    openFigure(id);
+  }
+
+  document.getElementById('searchInput').addEventListener('keydown', e => {
+    const ac = document.getElementById('searchAC');
+    if (!ac.classList.contains('open')) return;
+    const items = ac.querySelectorAll('.search-ac-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); acFocusIdx = Math.min(acFocusIdx + 1, items.length - 1); items.forEach((el,i) => el.classList.toggle('focused', i === acFocusIdx)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acFocusIdx = Math.max(acFocusIdx - 1, 0); items.forEach((el,i) => el.classList.toggle('focused', i === acFocusIdx)); }
+    else if (e.key === 'Enter' && acFocusIdx >= 0) { e.preventDefault(); if (acResults[acFocusIdx]) acSelect(acResults[acFocusIdx].id); }
+    else if (e.key === 'Escape') { closeAC(); }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.topbar-search')) closeAC();
+  });
+
+  // ── SCROLL TO TOP ───────────────────────────────
+  function scrollToTop() {
+    document.getElementById('contentArea').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  document.getElementById('contentArea').addEventListener('scroll', () => {
+    const btn = document.getElementById('scrollTopBtn');
+    const show = document.getElementById('contentArea').scrollTop > 300;
+    btn.classList.toggle('visible', show);
+  });
+
+  // ── PERSISTENT STATE ────────────────────────────
+  function saveState() {
+    try {
+      localStorage.setItem('archivist_state', JSON.stringify({
+        search: state.search, type: state.type, gender: state.gender,
+        denomination: state.denomination, role_office: state.role_office,
+        belief_id: state.belief_id, is_martyr: state.is_martyr,
+        sort: state.sort, era_index: state.era_index
+      }));
+    } catch(e) {}
+  }
+  function restoreState() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('archivist_state') || 'null');
+      if (!saved) return;
+      Object.assign(state, saved);
+      // Restore sort select
+      const ss = document.getElementById('sortSelect');
+      if (ss && state.sort) ss.value = state.sort;
+      // Restore era chips/bands
+      if (state.era_index >= 0) {
+        document.querySelectorAll('.era-band').forEach((el,i) => el.classList.toggle('active', i === state.era_index));
+        document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === String(state.era_index)));
+      }
+      // Restore search input
+      if (state.search) document.getElementById('searchInput').value = state.search;
+    } catch(e) {}
   }
 
   boot();
