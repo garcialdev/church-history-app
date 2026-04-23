@@ -27,7 +27,7 @@ async def fetch_wikipedia_image(name: str) -> Optional[str]:
         search_name = name.strip().replace(" ", "_")
         url = f"{WIKIPEDIA_API_URL}/{search_name}"
         headers = {
-            "User-Agent": "ChurchHistoryArchive/1.0 (https://historyapp.bbs1.net; contact@bbs1.net)"
+            "User-Agent": "ChurchHistoryArchive/1.0 (https://churcharchive.bbs1.net; contact@bbs1.net)"
         }
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(url, headers=headers)

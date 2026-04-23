@@ -1,7 +1,12 @@
-from fastapi import FastAPI, Depends, Query, HTTPException
+from fastapi import FastAPI, Depends, Query, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from sqlalchemy.orm import Session
 from typing import Optional
+
+limiter = Limiter(key_func=get_remote_address)
 
 from database import get_db
 from schemas import FigureCard, FigureDetail, FigureListResponse, FilterOptions, BeliefBase, EraBase
@@ -18,12 +23,14 @@ app = FastAPI(
     description="API for browsing historical figures in church history",
     version="1.0.0",
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://historyapp.bbs1.net",
-        "http://historyapp.bbs1.net",
+        "https://churcharchive.bbs1.net",
+        "http://churcharchive.bbs1.net",
         "http://localhost:3003",
         "http://localhost:3000",
     ],
@@ -318,7 +325,8 @@ class FigurePayload(BaseModel):
 
 
 @app.post("/admin/login")
-def admin_login(req: LoginRequest):
+@limiter.limit("5/minute")
+def admin_login(request: Request, req: LoginRequest):
     if req.password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Invalid password")
     return {"token": create_token()}

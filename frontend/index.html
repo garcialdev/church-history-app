@@ -820,22 +820,25 @@
     .map-legend-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); flex-shrink: 0; }
     .leaflet-popup-content-wrapper { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-lg) !important; box-shadow: var(--shadow-lg) !important; padding: 0 !important; overflow: hidden !important; }
     .leaflet-popup-tip { background: var(--surface) !important; }
-    .leaflet-popup-content { margin: 0 !important; width: 242px !important; overflow: hidden !important; }
-    .leaflet-popup-close-button { color: var(--ink-3) !important; top: 6px !important; right: 6px !important; }
-    .map-popup { display: flex; flex-direction: column; width: 280px; cursor: pointer; overflow: hidden; box-sizing: border-box; }
+    .leaflet-popup-content { margin: 0 !important; width: 280px !important; overflow: hidden !important; }
+    .leaflet-popup-close-button { color: var(--ink-3) !important; top: 5px !important; right: 5px !important; z-index: 10 !important; }
+    .map-popup { display: flex; flex-direction: row; width: 280px; cursor: pointer; overflow: hidden; box-sizing: border-box; min-height: 120px; }
     .map-popup:hover .map-popup-name { color: var(--accent); }
-    .map-popup-hero { position: relative; width: 100%; height: 140px; overflow: hidden; flex-shrink: 0; }
-    .map-popup-img { width: 100% !important; height: 140px !important; min-width: unset !important; max-width: unset !important; object-fit: cover; object-position: top center; display: block; }
-    .map-popup-placeholder { width: 100% !important; height: 140px !important; min-width: unset !important; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-style: italic; color: var(--ink-4); }
-    .map-popup-hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(13,13,26,0.9) 0%, transparent 55%); pointer-events: none; }
-    .map-popup-hero-badge { position: absolute; top: 0.5rem; left: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; background: rgba(13,13,26,0.7); color: var(--ink-3); padding: 0.2rem 0.45rem; border-radius: var(--radius); }
-    .map-popup-info { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.8rem 0.9rem 0.7rem; }
-    .map-popup-type { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); }
-    .map-popup-name { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--ink); line-height: 1.2; transition: color 0.15s; }
-    .map-popup-role { font-size: 0.78rem; color: var(--accent); font-style: italic; }
-    .map-popup-century { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--ink-3); margin-top: 0.1rem; }
-    .map-popup-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.82rem; color: var(--ink-2); line-height: 1.55; margin-top: 0.3rem; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .map-popup-cta { font-size: 0.7rem; color: var(--ink-4); margin-top: 0.45rem; font-style: italic; border-top: 1px solid var(--border-light); padding-top: 0.45rem; }
+    /* Left: portrait image strip */
+    .map-popup-hero { position: relative; width: 88px; flex-shrink: 0; overflow: hidden; align-self: stretch; }
+    .map-popup-img { width: 88px !important; height: 100% !important; min-width: unset !important; max-width: unset !important; min-height: 130px !important; object-fit: cover; object-position: top center; display: block; filter: grayscale(0.5) opacity(0.75); transition: filter 0.4s; }
+    .map-popup:hover .map-popup-img { filter: grayscale(0) opacity(1); }
+    .map-popup-placeholder { width: 88px !important; min-height: 130px !important; height: 100% !important; min-width: unset !important; display: flex; align-items: center; justify-content: center; background: var(--card-img-bg); font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-style: italic; color: var(--ink-4); }
+    .map-popup-hero-gradient { position: absolute; inset: 0; background: linear-gradient(to right, transparent 55%, rgba(19,19,31,0.65)); pointer-events: none; }
+    .map-popup-hero-badge { position: absolute; bottom: 0.45rem; left: 0; right: 0; text-align: center; font-family: 'DM Mono', monospace; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(13,13,26,0.7); color: var(--ink-3); padding: 0.18rem 0.3rem; }
+    /* Right: text info */
+    .map-popup-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; padding: 0.75rem 0.8rem 0.65rem; }
+    .map-popup-type { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); }
+    .map-popup-name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; color: var(--ink); line-height: 1.2; transition: color 0.15s; }
+    .map-popup-role { font-size: 0.75rem; color: var(--accent); font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .map-popup-century { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--ink-3); margin-top: 0.05rem; }
+    .map-popup-desc { font-family: 'EB Garamond', Georgia, serif; font-size: 0.8rem; color: var(--ink-2); line-height: 1.5; margin-top: 0.25rem; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .map-popup-cta { font-size: 0.65rem; color: var(--ink-4); margin-top: auto; padding-top: 0.4rem; font-style: italic; }
 
     /* ── MODAL (editorial) ──────────────────────────── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 10000; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; backdrop-filter: blur(8px); animation: fadeIn 0.2s ease; }
@@ -855,7 +858,10 @@
     .mpro-meta-panel { padding: 0 1.5rem; background: var(--surface-2); flex: 1; }
     .mpro-meta-row { padding: 0.65rem 0; border-bottom: 1px solid var(--border-light); }
     .mpro-meta-row:last-child { border-bottom: none; }
-    .mpro-meta-label { font-family: 'DM Mono', monospace; font-size: 0.54rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-4); display: block; margin-bottom: 0.2rem; }
+    .mpro-meta-row-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0.65rem 0; border-bottom: 1px solid var(--border-light); }
+    .mpro-meta-row-pair .mpro-meta-half:first-child { padding-right: 0.75rem; border-right: 1px solid var(--border-light); }
+    .mpro-meta-row-pair .mpro-meta-half:last-child { padding-left: 0.75rem; }
+    .mpro-meta-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); display: block; margin-bottom: 0.2rem; opacity: 0.8; }
     .mpro-meta-value { font-family: 'EB Garamond', Georgia, serif; font-size: 0.93rem; color: var(--ink-2); line-height: 1.4; }
     .mpro-tags-wrap { padding: 1rem 1.5rem 1.25rem; background: var(--surface-2); border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.75rem; }
 
@@ -919,6 +925,10 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
 
+    /* ── HAMBURGER BUTTON (hidden by default on desktop) ── */
+    .topbar-hamburger { display: none; background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--ink-3); width: 36px; height: 36px; border-radius: var(--radius); cursor: pointer; font-size: 1rem; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .topbar-hamburger:hover { background: rgba(255,255,255,0.07); color: var(--ink); }
+
     /* ── MOBILE NAV (hidden by default) ──────────────── */
     .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 499; }
     .sidebar-overlay.open { display: block; }
@@ -926,7 +936,11 @@
 
     /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 960px) {
-      .sidebar { width: 500px; }
+      /* Sidebar becomes a slide-in drawer — removes it from flex layout */
+      .sidebar { position: fixed; left: -260px; top: 0; width: 240px; height: 100vh; z-index: 500; transition: left 0.25s ease; overflow-y: auto; display: flex; flex-direction: column; }
+      .sidebar.open { left: 0; box-shadow: 4px 0 32px rgba(0,0,0,0.6); }
+      /* Show hamburger in topbar */
+      .topbar-hamburger { display: flex; }
       .card-grid { grid-template-columns: 1fr; }
       .mpro-layout { grid-template-columns: 1fr; }
       .mpro-left { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; }
@@ -936,34 +950,36 @@
     }
 
     @media (max-width: 700px) {
-      /* Switch body out of flex — removes sidebar from width calculation */
+      /* Switch body out of flex for mobile — body scrolls */
       html { overflow-x: hidden; }
       body { display: block; width: 100%; overflow-x: hidden; overflow-y: auto; height: auto; min-height: 100vh; }
-      /* Sidebar as slide-in drawer */
-      .sidebar { position: fixed; left: -260px; top: 0; width: 240px; height: 100vh; z-index: 500; transition: left 0.25s ease; overflow-y: auto; flex-direction: column; display: flex; }
-      .sidebar.open { left: 0; box-shadow: 4px 0 32px rgba(0,0,0,0.6); }
-      .sidebar-logo, .sidebar-stats, .sidebar-bottom { display: flex; }
-      .sidebar-nav { flex-direction: column; padding: 0.75rem; }
       /* Main area fills the block body */
       .main-area { width: 100%; height: auto; overflow-x: hidden; display: flex; flex-direction: column; }
-      .content-area { overflow-x: hidden; height: auto; padding: 0.75rem 0.75rem 76px; }
+      .content-area { overflow-x: hidden; height: auto; padding: 0.75rem 0.75rem 80px; }
       /* Topbar */
       .view-tabs { display: none; }
       .topbar { flex-wrap: wrap; height: auto; padding: 0.5rem 0.75rem; gap: 0.4rem; width: 100%; box-sizing: border-box; }
-      .topbar-search { flex: 1 1 100%; max-width: 100%; }
-      .topbar-right { flex: 1 1 100%; margin-left: 0; }
+      .topbar-search { flex: 1 1 0; min-width: 0; max-width: 100%; }
+      .topbar-right { margin-left: 0; }
       .era-chips { display: none; }
       /* Results bar wraps on small screens */
       .results-bar { flex-wrap: wrap; gap: 0.4rem; padding-bottom: 0.5rem; }
-      .chrono-layout { grid-template-columns: 0 1fr 0; }
-      .chrono-side-nav { display: none; }
-      .chrono-main { padding: 1rem; }
+      /* Timeline: use simple block layout, no grid trickery */
+      .chrono-layout { display: block !important; }
+      .chrono-side-nav { display: none !important; }
+      .chrono-main { padding: 0.75rem 0.75rem 2rem; max-width: 100%; }
+      .chrono-header { padding: 0.75rem 0 2rem; }
       .chrono-header-title { font-size: 2rem; }
-      .chrono-entry { flex-direction: column; gap: 0.5rem; }
-      .chrono-entry-slot { width: 100%; }
+      .chrono-header-sub { font-size: 0.9rem; }
+      .chrono-center-line { display: none; }
+      .chrono-entry { display: block; }
+      .chrono-entry-slot { display: block; width: 100%; }
       .chrono-entry-slot.empty { display: none; }
       .chrono-node { display: none; }
-      .chrono-center-line { display: none; }
+      .chrono-card { flex-direction: row; }
+      .chrono-card-img-wrap { width: 72px; }
+      .chrono-card-placeholder { width: 72px; }
+      .chrono-era-intro-name { font-size: 1.4rem; }
       /* Tighter era bands */
       .stats-banner { gap: 0.5rem; margin-bottom: 1rem; }
       .era-band { padding: 0.65rem 0.75rem; }
@@ -978,16 +994,18 @@
       .arch-card-beliefs { display: flex; flex-wrap: wrap; gap: 0.25rem; }
       .arch-card-footer { gap: 0.4rem; }
       .arch-card-tags { min-width: 0; overflow: hidden; }
+      /* Map height with bottom nav */
+      #mapContainer { height: calc(100dvh - 160px) !important; min-height: 300px !important; }
       /* Bottom nav */
       .mobile-nav {
         display: flex;
         position: fixed;
         bottom: 0; left: 0; right: 0;
         height: 64px;
-        background: rgba(12,10,8,0.88);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-top: 1px solid rgba(255,255,255,0.06);
+        background: rgba(12,10,8,0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-top: 1px solid rgba(255,255,255,0.08);
         z-index: 400;
         align-items: stretch;
       }
@@ -1017,6 +1035,23 @@
       .stats-banner { grid-template-columns: 1fr 1fr; }
       .era-scrubber { display: none; }
       .scroll-top-btn { bottom: 4.5rem; right: 0.75rem; }
+    }
+
+    @media (max-width: 480px) {
+      /* Very small phones: profile modal fullscreen */
+      .modal-overlay { padding: 0; align-items: flex-start; }
+      .modal { border-radius: 0; min-height: 100vh; }
+      .mpro-left { flex-direction: column !important; }
+      .mpro-img-wrap { width: 100% !important; min-height: 200px !important; max-height: 240px !important; }
+      .mpro-right { padding: 1.25rem 1rem; }
+      .mpro-name { font-size: 2.2rem; }
+      /* Timeline cards: minimal padding */
+      .chrono-card-body { padding: 0.65rem 0.75rem; }
+      .chrono-card-name { font-size: 1.05rem; }
+      .chrono-card-desc { -webkit-line-clamp: 2; line-clamp: 2; }
+      /* Topbar compact */
+      .topbar { gap: 0.3rem; padding: 0.45rem 0.6rem; }
+      .topbar-hamburger { width: 32px; height: 32px; font-size: 0.9rem; }
     }
 
     /* ── RELATIONSHIP GRAPH ────────────────────────── */
@@ -1174,6 +1209,7 @@
 
   <!-- TOP BAR -->
   <div class="topbar">
+    <button class="topbar-hamburger" onclick="openMobileSidebar()" aria-label="Open menu">☰</button>
     <div class="topbar-search">
       <span class="search-icon">⚲</span>
       <input type="text" id="searchInput" placeholder="Search figures, councils, locations…" autocomplete="off" />
@@ -1328,7 +1364,7 @@
 </div>
 
 <script>
-  const API = 'https://historyapi.bbs1.net';
+  const API = 'https://churcharchiveapi.bbs1.net';
 
   // ── STATE ──────────────────────────────────────
   let state = {
@@ -1397,6 +1433,7 @@
       if (cv && cv._keyHandler) document.removeEventListener('keydown', cv._keyHandler);
       const ca = document.getElementById('contentArea');
       if (ca) ca.removeEventListener('scroll', chronoScrollListener);
+      window.removeEventListener('scroll', chronoScrollListener);
     }
     currentView = view;
     closeMobileSidebar();
@@ -1420,6 +1457,7 @@
     if (view === 'timeline') {
       const ca = document.getElementById('contentArea');
       if (ca) ca.addEventListener('scroll', chronoScrollListener);
+      window.addEventListener('scroll', chronoScrollListener); // mobile body-scroll
       if (!timelineLoaded) loadChronoView(); else setTimeout(applyChronoFocus, 50);
     }
     if (view === 'map') {
@@ -1550,13 +1588,16 @@
     const items = document.querySelectorAll('#chronoEntries > .chrono-entry, #chronoEntries > .chrono-era-block');
     if (!items.length) return;
     const areaRect = contentArea.getBoundingClientRect();
-    const center = areaRect.top + areaRect.height * 0.46; // slightly above midpoint feels more natural
+    // On mobile body scrolls so contentArea height >> viewport; cap to viewport height
+    const viewH = Math.min(areaRect.height, window.innerHeight);
+    const areaTop = Math.max(areaRect.top, 0);
+    const center = areaTop + viewH * 0.46;
     items.forEach(item => {
       const rect = item.getBoundingClientRect();
       const itemCenter = rect.top + rect.height * 0.5;
       const dist = Math.abs(itemCenter - center);
-      const t = Math.min(dist / (areaRect.height * 0.78), 1); // 0 = centred, 1 = at edge
-      const ease = t * t * (3 - 2 * t); // smoothstep
+      const t = Math.min(dist / (viewH * 0.78), 1);
+      const ease = t * t * (3 - 2 * t);
       const scale   = 1 - ease * 0.14;
       const opacity = 1 - ease * 0.62;
       item.style.transform = `scale(${scale.toFixed(4)})`;
@@ -1763,7 +1804,7 @@
           `<div class="map-popup-placeholder" style="display:none">${initial}</div>`
         : `<div class="map-popup-placeholder">${initial}</div>`;
       const martyrBadge = f.is_martyr==='Yes' ? '<span class="martyr-badge">✝ Martyr</span>' : '';
-      marker.bindPopup(`<div class="map-popup" onclick="closeMapPopup();openFigure(${f.id})"><div class="map-popup-hero">${imgHtml}<div class="map-popup-hero-gradient"></div><div class="map-popup-hero-badge">${f.type||''}</div></div><div class="map-popup-info"><div class="map-popup-name">${f.name}</div>${f.role_office?`<div class="map-popup-role">${f.role_office}</div>`:''}<div class="map-popup-century">${[f.century?f.century+' c.':'', martyrBadge].filter(Boolean).join(' · ')}</div>${f.short_description?`<div class="map-popup-desc">${f.short_description}</div>`:''}<div class="map-popup-cta">Click to view profile →</div></div></div>`, {maxWidth:300});
+      marker.bindPopup(`<div class="map-popup" onclick="closeMapPopup();openFigure(${f.id})"><div class="map-popup-hero">${imgHtml}<div class="map-popup-hero-gradient"></div><div class="map-popup-hero-badge">${f.type||''}</div></div><div class="map-popup-info"><div class="map-popup-name">${f.name}</div>${f.role_office?`<div class="map-popup-role">${f.role_office}</div>`:''}<div class="map-popup-century">${[f.century?f.century+' c.':'', martyrBadge].filter(Boolean).join(' · ')}</div>${f.short_description?`<div class="map-popup-desc">${f.short_description}</div>`:''}<div class="map-popup-cta">Tap to view profile →</div></div></div>`, {maxWidth:290});
       marker.on('mouseover', function() { this.openPopup(); });
       marker.addTo(mapInstance);
       mapMarkers.push(marker);
@@ -2021,17 +2062,24 @@
       : `<div class="mpro-img-placeholder">${initial}</div>`;
 
     // Left metadata rows
+    const suffix = (f.era_type||'').includes('BC') ? ' BC' : ' AD';
+    const bornVal  = f.born  ? `${f.born}${suffix}`  : null;
+    const diedVal  = f.death ? `${f.death} AD`       : null;
+    const isCoords = v => v && /^-?[\d.]+[;,]-?[\d.]+$/.test(v.trim());
+    const bornDiedHtml = (bornVal || diedVal) ? `
+      <div class="mpro-meta-row-pair">
+        ${bornVal  ? `<div class="mpro-meta-half"><span class="mpro-meta-label">Born</span><span class="mpro-meta-value">${bornVal}</span></div>`  : '<div class="mpro-meta-half"></div>'}
+        ${diedVal  ? `<div class="mpro-meta-half"><span class="mpro-meta-label">Died</span><span class="mpro-meta-value">${diedVal}</span></div>`  : '<div class="mpro-meta-half"></div>'}
+      </div>` : '';
     const metaItems = [
-      ['Born', f.born ? `${f.born} ${(f.era_type||'').includes('BC') ? 'BC' : 'AD'}` : null],
-      ['Birthplace', f.birthplace && !/^-?[\d.]+;-?[\d.]+$/.test(f.birthplace.trim()) ? f.birthplace : null],
-      ['Died', f.death ? `${f.death} AD` : null],
+      ['Birthplace', !isCoords(f.birthplace) ? f.birthplace : null],
       ['Deathplace', f.deathplace || null],
       ['Century', (f.century || deriveCentury(f.born, f.death)) ? `${f.century || deriveCentury(f.born, f.death)} Century` : null],
       ['Region', f.primary_region || null],
       ['Denomination', f.denomination_tradition || null],
       ['Gender', f.gender || null],
     ].filter(([,v]) => v);
-    const metaHtml = metaItems.map(([l,v]) =>
+    const metaHtml = bornDiedHtml + metaItems.map(([l,v]) =>
       `<div class="mpro-meta-row"><span class="mpro-meta-label">${l}</span><span class="mpro-meta-value">${v}</span></div>`
     ).join('');
 

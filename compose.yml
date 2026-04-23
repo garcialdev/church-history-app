@@ -1,5 +1,20 @@
 services:
 
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: miguel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U miguel -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   api:
     build: ./api
     ports:
@@ -8,9 +23,10 @@ services:
       - DATABASE_URL=postgresql://miguel:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - NOCODB_BASE_URL=https://nocodb.bbs1.net
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
-    networks:
-      - postgres_postgres_net
 
   frontend:
     build: ./frontend
@@ -18,6 +34,15 @@ services:
       - "3003:80"
     restart: unless-stopped
 
-networks:
-  postgres_postgres_net:
-    external: true
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - api
+
+volumes:
+  postgres_data:
