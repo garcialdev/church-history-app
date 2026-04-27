@@ -1,3 +1,5 @@
 .env
 *.sql
 \stitch
+api-new/
+frontend-new/

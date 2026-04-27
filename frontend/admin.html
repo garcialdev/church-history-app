@@ -284,7 +284,12 @@
   <div class="drawer" id="drawerPanel">
     <div class="drawer-header">
       <div class="drawer-title" id="drawerTitle">Figure</div>
-      <button class="btn btn-ghost btn-sm" onclick="closeDrawer()">✕</button>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="btn btn-ghost btn-sm" id="drawerNavPrev" onclick="navFigure(-1)" title="Previous figure" style="display:none;padding:0.28rem 0.55rem;font-size:0.85rem">←</button>
+        <span class="btn btn-ghost btn-sm" id="drawerNavPos" style="display:none;cursor:default;color:var(--ink-3);pointer-events:none;min-width:52px;text-align:center;font-family:'DM Mono',monospace;font-size:0.6rem"></span>
+        <button class="btn btn-ghost btn-sm" id="drawerNavNext" onclick="navFigure(1)" title="Next figure" style="display:none;padding:0.28rem 0.55rem;font-size:0.85rem">→</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeDrawer()" style="margin-left:4px">✕</button>
+      </div>
     </div>
     <div class="drawer-body" id="drawerBody"></div>
     <div class="drawer-footer" id="drawerFooter"></div>
@@ -307,6 +312,8 @@
   const API = 'https://churcharchiveapi.bbs1.net';
   let token = sessionStorage.getItem('adminToken') || '';
   let allFigures = [];
+  let filteredFigures = [];   // sorted/filtered list currently shown in table
+  let currentFigureId = null; // id of the figure open in the drawer
   let filterText = '';
   let currentPage = 'dashboard';
   let roleOfficeOptions = [];
@@ -476,6 +483,7 @@
     );
     // sort alphabetically by name
     filtered = filtered.slice().sort((a, b) => (a.name||'').localeCompare(b.name||''));
+    filteredFigures = filtered;
 
     const countEl = document.getElementById('figureCount');
     if (countEl) countEl.textContent = `${filtered.length} of ${allFigures.length} records`;
@@ -664,6 +672,7 @@
   }
 
   async function openNewFigure() {
+    hideDrawerNav();
     await loadFilterOptions();
     document.getElementById('drawerTitle').textContent = 'New Figure';
     document.getElementById('drawerBody').innerHTML = `<form id="figureForm">${figureForm()}</form>`;
@@ -811,8 +820,37 @@
     document.getElementById('confirmDialog').style.display = 'flex';
   }
 
+  // ── FIGURE NAV ──────────────────────────────────
+  function updateDrawerNav(id) {
+    const idx = filteredFigures.findIndex(f => f.id === id);
+    const total = filteredFigures.length;
+    const prevBtn = document.getElementById('drawerNavPrev');
+    const nextBtn = document.getElementById('drawerNavNext');
+    const posEl   = document.getElementById('drawerNavPos');
+    if (!prevBtn || total === 0) return;
+    prevBtn.style.display = nextBtn.style.display = posEl.style.display = '';
+    prevBtn.disabled = idx <= 0;
+    nextBtn.disabled = idx >= total - 1;
+    posEl.textContent = `${idx + 1} / ${total}`;
+  }
+
+  function navFigure(dir) {
+    const idx = filteredFigures.findIndex(f => f.id === currentFigureId);
+    const next = filteredFigures[idx + dir];
+    if (next) openEditFigure(next.id);
+  }
+
+  function hideDrawerNav() {
+    ['drawerNavPrev','drawerNavNext','drawerNavPos'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+  }
+
   // ── FIGURE EDIT WITH BELIEFS ────────────────────
   async function openEditFigure(id) {
+    currentFigureId = id;
+    updateDrawerNav(id);
     document.getElementById('drawerTitle').textContent = 'Edit Figure';
     document.getElementById('drawerBody').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
     document.getElementById('drawerFooter').innerHTML = '';
@@ -893,7 +931,15 @@
   // ── DRAWER ──────────────────────────────────────
   function closeDrawer() { document.getElementById('drawer').style.display = 'none'; }
   function closeDrawerOnOverlay(e) { if(e.target===document.getElementById('drawer')) closeDrawer(); }
-  document.addEventListener('keydown', e => { if(e.key==='Escape') { closeDrawer(); closeConfirm(); } });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDrawer(); closeConfirm(); return; }
+    const drawerOpen = document.getElementById('drawer').style.display !== 'none';
+    if (!drawerOpen || !currentFigureId) return;
+    // Don't intercept when typing in a form field
+    if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); navFigure(-1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); navFigure(1); }
+  });
 
   // ── TOAST ───────────────────────────────────────
   function showToast(msg, type='success') {
