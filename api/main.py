@@ -1,10 +1,12 @@
-from fastapi import FastAPI, Depends, Query, HTTPException, Request
+from fastapi import FastAPI, Depends, Query, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.orm import Session
 from typing import Optional
+import os, shutil, time, pathlib
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -38,6 +40,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+UPLOADS_DIR = pathlib.Path("/app/uploads")
+UPLOADS_DIR.mkdir(exist_ok=True)
+PUBLIC_API_URL = os.environ.get("PUBLIC_API_URL", "https://churcharchiveapi.bbs1.net")
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 
 def map_row_to_card(row, beliefs, image_url):
@@ -279,7 +286,7 @@ from fastapi.responses import JSONResponse
 from config import ADMIN_PASSWORD, create_token, validate_token, revoke_token
 from queries import (
     admin_get_all_figures, admin_get_figure, admin_create_figure,
-    admin_update_figure, admin_delete_figure, admin_get_stats
+    admin_update_figure, admin_delete_figure, admin_get_stats, clear_figure_image
 )
 from pydantic import BaseModel
 from typing import Any, Dict
@@ -341,6 +348,31 @@ def admin_logout(token: str = Depends(require_admin)):
 @app.get("/admin/stats")
 def admin_stats(db: Session = Depends(get_db), _=Depends(require_admin)):
     return admin_get_stats(db)
+
+
+@app.post("/admin/upload-image")
+async def upload_image(
+    figure_id: int = Form(...),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    ext = pathlib.Path(file.filename).suffix.lower() or ".jpg"
+    filename = f"{figure_id}_{int(time.time())}{ext}"
+    dest = UPLOADS_DIR / filename
+    with dest.open("wb") as buf:
+        shutil.copyfileobj(file.file, buf)
+    url = f"{PUBLIC_API_URL}/uploads/{filename}"
+    # Save new URL and clear any legacy NocoDB thumbnail so cached_url wins
+    clear_figure_image(db, figure_id)
+    save_cached_image_url(db, figure_id, url)
+    return {"image_url": url}
+
+
+@app.delete("/admin/figures/{figure_id}/image")
+def delete_figure_image(figure_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
+    clear_figure_image(db, figure_id)
+    return {"status": "cleared"}
 
 
 @app.get("/admin/figures")

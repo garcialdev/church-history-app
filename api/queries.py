@@ -223,6 +223,16 @@ def save_cached_image_url(db: Session, figure_id: int, url: str):
     db.commit()
 
 
+def clear_figure_image(db: Session, figure_id: int):
+    """Clear both the NocoDB thumbnail and the cached image URL."""
+    db.execute(text("""
+        UPDATE "Church History"
+        SET "Cached_Image_URL" = NULL, "Thumbnail" = NULL
+        WHERE id = :id
+    """), {"id": figure_id})
+    db.commit()
+
+
 def get_random_figure_id(db: Session) -> Optional[int]:
     """Return a random figure id."""
     row = db.execute(text("""

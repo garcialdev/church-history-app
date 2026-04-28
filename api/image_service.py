@@ -48,18 +48,18 @@ async def resolve_image(
 ) -> Optional[str]:
     """
     Priority:
-    1. NocoDB uploaded thumbnail
-    2. Cached image URL from DB (no live HTTP call)
+    1. Cached image URL from DB (manually uploaded or set — always wins)
+    2. NocoDB uploaded thumbnail (legacy fallback)
     3. Wikipedia live lookup (only if no cache)
     """
-    # 1. NocoDB uploaded image
+    # 1. Cached URL from DB — manually set/uploaded images always take priority
+    if cached_image_url and cached_image_url.strip():
+        return cached_image_url.strip()
+
+    # 2. NocoDB uploaded image (legacy — may be broken after server migration)
     nocodb_url = parse_nocodb_thumbnail(thumbnail_json)
     if nocodb_url:
         return nocodb_url
-
-    # 2. Cached URL from DB — instant, no HTTP call
-    if cached_image_url and cached_image_url.strip():
-        return cached_image_url.strip()
 
     # 3. Live Wikipedia lookup (slow path — only runs if not cached)
     if wikipedia_name and wikipedia_name.strip():

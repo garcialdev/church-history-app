@@ -4,8 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Archivist — Church History</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0c0a08">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ecclesia">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
@@ -43,7 +51,7 @@
       --martyr-bg:    rgba(192,57,43,0.13);
       --martyr-fg:    #e88a7a;
       --green:        #9bb888;
-      --era1: #7fa7c4; --era2: #b29ad8; --era3: #e8956a; --era4: #d88a5a;
+      --era1: #7fa7c4; --era2: #b29ad8; --era3: #e8956a; --era4: #c0502a;
       --radius: 14px; --radius-lg: 18px; --radius-xl: 24px;
       --shadow-sm: 0 1px 4px rgba(0,0,0,0.4);
       --shadow:    0 4px 20px rgba(0,0,0,0.55);
@@ -83,7 +91,7 @@
       --martyr-bg:    rgba(192,57,43,0.08);
       --martyr-fg:    #a93a2a;
       --green:        #6a8558;
-      --era1: #6a8da8; --era2: #8b6ba5; --era3: #b0462b; --era4: #c97347;
+      --era1: #6a8da8; --era2: #8b6ba5; --era3: #b0462b; --era4: #a03d1f;
       --radius: 14px; --radius-lg: 18px; --radius-xl: 24px;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
       --shadow:    0 4px 16px rgba(0,0,0,0.10);
@@ -186,7 +194,6 @@
     .nav-item.active { background: var(--surface); color: var(--accent); font-weight: 500; box-shadow: var(--shadow-sm); border-left: 3px solid var(--accent); padding-left: calc(1rem - 3px); }
 
     .nav-item-left { display: flex; align-items: center; gap: 8px; }
-    .nav-era-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
     .nav-icon { font-size: 0.85rem; flex-shrink: 0; opacity: 0.75; }
     .nav-count {
       font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -447,9 +454,9 @@
     .era-band-3 { color: var(--era3); background: rgba(212,144,58,0.07); }
     .era-band-3::before { background: var(--era3); }
     .era-band-3:hover { box-shadow: 0 4px 20px rgba(212,144,58,0.2); }
-    .era-band-4 { color: var(--era4); background: rgba(201,106,58,0.07); }
+    .era-band-4 { color: var(--era4); background: rgba(192,80,42,0.07); }
     .era-band-4::before { background: var(--era4); }
-    .era-band-4:hover { box-shadow: 0 4px 20px rgba(201,106,58,0.2); }
+    .era-band-4:hover { box-shadow: 0 4px 20px rgba(192,80,42,0.2); }
 
     .era-band-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; opacity: 0.65; margin-bottom: 0.25rem; }
     .era-band-count { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 300; line-height: 1; margin-bottom: 0.2rem; }
@@ -1710,11 +1717,28 @@
       /* Timeline: use simple block layout, no grid trickery */
       .chrono-layout { display: block !important; }
       .chrono-side-nav { display: none !important; }
-      .chrono-main { padding: 0.75rem 0.75rem 2rem; max-width: 100%; }
+      .chrono-main { padding: 0 0 2rem; max-width: 100%; }
       .chrono-header { padding: 0.75rem 0 2rem; }
       .chrono-header-title { font-size: 2rem; }
       .chrono-header-sub { font-size: 0.9rem; }
       .chrono-center-line { display: none; }
+      /* Codex / Timeline page — mobile reflow */
+      .codex-body { padding: 20px 16px 28px; }
+      .codex-inner { padding: 20px 16px 32px; }
+      .codex-chapter-head { flex-direction: column !important; align-items: flex-start !important; gap: 6px; margin-bottom: 20px; padding-bottom: 14px; }
+      .codex-title { font-size: 1.9rem; letter-spacing: 0.03em; }
+      .codex-chapter-dates { margin-top: 2px; }
+      .codex-chapter-desc { font-size: 0.85rem; max-width: 100%; margin-top: 8px; }
+      .codex-entry.chrono-entry { display: flex; flex-direction: row; align-items: flex-start; gap: 12px; padding: 14px 0; }
+      .codex-margin { display: flex; flex-direction: column; align-items: center; text-align: center; padding-right: 0; border-right: none; width: 52px; flex-shrink: 0; }
+      .codex-medallion { order: 1; margin-left: 0; width: 44px; height: 44px; font-size: 1.1rem; margin-top: 0; }
+      .codex-year { order: 2; font-size: 0.62rem; text-align: center; margin-top: 4px; }
+      .codex-content { padding-top: 2px; }
+      .codex-entry-name { font-size: 1.25rem; }
+      .codex-entry-text { font-size: 0.88rem; }
+      .codex-corner { display: none; }
+      .codex-folio { padding: 0 16px; }
+      .codex-explicit { margin-top: 24px; }
       .chrono-entry { display: block; }
       .chrono-entry-slot { display: block; width: 100%; }
       .chrono-entry-slot.empty { display: none; }
@@ -1808,7 +1832,6 @@
 
     @media (max-width: 640px) {
       .stats-banner { grid-template-columns: 1fr 1fr; }
-      .era-scrubber { display: none; }
       .scroll-top-btn { bottom: 4.5rem; right: 0.75rem; }
     }
 
@@ -1852,7 +1875,21 @@
 
     /* ── VIEW TRANSITIONS ──────────────────────────── */
     @keyframes viewReveal { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes viewHide   { from { opacity: 1; } to { opacity: 0; } }
     .view-entering { animation: viewReveal 0.28s ease forwards; }
+    .view-leaving  { animation: viewHide 0.15s ease forwards; pointer-events: none; }
+
+    /* ── SKELETON LOADERS ──────────────────────────── */
+    @keyframes skel-sweep { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .skeleton-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
+    .skel-line { border-radius: 4px; background: linear-gradient(90deg, var(--surface-2) 25%, var(--raised) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: skel-sweep 1.4s ease-in-out infinite; }
+    .skel-img { width: 88px; height: 104px; border-radius: var(--radius); flex-shrink: 0; }
+    .skel-header { display: flex; gap: 12px; align-items: flex-start; }
+    .skel-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+
+    /* ── MAP CLUSTER ───────────────────────────────── */
+    .map-cluster { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.35); cursor: pointer; transition: transform 0.15s; }
+    .map-cluster:hover { transform: scale(1.15); }
 
     /* ── FILTER PILLS ──────────────────────────────── */
     .filter-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.7rem; }
@@ -1890,16 +1927,6 @@
     .search-ac-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.54rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.1rem; }
     .search-ac-empty { padding: 0.75rem; font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-3); font-size: 0.9rem; text-align: center; }
 
-    /* ── ERA SCRUBBER ──────────────────────────────── */
-    .era-scrubber { position: fixed; right: 0.5rem; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 0.2rem; z-index: 80; padding: 0.5rem 0; }
-    .era-scrub-item { display: flex; align-items: center; justify-content: flex-end; gap: 0.45rem; padding: 0.3rem 0.35rem; cursor: pointer; border-radius: var(--radius); transition: background 0.2s; }
-    .era-scrub-item:hover { background: rgba(255,255,255,0.05); }
-    .era-scrub-label { font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); white-space: nowrap; opacity: 0; transform: translateX(4px); transition: all 0.2s; pointer-events: none; }
-    .era-scrub-item:hover .era-scrub-label { opacity: 1; transform: translateX(0); }
-    .era-scrub-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; transition: all 0.25s; flex-shrink: 0; opacity: 0.45; }
-    .era-scrub-item:hover .era-scrub-dot { opacity: 0.85; transform: scale(1.3); }
-    .era-scrub-item.active .era-scrub-dot { width: 10px; height: 10px; opacity: 1; box-shadow: 0 0 8px currentColor; }
-    .era-scrub-item.active .era-scrub-label { opacity: 0.8; transform: translateX(0); }
   </style>
 </head>
 <body>
@@ -1943,24 +1970,6 @@
     <button class="nav-item" id="nav-martyr" onclick="filterByMartyr(); switchView('grid')">
       <span class="nav-item-left"><span class="nav-icon">✝</span> Martyred</span>
       <span class="nav-count" id="nav-martyrs">—</span>
-    </button>
-
-    <div class="nav-section-label" style="margin-top:1rem">By Era</div>
-    <button class="nav-item" id="nav-era-0" onclick="clickEra(0); switchView('grid')">
-      <span class="nav-item-left"><span class="nav-era-dot" style="background:#6baed6"></span> Apostolic Age</span>
-      <span class="nav-count" id="nav-era-count-0">—</span>
-    </button>
-    <button class="nav-item" id="nav-era-1" onclick="clickEra(1); switchView('grid')">
-      <span class="nav-item-left"><span class="nav-era-dot" style="background:#9e7faf"></span> Early Church</span>
-      <span class="nav-count" id="nav-era-count-1">—</span>
-    </button>
-    <button class="nav-item" id="nav-era-2" onclick="clickEra(2); switchView('grid')">
-      <span class="nav-item-left"><span class="nav-era-dot" style="background:#7a4a3a"></span> Medieval Church</span>
-      <span class="nav-count" id="nav-era-count-2">—</span>
-    </button>
-    <button class="nav-item" id="nav-era-3" onclick="clickEra(3); switchView('grid')">
-      <span class="nav-item-left"><span class="nav-era-dot" style="background:#c0502a"></span> Reformation</span>
-      <span class="nav-count" id="nav-era-count-3">—</span>
     </button>
 
     <div class="nav-section-label" style="margin-top:1rem">Narrow</div>
@@ -2041,6 +2050,7 @@
 
     <!-- Grid View -->
     <div id="view-grid">
+      <div id="pullIndicator" style="display:none;text-align:center;padding:10px 0 4px;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4)">↓ Pull to refresh</div>
       <!-- Era bands -->
       <div class="stats-banner">
         <div class="era-band era-band-1" id="era-0" data-name="Apostolic" onclick="clickEra(0)">
@@ -2151,7 +2161,6 @@
 </nav>
 
 <!-- ERA SCRUBBER -->
-<div class="era-scrubber" id="eraScrubber"></div>
 
 <!-- SCROLL TO TOP -->
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="Back to top">↑</button>
@@ -2199,7 +2208,7 @@
     { color:'var(--era1)', hex:'#38bdf8', name:'Apostolic Age',       dates:'AD 30 – 100',       desc:'The period following the resurrection of Jesus, defined by the ministry of the twelve apostles, the founding of the early church at Pentecost, and the composition of the New Testament. The gospel spread rapidly through the Roman Empire despite early opposition.' },
     { color:'var(--era2)', hex:'#a78bfa', name:'Early Church',         dates:'AD 100 – 313',       desc:'The age of the church fathers and apologists. Despite fierce Roman persecution, Christianity expanded dramatically. Brilliant theologians defended the faith against early heresies, clarifying the doctrines of the Trinity and the person of Christ.' },
     { color:'var(--era3)', hex:'#f0c040', name:'Medieval Church',       dates:'AD 313 – 1517',      desc:"Constantine's Edict of Milan brought tolerance; Christianity eventually became the Roman state religion. This long era encompassed the great ecumenical councils, the rise of monasticism, the East–West Schism, the Crusades, and the flowering of scholastic theology." },
-    { color:'var(--era4)', hex:'#fb923c', name:'Reformation & Beyond', dates:'AD 1517 – present',   desc:"Luther's 95 Theses ignited a reformation that fractured and reshaped Western Christianity. Protestantism emerged alongside the Catholic Counter-Reformation. The following centuries brought global missions, the rise of evangelical movements, and the modern denominational landscape." },
+    { color:'var(--era4)', hex:'#c0502a', name:'Reformation & Beyond', dates:'AD 1517 – present',   desc:"Luther's 95 Theses ignited a reformation that fractured and reshaped Western Christianity. Protestantism emerged alongside the Catholic Counter-Reformation. The following centuries brought global missions, the rise of evangelical movements, and the modern denominational landscape." },
   ];
   function getEraFromCentury(century) {
     if (!century) return -1;
@@ -2239,15 +2248,32 @@
       if (ca) ca.removeEventListener('scroll', chronoScrollListener);
       window.removeEventListener('scroll', chronoScrollListener);
     }
+    const prevView = currentView;
     currentView = view;
     closeMobileSidebar();
+
+    // Fade out the departing view, then hide it
+    // Map is skipped — it needs the container fully cleared before sizing
+    const outgoingEl = document.getElementById(`view-${prevView}`);
+    if (outgoingEl && prevView !== view) {
+      if (view === 'map') {
+        outgoingEl.style.display = 'none';
+      } else {
+        outgoingEl.classList.add('view-leaving');
+        setTimeout(() => { outgoingEl.style.display = 'none'; outgoingEl.classList.remove('view-leaving'); }, 150);
+      }
+    }
 
     const allViews = ['home','grid','timeline','map'];
     allViews.forEach(v => {
       const el = document.getElementById(`view-${v}`);
       if (!el) return;
-      el.style.display = v === view ? (v === 'map' ? 'flex' : 'block') : 'none';
-      if (v === view) { el.classList.remove('view-entering'); void el.offsetWidth; el.classList.add('view-entering'); }
+      if (v === view) {
+        el.style.display = v === 'map' ? 'flex' : 'block';
+        el.classList.remove('view-entering'); void el.offsetWidth; el.classList.add('view-entering');
+      } else if (v !== prevView) {
+        el.style.display = 'none';
+      }
     });
 
     // Tab bar only shows for grid/timeline/map
@@ -2294,12 +2320,12 @@
   // ── BOOT ───────────────────────────────────────
   async function boot() {
     restoreState();
-    initEraScrubber();
     await Promise.all([loadFilters(), loadStats()]);
     // Show home view first, load grid in background
     switchView('home');
     await loadFigures();
     initGridKeyNav();
+    initPullToRefresh();
   }
 
   // ── STATS ──────────────────────────────────────
@@ -2476,7 +2502,6 @@
     document.querySelectorAll('.era-band').forEach((el, i) => el.classList.toggle('active', i === state.era_index));
     document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === (state.era_index === -1 ? '' : String(state.era_index))));
     state.century = '';
-    updateEraScrubber();
     loadFigures();
     if (currentView === 'map') renderMapPins();
   }
@@ -2487,7 +2512,6 @@
     document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c === el));
     document.querySelectorAll('.era-band').forEach((b, i) => b.classList.toggle('active', i === index));
     state.century = '';
-    updateEraScrubber();
     loadFigures();
     if (currentView === 'map') renderMapPins();
   }
@@ -2544,6 +2568,50 @@
   function chronoJumpEra(eraIdx) {
     const el = document.querySelector(`.chrono-era-block[data-era="${eraIdx}"]`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function initChronoSwipe() {
+    const el = document.getElementById('chronoView');
+    if (!el) return;
+    let x0 = 0, y0 = 0;
+    el.addEventListener('touchstart', e => {
+      x0 = e.touches[0].clientX;
+      y0 = e.touches[0].clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - x0;
+      const dy = e.changedTouches[0].clientY - y0;
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      const active = document.querySelector('.chrono-era-dot.active');
+      const cur = active ? parseInt(active.dataset.era) : 0;
+      chronoJumpEra(dx < 0 ? Math.min(cur + 1, 3) : Math.max(cur - 1, 0));
+    }, { passive: true });
+  }
+
+  function initPullToRefresh() {
+    const scroller = document.getElementById('contentArea');
+    const indicator = document.getElementById('pullIndicator');
+    if (!scroller) return;
+    let y0 = 0, pulling = false;
+    scroller.addEventListener('touchstart', e => {
+      if (currentView !== 'grid' || scroller.scrollTop > 2) return;
+      y0 = e.touches[0].clientY; pulling = true;
+    }, { passive: true });
+    scroller.addEventListener('touchmove', e => {
+      if (!pulling) return;
+      const dy = e.touches[0].clientY - y0;
+      if (dy > 10 && indicator) {
+        indicator.style.display = 'block';
+        indicator.textContent = dy > 70 ? '↑ Release to refresh' : '↓ Pull to refresh';
+      }
+    }, { passive: true });
+    scroller.addEventListener('touchend', e => {
+      if (!pulling) return;
+      pulling = false;
+      const dy = e.changedTouches[0].clientY - y0;
+      if (indicator) indicator.style.display = 'none';
+      if (dy > 70 && currentView === 'grid') loadFigures();
+    }, { passive: true });
   }
 
   async function loadChronoView() {
@@ -2692,7 +2760,6 @@
         .forEach(el => chronoObserver.observe(el));
 
       // Pop-in animation as entries scroll into view
-      const scrollRoot = document.querySelector('.codex-page');
       const popObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -2700,10 +2767,11 @@
             popObserver.unobserve(entry.target);
           }
         });
-      }, { root: scrollRoot, threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+      }, { root: null, threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
       document.querySelectorAll('.codex-entry').forEach(el => popObserver.observe(el));
 
       timelineLoaded = true;
+      initChronoSwipe();
       setTimeout(applyChronoFocus, 80);
     } catch(e) {
       container.innerHTML = `<div class="empty-state">Could not load: ${e.message}</div>`;
@@ -2715,6 +2783,7 @@
   let allMapFigures = [];
   let mapMarkers = [];
   let deathMarkers = [];
+  let clusterGroup = null;
   let mapEraFilter = -1;   // -1 = all
   let mapShowDeath = false;
   let selectedMapFigId = null;
@@ -2757,7 +2826,21 @@
 
   function renderMapPins() {
     if (!mapInstance) return;
-    mapMarkers.forEach(m => m.remove()); mapMarkers = [];
+    if (clusterGroup) {
+      clusterGroup.clearLayers();
+    } else {
+      clusterGroup = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        maxClusterRadius: 50,
+        spiderfyOnMaxZoom: true,
+        iconCreateFunction: c => L.divIcon({
+          html: `<div class="map-cluster">${c.getChildCount()}</div>`,
+          className: '', iconSize: [36, 36], iconAnchor: [18, 18]
+        })
+      });
+      clusterGroup.addTo(mapInstance);
+    }
+    mapMarkers = [];
     deathMarkers.forEach(m => m.remove()); deathMarkers = [];
 
     const filtered = allMapFigures.filter(f => {
@@ -2786,27 +2869,13 @@
             marker.bindTooltip(f.name, { permanent: false, direction: 'top', offset: [0, -8], className: 'map-pin-tip' });
             marker.on('mouseover', function() { const inner = this.getElement()?.querySelector('div'); if (inner) inner.style.transform = 'scale(1.5)'; });
             marker.on('mouseout',  function() { const inner = this.getElement()?.querySelector('div'); if (inner) inner.style.transform = ''; });
-            marker.addTo(mapInstance);
+            clusterGroup.addLayer(marker);
             mapMarkers.push(marker);
             plotted++;
           }
         }
       }
 
-      // Death place marker (optional layer) — same dual-delimiter handling
-      if (mapShowDeath && f.deathplace) {
-        const dsep = f.deathplace.includes(';') ? ';' : ',';
-        const dparts = f.deathplace.split(dsep);
-        if (dparts.length >= 2) {
-          const dlat = parseFloat(dparts[0]), dlng = parseFloat(dparts[1]);
-          if (!isNaN(dlat) && !isNaN(dlng)) {
-            const dm = L.marker([dlat, dlng], { icon: makeDeathPin(color) });
-            dm.on('click', () => selectMapFigure(f.id));
-            dm.addTo(mapInstance);
-            deathMarkers.push(dm);
-          }
-        }
-      }
     });
 
     const countEl = document.getElementById('mapCount');
@@ -2916,6 +2985,7 @@
       mapLoaded = true;
     }
     setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);
+    setTimeout(() => mapInstance && mapInstance.invalidateSize(), 220);
 
     if (allMapFigures.length === 0) {
       try {
@@ -2979,9 +3049,8 @@
   // This lets us place century-only figures correctly within the sort order.
   async function loadFigures() {
     saveState();
-    updateEraScrubber();
     const grid = document.getElementById('grid');
-    grid.innerHTML = `<div class="loading"><div class="spinner"></div>Loading records…</div>`;
+    grid.innerHTML = Array(8).fill(`<div class="skeleton-card"><div class="skel-header"><div class="skel-line skel-img"></div><div class="skel-body"><div class="skel-line" style="height:11px;width:55%"></div><div class="skel-line" style="height:20px;width:88%;margin-top:2px"></div><div class="skel-line" style="height:13px;width:45%;margin-top:2px"></div><div class="skel-line" style="height:13px;width:60%;margin-top:2px"></div></div></div><div class="skel-line" style="height:12px;width:100%"></div><div class="skel-line" style="height:12px;width:72%"></div></div>`).join('');
     const params = new URLSearchParams({ page:1, page_size:500 });
     if (state.search)       params.set('search', state.search);
     if (state.type)         params.set('type', state.type);
@@ -3574,21 +3643,6 @@
     banner.classList.add('visible');
   }
 
-  // ── ERA SCRUBBER ────────────────────────────────
-  function initEraScrubber() {
-    const container = document.getElementById('eraScrubber');
-    if (!container) return;
-    container.innerHTML = CHRONO_ERAS.map((era, i) => `
-      <div class="era-scrub-item ${state.era_index === i ? 'active' : ''}" onclick="clickEra(${i})" style="color:${ERA_HEX[i]}">
-        <span class="era-scrub-label">${era.name.split(' ')[0]}</span>
-        <span class="era-scrub-dot"></span>
-      </div>`).join('');
-  }
-
-  function updateEraScrubber() {
-    document.querySelectorAll('.era-scrub-item').forEach((el, i) =>
-      el.classList.toggle('active', i === state.era_index));
-  }
 
   // ── SEARCH AUTOCOMPLETE ─────────────────────────
   let acResults = [];

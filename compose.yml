@@ -23,6 +23,9 @@ services:
       - DATABASE_URL=postgresql://miguel:${POSTGRES_PASSWORD}@postgres:5432/postgres
       - NOCODB_BASE_URL=https://nocodb.bbs1.net
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - PUBLIC_API_URL=https://churcharchiveapi.bbs1.net
+    volumes:
+      - ./uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
