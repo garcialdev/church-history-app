@@ -274,7 +274,8 @@ def get_figure_by_id(db: Session, figure_id: int):
             ch."Martyr___Yes_No_"                        AS is_martyr,
             ch."Believer_Saved"                          AS believer_saved,
             ch."Thumbnail"                               AS thumbnail_json,
-            ch."Wikipedia_Name"                          AS wikipedia_name
+            ch."Wikipedia_Name"                          AS wikipedia_name,
+            ch."Cached_Image_URL"                        AS cached_image_url
         FROM "Church History" ch
         WHERE ch.id = :id
     """), {"id": figure_id}).mappings().first()
@@ -399,6 +400,20 @@ def admin_get_all_figures(db: Session):
         FROM "Church History"
         ORDER BY nc_order ASC NULLS LAST, id ASC
     """)).mappings().all()
+
+
+def get_all_beliefs_grouped(db: Session) -> dict:
+    """Returns {figure_id: [belief_name, ...]} for all figures in one query."""
+    rows = db.execute(text("""
+        SELECT m."Church History_id" AS figure_id, b."Belief_Name" AS belief_name
+        FROM "Beliefs" b
+        JOIN "nc_hxad___nc_m2m_Church History_Beliefs" m ON m."Beliefs_id" = b.id
+        ORDER BY b.nc_order ASC NULLS LAST
+    """)).mappings().all()
+    grouped: dict = {}
+    for row in rows:
+        grouped.setdefault(row["figure_id"], []).append(row["belief_name"])
+    return grouped
 
 
 def admin_get_figure(db: Session, figure_id: int):

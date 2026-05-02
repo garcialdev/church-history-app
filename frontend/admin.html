@@ -433,7 +433,8 @@
   async function loadDashboard() {
     document.getElementById('topbarTitle').textContent = 'Dashboard';
     document.getElementById('topbarActions').innerHTML = `
-      <button class="btn btn-ghost btn-sm" onclick="runCacheWarmer()">🔄 Refresh Image Cache</button>`;
+      <button class="btn btn-ghost btn-sm" onclick="runCacheWarmer()">🔄 Refresh Image Cache</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>`;
     document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div>Loading stats…</div>';
     const res = await apiFetch('/admin/stats');
     if (!res) return;
@@ -478,6 +479,20 @@
     const data = await res.json();
     showToast(`✓ Cache done: ${data.updated} updated, ${data.skipped} skipped, ${data.failed} failed`, 'success');
     loadDashboard();
+  }
+
+  async function exportCSV() {
+    showToast('⏳ Preparing export…', 'info');
+    const res = await fetch(`${API}/admin/export/csv`, { headers: { 'x-admin-token': token } });
+    if (!res || !res.ok) { showToast('✗ Export failed', 'error'); return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ecclesia_export_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✓ Export downloaded', 'success');
   }
 
   // ── FIGURES TABLE ───────────────────────────────

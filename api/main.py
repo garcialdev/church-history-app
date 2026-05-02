@@ -281,12 +281,14 @@ def list_filter_options(db: Session = Depends(get_db)):
 
 # ── ADMIN ROUTES ──────────────────────────────────────────────────────────────
 
+import csv, io
 from fastapi import Header
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from config import ADMIN_PASSWORD, create_token, validate_token, revoke_token
 from queries import (
     admin_get_all_figures, admin_get_figure, admin_create_figure,
-    admin_update_figure, admin_delete_figure, admin_get_stats, clear_figure_image
+    admin_update_figure, admin_delete_figure, admin_get_stats, clear_figure_image,
+    get_all_beliefs_grouped,
 )
 from pydantic import BaseModel
 from typing import Any, Dict
@@ -449,3 +451,28 @@ def admin_update_belief_route(belief_id: int, payload: BeliefCreatePayload, db: 
 def admin_delete_belief_route(belief_id: int, db: Session = Depends(get_db), _=Depends(require_admin)):
     admin_delete_belief(db, belief_id)
     return {"status": "deleted"}
+
+@app.get("/admin/export/csv")
+def export_figures_csv(db: Session = Depends(get_db), _=Depends(require_admin)):
+    figures = admin_get_all_figures(db)
+    beliefs_map = get_all_beliefs_grouped(db)
+    columns = [
+        "id", "name", "type", "gender", "century", "born", "death",
+        "era_type", "role_office", "denomination_tradition",
+        "short_description", "alternative_names", "birthplace",
+        "primary_region", "is_martyr", "believer_saved",
+        "wikipedia_name", "cached_image_url", "beliefs",
+    ]
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=columns, extrasaction="ignore")
+    writer.writeheader()
+    for f in figures:
+        row = dict(f)
+        row["beliefs"] = "; ".join(beliefs_map.get(f["id"], []))
+        writer.writerow(row)
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=ecclesia_export.csv"},
+    )

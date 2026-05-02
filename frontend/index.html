@@ -461,8 +461,6 @@
     .era-band-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; opacity: 0.65; margin-bottom: 0.25rem; }
     .era-band-count { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 300; line-height: 1; margin-bottom: 0.2rem; }
     .era-band-label { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 0.82rem; font-style: italic; opacity: 0.8; }
-    .era-band-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: currentColor; opacity: 0.35; transition: opacity 0.2s; }
-    .era-band:hover .era-band-bar, .era-band.active .era-band-bar { opacity: 1; }
 
     /* ── RESULTS BAR ──────────────────────────────── */
     .results-bar {
@@ -501,7 +499,7 @@
       border-radius: var(--radius);
       padding: 18px;
       cursor: pointer;
-      transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+      transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease, border-color 200ms ease;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -510,12 +508,12 @@
       min-width: 0;
     }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .arch-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--border); }
+    .arch-card:hover { transform: translateY(-6px) scale(1.015); box-shadow: var(--shadow-lg); border-color: var(--accent); }
     .arch-card.card-focused {
       border: 2px solid var(--accent);
       padding: 17px;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 20%, transparent),
+      transform: translateY(-6px) scale(1.015);
+      box-shadow: 0 12px 32px color-mix(in srgb, var(--accent) 20%, transparent),
                   0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent);
     }
 
@@ -1598,68 +1596,73 @@
     .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink-3); width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; z-index: 10; transition: all 0.15s; line-height: 1; }
     .modal-close:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
 
-    /* Two-column editorial layout */
-    .mpro-layout { display: grid; grid-template-columns: 340px 1fr; }
-    .mpro-left { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
-    .mpro-img-wrap { position: relative; aspect-ratio: 4/5; max-height: 420px; overflow: hidden; background: var(--card-img-bg); flex-shrink: 0; }
-    .mpro-image { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
-    .mpro-img-placeholder { width: 100%; height: 100%; min-height: 280px; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 7rem; font-style: italic; color: var(--ink-5); }
-    .mpro-img-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.1) 40%, transparent 65%); pointer-events: none; }
-    .mpro-meta-panel { padding: 0 1.5rem; background: var(--surface-2); flex: 1; }
-    .mpro-meta-row { padding: 0.65rem 0; border-bottom: 1px solid var(--border-light); }
-    .mpro-meta-row:last-child { border-bottom: none; }
-    .mpro-meta-row-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0.65rem 0; border-bottom: 1px solid var(--border-light); }
-    .mpro-meta-row-pair .mpro-meta-half:first-child { padding-right: 0.75rem; border-right: 1px solid var(--border-light); }
-    .mpro-meta-row-pair .mpro-meta-half:last-child { padding-left: 0.75rem; }
-    .mpro-meta-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); display: block; margin-bottom: 0.2rem; opacity: 0.8; }
-    .mpro-meta-value { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 0.93rem; color: var(--ink-2); line-height: 1.4; }
-    .mpro-tags-wrap { padding: 1rem 1.5rem 1.25rem; background: var(--surface-2); border-top: 1px solid var(--border-light); display: flex; flex-direction: column; gap: 0.75rem; }
-
-    /* Right column */
-    .mpro-right { padding: 2.75rem 3rem; display: flex; flex-direction: column; gap: 2rem; max-width: 100%; }
+    /* Hero: image left + info right */
+    .mpro-hero { display: flex; border-bottom: 1px solid var(--border); }
+    .mpro-hero-img-wrap { width: 270px; flex-shrink: 0; position: relative; background: var(--card-img-bg); overflow: hidden; }
+    .mpro-image { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; min-height: 340px; }
+    .mpro-img-placeholder { width: 100%; min-height: 340px; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 6rem; font-style: italic; color: var(--ink-5); }
+    .mpro-hero-info { flex: 1; padding: 2.25rem 2.75rem 2rem; display: flex; flex-direction: column; gap: 0.65rem; min-width: 0; }
+    .mpro-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     .mpro-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
-    .mpro-name { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; font-style: italic; color: var(--ink); line-height: 1.05; letter-spacing: 0.01em; margin: -0.25rem 0 0; }
-    .mpro-subtitle { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-2); font-size: 1.15rem; margin-top: -0.9rem; }
-    .mpro-alt { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-3); font-size: 0.95rem; margin-top: -1.1rem; }
-    .mpro-martyr { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); color: var(--red); font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; padding: 0.25rem 0.65rem; border-radius: var(--radius); width: fit-content; margin-top: -0.5rem; }
+    .mpro-name { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; font-style: italic; color: var(--ink); line-height: 1.05; letter-spacing: 0.01em; margin: 0; }
+    .mpro-alt { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-4); font-size: 0.88rem; margin: 0; }
+    .mpro-subtitle { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-2); font-size: 1.1rem; margin: 0; }
+    .mpro-martyr { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--red-dim); border: 1px solid rgba(192,57,43,0.3); color: var(--red); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; padding: 0.25rem 0.65rem; border-radius: var(--radius); width: fit-content; }
 
-    /* Sections */
+    /* Quick-facts strip */
+    .mpro-facts { display: flex; flex-wrap: wrap; border: 1px solid var(--border-light); border-radius: var(--radius); overflow: hidden; margin-top: 0.35rem; }
+    .mpro-fact { padding: 0.55rem 1rem; border-right: 1px solid var(--border-light); flex: 1; min-width: 72px; background: var(--surface-2); }
+    .mpro-fact:last-child { border-right: none; }
+    .mpro-fact-label { font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); display: block; margin-bottom: 0.2rem; opacity: 0.8; }
+    .mpro-fact-value { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 0.88rem; color: var(--ink-2); }
+
+    /* Overview inside hero */
+    .mpro-overview { margin-top: 0.35rem; padding-top: 0.85rem; border-top: 1px solid var(--border-light); }
+    .mpro-overview-label { font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); display: block; margin-bottom: 0.35rem; }
+    .mpro-overview-text { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 1rem; color: var(--ink-2); line-height: 1.72; font-style: italic; margin: 0; }
+
+    /* Body: content + sidebar */
+    .mpro-body { display: grid; grid-template-columns: 1fr 210px; }
+    .mpro-content { padding: 2.25rem 2.75rem; display: flex; flex-direction: column; gap: 2rem; border-right: 1px solid var(--border-light); min-width: 0; }
+    .mpro-sidebar { padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.75rem; background: var(--surface-2); }
+    .mpro-side-section { display: flex; flex-direction: column; gap: 0.4rem; }
+    .mpro-side-label { font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); opacity: 0.8; display: block; margin-bottom: 0.15rem; }
+    .mpro-side-value { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 0.9rem; color: var(--ink-2); line-height: 1.4; }
+
+    /* Content sections */
     .mpro-section { display: flex; flex-direction: column; gap: 0.85rem; }
-    .mpro-section-head {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; text-transform: uppercase;
-      letter-spacing: 0.14em; color: var(--ink-2);
-      padding-bottom: 0.55rem;
-      border-bottom: 1px solid var(--border);
-      width: 60%;
-    }
+    .mpro-section-head { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-3); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); }
     .mpro-text { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 1.05rem; color: var(--ink); line-height: 1.9; white-space: pre-wrap; max-width: 72ch; }
-    .mpro-quote {
-      position: relative;
-      border-left: 3px solid var(--gold-dim);
-      padding: 1.25rem 1.5rem 1.25rem 1.75rem;
-      background: var(--gold-glow);
-      color: var(--ink-2);
-      font-family: 'Fraunces', 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 1.2rem;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      border-radius: 0 var(--radius) var(--radius) 0;
-    }
-    .mpro-quote::before {
-      content: '\201C';
-      position: absolute;
-      top: -0.5rem; left: 0.75rem;
-      font-family: 'Fraunces', 'Cormorant Garamond', serif;
-      font-size: 5rem; line-height: 1;
-      color: var(--gold);
-      opacity: 0.18;
-      pointer-events: none;
-    }
+
+    /* Markdown prose */
+    .md-prose { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-size: 1.05rem; color: var(--ink); line-height: 1.85; }
+    .md-prose .md-p { margin: 0 0 0.9em; max-width: 72ch; }
+    .md-prose .md-p:last-child { margin-bottom: 0; }
+    .md-prose .md-ul, .md-prose .md-ol { padding-left: 1.4em; margin: 0 0 0.9em; display: flex; flex-direction: column; gap: 0.2em; max-width: 72ch; }
+    .md-prose .md-ul li { list-style: disc; }
+    .md-prose .md-ol li { list-style: decimal; }
+    .md-prose .md-hr { border: none; border-top: 1px solid var(--border-light); margin: 1.25em 0; max-width: 72ch; }
+    .md-prose .mpro-quote { margin: 0 0 0.9em; white-space: normal; }
+
+    /* Collapsible heading sections */
+    .md-collapsible { border: none; margin: 0; }
+    .md-summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0; border-bottom: 1px solid var(--border-light); user-select: none; transition: color 0.15s; }
+    .md-summary::-webkit-details-marker { display: none; }
+    .md-summary::before { content: '›'; font-size: 1.1rem; color: var(--accent); transition: transform 0.2s ease; display: inline-block; flex-shrink: 0; line-height: 1; }
+    details[open] > .md-summary::before { transform: rotate(90deg); }
+    .md-summary:hover { color: var(--accent); }
+    .md-summary-h1 { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; font-weight: 600; color: var(--ink); }
+    .md-summary-h2 { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 1.08rem; font-style: italic; font-weight: 600; color: var(--ink-2); }
+    .md-summary-h3 { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); }
+    .md-collapsible-body { padding: 1rem 0 0.25rem; display: flex; flex-direction: column; gap: 0; }
+
+    /* Quote block */
+    .mpro-quote { position: relative; border-left: 3px solid var(--gold-dim); padding: 1.25rem 1.5rem 1.25rem 1.75rem; background: var(--gold-glow); color: var(--ink-2); font-family: 'Fraunces', 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; line-height: 1.7; white-space: pre-wrap; border-radius: 0 var(--radius) var(--radius) 0; }
+    .mpro-quote::before { content: '\201C'; position: absolute; top: -0.5rem; left: 0.75rem; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 5rem; line-height: 1; color: var(--gold); opacity: 0.18; pointer-events: none; }
 
     /* Related figures */
     .mpro-related { border-top: 1px solid var(--border); padding: 1.75rem 2.25rem 2.25rem; background: var(--surface-2); }
-    .mpro-related-head { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-4); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); width: 60%; margin-bottom: 1.25rem; }
+    .mpro-related-head { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-4); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); margin-bottom: 1.25rem; }
     .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.85rem; }
     .related-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; }
     .related-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow-sm); }
@@ -1692,10 +1695,14 @@
       /* Show hamburger in topbar */
       .topbar-hamburger { display: flex; }
       .card-grid { grid-template-columns: 1fr; }
-      .mpro-layout { grid-template-columns: 1fr; }
-      .mpro-left { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; }
-      .mpro-img-wrap { width: 180px; flex-shrink: 0; aspect-ratio: auto; max-height: none; min-height: 220px; }
-      .mpro-meta-panel { flex: 1; }
+      .mpro-hero { flex-direction: column; }
+      .mpro-hero-img-wrap { width: 100%; max-height: 260px; }
+      .mpro-image { min-height: 180px; max-height: 260px; }
+      .mpro-img-placeholder { min-height: 180px; }
+      .mpro-hero-info { padding: 1.5rem; }
+      .mpro-body { grid-template-columns: 1fr; }
+      .mpro-sidebar { border-top: 1px solid var(--border); }
+      .mpro-content { padding: 1.75rem 1.5rem; }
       .stats-banner { grid-template-columns: repeat(2, 1fr); }
     }
 
@@ -1839,10 +1846,11 @@
       /* Very small phones: profile modal fullscreen */
       .modal-overlay { padding: 0; align-items: flex-start; }
       .modal { border-radius: 0; min-height: 100vh; }
-      .mpro-left { flex-direction: column !important; }
-      .mpro-img-wrap { width: 100% !important; min-height: 200px !important; max-height: 240px !important; }
-      .mpro-right { padding: 1.25rem 1rem; }
+      .mpro-hero-info { padding: 1.25rem 1rem; }
       .mpro-name { font-size: 2.2rem; }
+      .mpro-facts { flex-direction: column; }
+      .mpro-fact { border-right: none; border-bottom: 1px solid var(--border-light); }
+      .mpro-content { padding: 1.25rem 1rem; }
       /* Timeline cards: minimal padding */
       .chrono-card-body { padding: 0.65rem 0.75rem; }
       .chrono-card-name { font-size: 1.05rem; }
@@ -2057,25 +2065,21 @@
           <div class="era-band-dates">AD 30 – 100</div>
           <div class="era-band-count" id="era-count-0">—</div>
           <div class="era-band-label">Apostolic Age</div>
-          <div class="era-band-bar" id="era-bar-0" style="width:0%"></div>
         </div>
         <div class="era-band era-band-2" id="era-1" data-name="Early" onclick="clickEra(1)">
           <div class="era-band-dates">AD 100 – 313</div>
           <div class="era-band-count" id="era-count-1">—</div>
           <div class="era-band-label">Early Church</div>
-          <div class="era-band-bar" id="era-bar-1" style="width:0%"></div>
         </div>
         <div class="era-band era-band-3" id="era-2" data-name="Medieval" onclick="clickEra(2)">
           <div class="era-band-dates">AD 313 – 1517</div>
           <div class="era-band-count" id="era-count-2">—</div>
           <div class="era-band-label">Medieval Church</div>
-          <div class="era-band-bar" id="era-bar-2" style="width:0%"></div>
         </div>
         <div class="era-band era-band-4" id="era-3" data-name="Reform" onclick="clickEra(3)">
           <div class="era-band-dates">AD 1517 – 1900</div>
           <div class="era-band-count" id="era-count-3">—</div>
           <div class="era-band-label">Reformation & Beyond</div>
-          <div class="era-band-bar" id="era-bar-3" style="width:0%"></div>
         </div>
       </div>
 
@@ -2186,7 +2190,7 @@
     belief_id:'', is_martyr:'', page:1, total:0,
     era_index:-1, sort:'date_asc'
   };
-  const PAGE_SIZE = 20;
+  const PAGE_SIZE = 200;
   let allFigures = [];   // full sorted dataset — pagination is client-side
   let searchTimer;
   let acTimer;
@@ -2355,7 +2359,6 @@
       const maxCount = Math.max(...eraRanges.map(e => e.count), 1);
       eraRanges.forEach((era, i) => {
         animateCount(document.getElementById(`era-count-${i}`), era.count, i * 120);
-        document.getElementById(`era-bar-${i}`).style.width = `${Math.round((era.count/maxCount)*100)}%`;
         const navCount = document.getElementById(`nav-era-count-${i}`);
         if (navCount) navCount.textContent = era.count;
       });
@@ -2727,7 +2730,7 @@
             </div>
             <div class="codex-entries" id="chronoEntries${ch.eraIdx}">${entriesHtml}</div>
             <div class="codex-explicit">
-              <span class="codex-explicit-text">Explicit Liber ${ERA_ROMAN[ch.eraIdx]||ch.eraIdx+1} · Incipit Liber ${ERA_ROMAN[ch.eraIdx+1]||'…'}</span>
+              <span class="codex-explicit-text">End of ${era.name}${CHRONO_ERAS[ch.eraIdx+1] ? ' · ' + CHRONO_ERAS[ch.eraIdx+1].name + ' begins' : ''}</span>
             </div>
             <div class="codex-folio">${chIdx + 1}</div>
           </div>
@@ -3217,60 +3220,110 @@
     }
   }
 
+  function renderMarkdown(text) {
+    if (!text) return '';
+    const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const inline = s => esc(s)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/_(.+?)_/g, '<em>$1</em>');
+
+    function renderBlock(block) {
+      const lines = block.split('\n');
+      const first = lines[0];
+      if (/^---+$/.test(first.trim())) return '<hr class="md-hr">';
+      if (/^>\s?/.test(first)) {
+        const inner = lines.map(l=>l.replace(/^>\s?/,'')).join(' ');
+        return `<blockquote class="mpro-quote">${inline(inner)}</blockquote>`;
+      }
+      if (/^[-*]\s/.test(first)) {
+        const items = lines.filter(l=>/^[-*]\s/.test(l)).map(l=>`<li>${inline(l.slice(2))}</li>`).join('');
+        return `<ul class="md-ul">${items}</ul>`;
+      }
+      if (/^\d+\.\s/.test(first)) {
+        const items = lines.filter(l=>/^\d+\.\s/.test(l)).map(l=>`<li>${inline(l.replace(/^\d+\.\s/,''))}</li>`).join('');
+        return `<ol class="md-ol">${items}</ol>`;
+      }
+      return `<p class="md-p">${inline(lines.join(' '))}</p>`;
+    }
+
+    const blocks = text.split(/\n{2,}/);
+    let html = '';
+    let inDetails = false;
+
+    const closeDetails = () => { if (inDetails) { html += '</div></details>'; inDetails = false; } };
+
+    for (const block of blocks) {
+      const first = block.split('\n')[0];
+      let level = 0, titleText = '';
+      if (/^###\s/.test(first))     { level = 3; titleText = first.slice(4); }
+      else if (/^##\s/.test(first)) { level = 2; titleText = first.slice(3); }
+      else if (/^#\s/.test(first))  { level = 1; titleText = first.slice(2); }
+
+      if (level) {
+        closeDetails();
+        const cls = `md-summary md-summary-h${level}`;
+        html += `<details class="md-collapsible" open><summary class="${cls}">${inline(titleText)}</summary><div class="md-collapsible-body">`;
+        inDetails = true;
+      } else {
+        html += renderBlock(block);
+      }
+    }
+
+    closeDetails();
+    return html;
+  }
+
   function renderModal(f, related=[]) {
     const name = f.name || 'Unknown';
     const initial = name.charAt(0);
 
-    // Image
     const imgHtml = f.image_url
       ? `<img class="mpro-image" src="${f.image_url}" alt="${name}" onerror="this.parentElement.innerHTML='<div class=\\'mpro-img-placeholder\\'>${initial}</div>'">`
       : `<div class="mpro-img-placeholder">${initial}</div>`;
 
-    // Left metadata rows
     const suffix = (f.era_type||'').includes('BC') ? ' BC' : ' AD';
-    const bornVal  = f.born  ? `${f.born}${suffix}`  : null;
-    const diedVal  = f.death ? `${f.death} AD`       : null;
-    const isCoords = v => v && /^-?[\d.]+[;,]-?[\d.]+$/.test(v.trim());
-    const bornDiedHtml = (bornVal || diedVal) ? `
-      <div class="mpro-meta-row-pair">
-        ${bornVal  ? `<div class="mpro-meta-half"><span class="mpro-meta-label">Born</span><span class="mpro-meta-value">${bornVal}</span></div>`  : '<div class="mpro-meta-half"></div>'}
-        ${diedVal  ? `<div class="mpro-meta-half"><span class="mpro-meta-label">Died</span><span class="mpro-meta-value">${diedVal}</span></div>`  : '<div class="mpro-meta-half"></div>'}
-      </div>` : '';
-    const metaItems = [
-      ['Birthplace', !isCoords(f.birthplace) ? f.birthplace : null],
-      ['Deathplace', f.deathplace || null],
-      ['Century', (f.century || deriveCentury(f.born, f.death)) ? `${f.century || deriveCentury(f.born, f.death)} Century` : null],
-      ['Region', f.primary_region || null],
-      ['Denomination', f.denomination_tradition || null],
-      ['Gender', f.gender || null],
-    ].filter(([,v]) => v);
-    const metaHtml = bornDiedHtml + metaItems.map(([l,v]) =>
-      `<div class="mpro-meta-row"><span class="mpro-meta-label">${l}</span><span class="mpro-meta-value">${v}</span></div>`
-    ).join('');
+    const bornVal = f.born  ? `${f.born}${suffix}` : null;
+    const diedVal = f.death ? `${f.death} AD`      : null;
+    const century = f.century || deriveCentury(f.born, f.death);
 
-    // Tags
-    const beliefs = (f.beliefs||[]).map(b=>`<span class="belief-tag">${b.belief_name}</span>`).join('');
-    const eras = (f.eras||[]).map(e=>`<span class="belief-tag">${[e.name,e.time_span?`(${e.time_span})`:null].filter(Boolean).join(' ')}</span>`).join('');
-    const tagsHtml = (beliefs||eras) ? `<div class="mpro-tags-wrap">
-      ${beliefs?`<div><span class="mpro-meta-label" style="margin-bottom:0.35rem;display:block">Beliefs</span><div class="arch-card-beliefs">${beliefs}</div></div>`:''}
-      ${eras?`<div><span class="mpro-meta-label" style="margin-bottom:0.35rem;display:block">Era</span><div class="arch-card-beliefs">${eras}</div></div>`:''}
-    </div>` : '';
+    const facts = [
+      bornVal   && { label:'Born',    value: bornVal },
+      diedVal   && { label:'Died',    value: diedVal },
+      century   && { label:'Century', value: `${century} c.` },
+      f.gender  && { label:'Gender',  value: f.gender },
+      f.primary_region && { label:'Region', value: f.primary_region },
+    ].filter(Boolean);
+    const factsHtml = facts.length ? `<div class="mpro-facts">${facts.map(fc=>`<div class="mpro-fact"><span class="mpro-fact-label">${fc.label}</span><span class="mpro-fact-value">${fc.value}</span></div>`).join('')}</div>` : '';
 
-    // Subtitle: role • denomination
-    const subtitleParts = [f.role_office, f.denomination_tradition].filter(Boolean);
-    const subtitle = subtitleParts.length ? `<p class="mpro-subtitle">${subtitleParts.join(' • ')}</p>` : '';
+    const subtitleParts = [f.role_office].filter(Boolean);
+    const subtitle = subtitleParts.length ? `<p class="mpro-subtitle">${subtitleParts.join(' · ')}</p>` : '';
 
-    // Body sections
+    const overviewHtml = f.short_description
+      ? `<div class="mpro-overview"><span class="mpro-overview-label">Overview</span><p class="mpro-overview-text">${f.short_description}</p></div>`
+      : '';
+
+    // Content sections — biography uses markdown, rest use pre-wrap text
     const sections = [];
-    if (f.short_description)     sections.push(mprosec('Overview',      `<div class="mpro-text">${f.short_description}</div>`));
-    if (f.long_biography)        sections.push(mprosec('Biography',     `<div class="mpro-text">${f.long_biography}</div>`));
-    if (f.key_life_events)       sections.push(mprosec('Key Life Events',`<div class="mpro-text">${f.key_life_events}</div>`));
-    if (f.primary_contributions) sections.push(mprosec('Contributions', `<div class="mpro-text">${f.primary_contributions}</div>`));
-    if (f.major_works)           sections.push(mprosec('Major Works',   `<div class="mpro-text">${f.major_works}</div>`));
-    if (f.associated_movements)  sections.push(mprosec('Movements',     `<div class="mpro-text">${f.associated_movements}</div>`));
-    if (f.scripture_references)  sections.push(mprosec('Scripture',     `<div class="mpro-text">${f.scripture_references}</div>`));
-    if (f.famous_quotes)         sections.push(mprosec('Famous Quotes', `<blockquote class="mpro-quote">${f.famous_quotes}</blockquote>`));
-    if (f.notes)                 sections.push(mprosec('Notes',         `<div class="mpro-text">${f.notes}</div>`));
+    if (f.long_biography)        sections.push(mprosec('Biography',      `<div class="md-prose">${renderMarkdown(f.long_biography)}</div>`));
+    if (f.key_life_events)       sections.push(mprosec('Key Life Events', `<div class="md-prose">${renderMarkdown(f.key_life_events)}</div>`));
+    if (f.primary_contributions) sections.push(mprosec('Contributions',   `<div class="mpro-text">${f.primary_contributions}</div>`));
+    if (f.major_works)           sections.push(mprosec('Major Works',     `<div class="mpro-text">${f.major_works}</div>`));
+    if (f.associated_movements)  sections.push(mprosec('Movements',       `<div class="mpro-text">${f.associated_movements}</div>`));
+    if (f.scripture_references)  sections.push(mprosec('Scripture',       `<div class="mpro-text">${f.scripture_references}</div>`));
+    if (f.famous_quotes)         sections.push(mprosec('Famous Quotes',   `<blockquote class="mpro-quote">${f.famous_quotes}</blockquote>`));
+    if (f.notes)                 sections.push(mprosec('Notes',           `<div class="md-prose">${renderMarkdown(f.notes)}</div>`));
+
+    // Sidebar
+    const beliefs = (f.beliefs||[]).map(b=>`<span class="belief-tag">${b.belief_name}</span>`).join('');
+    const eras    = (f.eras||[]).map(e=>`<span class="belief-tag">${e.name}</span>`).join('');
+    const sideItems = [
+      f.denomination_tradition && { label:'Denomination', html:`<span class="mpro-side-value">${f.denomination_tradition}</span>` },
+      f.deathplace             && { label:'Deathplace',   html:`<span class="mpro-side-value">${f.deathplace}</span>` },
+      beliefs                  && { label:'Beliefs',      html:`<div style="margin-top:0.3rem;display:flex;flex-wrap:wrap;gap:0.3rem">${beliefs}</div>` },
+      eras                     && { label:'Eras',         html:`<div style="margin-top:0.3rem;display:flex;flex-wrap:wrap;gap:0.3rem">${eras}</div>` },
+    ].filter(Boolean);
+    const sideHtml = sideItems.map(({label,html})=>`<div class="mpro-side-section"><span class="mpro-side-label">${label}</span>${html}</div>`).join('');
 
     // Related
     let relatedHtml = '';
@@ -3286,25 +3339,28 @@
       relatedHtml = `<div class="mpro-related"><div class="mpro-related-head">Related Figures</div><div class="related-grid">${cards}</div></div>`;
     }
 
+    const hasBody = sections.length || sideHtml;
+
     return `
-      <div class="mpro-layout">
-        <div class="mpro-left">
-          <div class="mpro-img-wrap">${imgHtml}<div class="mpro-img-gradient"></div></div>
-          ${metaHtml ? `<div class="mpro-meta-panel">${metaHtml}</div>` : ''}
-          ${tagsHtml}
-        </div>
-        <div class="mpro-right">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.1rem">
-            <div class="mpro-badge" style="margin-bottom:0">${f.type || 'Historical Figure'}</div>
-            <button class="graph-btn" onclick="openConnectionGraph(${f.id},'${name.replace(/'/g,"\\'")}')"> ${related.length} Connection${related.length !== 1 ? 's' : ''}</button>
+      <div class="mpro-hero">
+        <div class="mpro-hero-img-wrap">${imgHtml}</div>
+        <div class="mpro-hero-info">
+          <div class="mpro-hero-top">
+            <span class="mpro-badge">${f.type || 'Historical Figure'}</span>
+            <button class="graph-btn" onclick="openConnectionGraph(${f.id},'${name.replace(/'/g,"\\'")}')">⬡ ${related.length} Connection${related.length!==1?'s':''}</button>
           </div>
           <h2 class="mpro-name">${name}</h2>
           ${f.alternative_names ? `<p class="mpro-alt">Also known as: ${f.alternative_names}</p>` : ''}
           ${subtitle}
           ${f.is_martyr==='Yes' ? `<div class="mpro-martyr">✝ Died as a Martyr</div>` : ''}
-          ${sections.join('')}
+          ${factsHtml}
+          ${overviewHtml}
         </div>
       </div>
+      ${hasBody ? `<div class="mpro-body">
+        <div class="mpro-content">${sections.join('')}</div>
+        ${sideHtml ? `<div class="mpro-sidebar">${sideHtml}</div>` : ''}
+      </div>` : ''}
       ${relatedHtml}`;
   }
 
