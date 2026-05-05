@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>The Archivist — Church History</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0c0a08">
@@ -1944,6 +1944,431 @@
     .search-ac-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.54rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.1rem; }
     .search-ac-empty { padding: 0.75rem; font-family: 'EB Garamond', serif; font-style: italic; color: var(--ink-3); font-size: 0.9rem; text-align: center; }
 
+/* ─────────────────────────────────────────────────────────────
+   MOBILE MODERNIZATION — Hearth & Parchment
+   Cinematic + fluid mobile experience. Desktop untouched.
+   ───────────────────────────────────────────────────────────── */
+
+/* Mobile-only chrome: hidden on desktop, shown via mobile media query below */
+.m-topbar, .m-tabbar, .m-quick-filters, .m-pager-dots { display: none; }
+
+@media (max-width: 700px) {
+  :root, [data-theme="dark"] {
+    --glass:        rgba(12, 10, 8, 0.62);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --hero-veil:    linear-gradient(180deg, transparent 0%, rgba(8,6,4,0.85) 100%);
+  }
+  [data-theme="light"] {
+    --glass:        rgba(253, 248, 240, 0.72);
+    --glass-border: rgba(70, 45, 25, 0.10);
+    --hero-veil:    linear-gradient(180deg, transparent 0%, rgba(42,31,24,0.85) 100%);
+  }
+
+  .topbar { display: none; }
+  .mobile-nav { display: none !important; }
+  .era-scrubber { display: none !important; }
+  .scroll-top-btn { display: none !important; }
+  .stats-banner { display: none; }
+
+  html { overflow-y: auto; height: calc(100vh + 1px); overscroll-behavior-x: none; }
+  body { overflow: hidden; height: 100dvh; width: 100%; max-width: 100vw; overscroll-behavior-x: none; }
+  .main-area { padding-top: 0; }
+  .content-area { padding: 0 !important; height: 100dvh; }
+
+  /* ── 1 · Floating glass top bar ─────────────────── */
+  .m-topbar {
+    position: fixed; top: 12px; left: 12px; right: 12px; height: 52px;
+    border-radius: 26px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+            backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 18px; z-index: 60;
+    transition: transform 0.28s cubic-bezier(0.2,0.7,0.3,1), opacity 0.2s;
+  }
+  .m-topbar.hidden { transform: translateY(-130%); opacity: 0; pointer-events: none; }
+  .m-topbar-icon { font-size: 16px; color: var(--ink-3); }
+  .m-topbar-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: 'EB Garamond', Georgia, serif; font-style: italic;
+    font-size: 15px; color: var(--ink); min-width: 0;
+  }
+  .m-topbar-input::placeholder { color: var(--ink-3); }
+  .m-topbar-badge {
+    padding: 5px 11px; border-radius: 12px;
+    background: var(--accent-glow); border: 1px solid var(--accent);
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600;
+  }
+
+  /* ── 2 · Pager ─────────────────────────────────── */
+  .m-pager {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: row;
+    width: 300vw;
+    height: 100dvh;
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.34s cubic-bezier(0.2,0.7,0.3,1);
+    will-change: transform;
+  }
+  .m-pager.dragging { transition: none; }
+  .m-pane {
+    width: 100vw; height: 100dvh;
+    overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 76px 16px 130px;
+    overscroll-behavior-y: contain;
+    background: var(--bg);
+  }
+  .m-pane::-webkit-scrollbar { display: none; }
+  .m-pane[data-pane="map"] { padding: 0; }
+
+  /* ── 3 · Floating glass tab bar ─────────────────── */
+  .m-tabbar {
+    position: fixed; left: 16px; right: 16px; bottom: 24px; height: 64px;
+    border-radius: 32px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+            backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-around;
+    z-index: 60;
+    transition: transform 0.32s cubic-bezier(0.2,0.7,0.3,1), opacity 0.2s;
+  }
+  [data-theme="light"] .m-tabbar {
+    box-shadow: 0 12px 40px rgba(80,45,20,0.18), inset 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .m-tabbar.hidden { transform: translateY(140%); opacity: 0; pointer-events: none; }
+  .m-tab {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 8px 14px; border-radius: 22px;
+    background: none; border: none; cursor: pointer;
+    transition: background 0.18s;
+  }
+  .m-tab.active { background: var(--accent-glow); }
+  .m-tab-icon { font-size: 20px; line-height: 1; color: var(--ink-3); }
+  .m-tab-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .m-tab.active .m-tab-icon,
+  .m-tab.active .m-tab-label { color: var(--accent); }
+
+  .m-pager-dots {
+    position: fixed; left: 0; right: 0; bottom: 96px;
+    display: flex; justify-content: center; gap: 5px;
+    z-index: 59; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .m-pager-dot {
+    width: 5px; height: 5px; border-radius: 3px;
+    background: var(--ink-4); transition: all 0.3s;
+  }
+  .m-pager-dot.active { width: 22px; background: var(--accent); }
+
+  /* ── 4 · Era hero (timeline header) ─────────────── */
+  .m-era-hero {
+    position: relative; height: 220px; margin: -76px -16px 0;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--era-tint, var(--accent)) 0%, transparent 100%);
+  }
+  .m-era-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 50%, var(--bg) 100%);
+  }
+  .m-era-hero-body { position: absolute; left: 24px; right: 24px; bottom: 24px; }
+  .m-era-hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .m-era-hero-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 44px;
+    font-weight: 400; font-style: italic; color: var(--ink);
+    letter-spacing: -0.02em; line-height: 0.95;
+  }
+  .m-era-hero-meta {
+    font-family: 'EB Garamond', Georgia, serif; font-size: 13px;
+    color: var(--ink-3); margin-top: 10px; letter-spacing: 0.02em;
+  }
+
+  /* ── 5 · Timeline cards ─────────────────────────── */
+  .m-timeline-rail { position: relative; padding-left: 56px; padding-top: 20px; }
+  .m-timeline-rail::before {
+    content: ''; position: absolute; left: 32px; top: 12px; bottom: 12px; width: 1px;
+    background: linear-gradient(180deg, transparent, var(--border) 8%, var(--border) 92%, transparent);
+  }
+  .m-timeline-entry { position: relative; margin-bottom: 24px; animation: mhRise 0.6s both; }
+  .m-timeline-node {
+    position: absolute; left: -32px; top: 24px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--era-tint, var(--accent));
+    display: flex; align-items: center; justify-content: center;
+  }
+  .m-timeline-node::after {
+    content: ''; width: 6px; height: 6px; border-radius: 3px;
+    background: var(--era-tint, var(--accent));
+  }
+  .m-timeline-year {
+    position: absolute; left: -56px; top: -2px; width: 36px; text-align: right;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--ink-3); letter-spacing: 0.06em;
+  }
+  .m-timeline-card {
+    margin-right: 16px; border-radius: 14px; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border-light);
+    display: flex; min-height: 100px;
+  }
+  .m-timeline-card-img {
+    width: 96px; flex-shrink: 0; position: relative;
+    background: linear-gradient(135deg,
+      color-mix(in oklch, var(--era-tint, var(--accent)) 20%, transparent),
+      color-mix(in oklch, var(--era-tint, var(--accent)) 5%, transparent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 56px; color: var(--era-tint, var(--accent)); font-weight: 300;
+  }
+  .m-timeline-card-img img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover; object-position: center top;
+  }
+  .m-timeline-card-body { flex: 1; padding: 14px; min-width: 0; }
+  .m-timeline-card-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--era-tint, var(--accent)); margin-bottom: 4px;
+  }
+  .m-timeline-card-name {
+    font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500;
+    color: var(--ink); line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 4px;
+  }
+  .m-timeline-card-meta {
+    font-family: 'Inter Tight', 'Inter', sans-serif; font-size: 11.5px;
+    color: var(--ink-3); margin-bottom: 8px;
+  }
+  .m-timeline-card-desc {
+    font-family: 'EB Garamond', Georgia, serif; font-size: 13.5px;
+    color: var(--ink-2); line-height: 1.45;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .m-timeline-era-header {
+    margin: 32px -16px 8px; padding: 20px 24px 16px;
+    background: linear-gradient(180deg, color-mix(in oklch, var(--era-tint, var(--accent)) 12%, transparent), transparent);
+    border-top: 1px solid color-mix(in oklch, var(--era-tint, var(--accent)) 30%, transparent);
+  }
+  .m-timeline-era-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--era-tint, var(--accent)); margin-bottom: 4px;
+  }
+  .m-timeline-era-name {
+    font-family: 'Cormorant Garamond', serif; font-size: 28px; font-style: italic;
+    color: var(--ink); line-height: 1; letter-spacing: -0.02em;
+  }
+  .m-timeline-era-dates {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--ink-3); margin-top: 4px;
+  }
+
+  /* ── 6 · Bottom-sheet figure profile ────────────── */
+  .modal-overlay[data-mobile-sheet="open"] {
+    background: rgba(0,0,0,0.45);
+    align-items: flex-end; padding: 0;
+  }
+  [data-mobile-sheet="open"] .modal {
+    width: 100%; max-width: 100%; min-height: 92dvh; max-height: 92dvh;
+    border-radius: 28px 28px 0 0;
+    animation: m-sheet-rise 0.34s cubic-bezier(0.2,0.7,0.3,1);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  @keyframes m-sheet-rise {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  [data-mobile-sheet="open"] .modal-close {
+    top: 14px; right: 14px;
+    background: rgba(0,0,0,0.32);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #fff;
+  }
+  [data-mobile-sheet="open"] .modal::before {
+    content: ''; position: absolute; top: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.4); z-index: 30;
+  }
+
+  /* ── 7 · Map glass overlays ──────────────────────── */
+  .m-map-wrap { position: relative; width: 100vw; height: 100dvh; padding: 0; }
+  .m-map-wrap #mapContainer { width: 100%; height: 100% !important; border-radius: 0 !important; border: none !important; }
+  .m-map-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 400; }
+  .m-map-era-rail {
+    position: absolute; top: 80px; left: 0; right: 0;
+    display: flex; gap: 8px; padding: 0 16px;
+    overflow-x: auto; pointer-events: auto; scrollbar-width: none;
+  }
+  .m-map-era-rail::-webkit-scrollbar { display: none; }
+  .m-map-era-chip {
+    flex-shrink: 0; padding: 7px 14px; border-radius: 18px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 11px; font-weight: 600;
+    color: var(--ink-2); white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer; pointer-events: auto;
+  }
+  .m-map-era-chip[data-active="true"] {
+    background: var(--era-tint, var(--accent)); color: #fff;
+    border-color: var(--era-tint, var(--accent));
+  }
+  .m-map-selected-card {
+    position: absolute; left: 16px; right: 16px; bottom: 110px;
+    border-radius: 18px; padding: 14px;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(24px) saturate(140%); backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 36px rgba(0,0,0,0.3);
+    display: flex; gap: 12px; align-items: center;
+    pointer-events: auto;
+    transform: translateY(140%); opacity: 0;
+    transition: transform 0.32s cubic-bezier(0.2,0.7,0.3,1), opacity 0.2s;
+  }
+  .m-map-selected-card.shown { transform: translateY(0); opacity: 1; }
+  .m-map-pin {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--era-tint, var(--accent));
+    box-shadow: 0 0 18px var(--era-tint, var(--accent));
+    border: 2px solid var(--bg);
+  }
+  .m-map-pin.is-selected {
+    width: 18px; height: 18px;
+    animation: m-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes m-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+  /* ── 8 · Home header ─────────────────────────────── */
+  .m-home-header { padding: 20px 8px 14px; animation: mhRise 0.5s both; }
+  .m-home-eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .m-home-title {
+    font-family: 'Cormorant Garamond', serif; font-size: 32px;
+    font-weight: 400; color: var(--ink); line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  .m-home-title em { color: var(--accent); font-style: italic; }
+  .m-quick-filters {
+    position: fixed; top: 76px; left: 0; right: 0;
+    padding: 0 16px 12px; display: flex; gap: 7px;
+    overflow-x: auto; z-index: 55; scrollbar-width: none;
+    transform: translateY(-8px); opacity: 0;
+    pointer-events: none; transition: all 0.24s cubic-bezier(0.2,0.7,0.3,1);
+  }
+  .m-quick-filters.shown { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .m-quick-filters::-webkit-scrollbar { display: none; }
+  .m-quick-filter {
+    flex-shrink: 0; padding: 5px 12px; border-radius: 12px;
+    background: transparent; border: 1px solid var(--border);
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-size: 11px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
+    cursor: pointer;
+  }
+  .m-quick-filter.active { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .m-home-featured {
+    position: relative; margin: 8px 0 18px;
+    height: 240px; border-radius: 18px; overflow: hidden;
+    border: 1px solid var(--border-light); cursor: pointer;
+  }
+  .m-home-featured-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center top;
+    animation: m-kenburns 18s ease-in-out infinite alternate;
+  }
+  .m-home-featured-veil { position: absolute; inset: 0; background: var(--hero-veil); }
+  .m-home-featured-body { position: absolute; left: 18px; right: 18px; bottom: 18px; color: #fff; }
+  .m-home-eras {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .m-home-era-card {
+    padding: 12px; border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border-light); cursor: pointer;
+  }
+  .m-home-era-card-bar { height: 3px; width: 28px; border-radius: 2px; background: var(--era-tint, var(--accent)); margin-bottom: 10px; }
+  .m-home-era-card-count { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--ink); line-height: 1; letter-spacing: -0.02em; }
+  .m-home-era-card-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: var(--ink); margin-top: 4px; }
+  .m-home-era-card-dates { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--ink-3); margin-top: 4px; letter-spacing: 0.04em; }
+
+  /* ── 9 · Shared keyframes ────────────────────────── */
+  @keyframes mhRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes m-kenburns {
+    0%   { transform: scale(1.05); }
+    100% { transform: scale(1.18) translate(-2%,-3%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .m-home-featured-img { animation: none; }
+  }
+}
+
+@media (max-width: 700px) and (min-width: 480px) {
+  .m-tabbar { left: 24px; right: 24px; }
+}
+
+/* Override the old fixed-map behaviour inside the pager */
+@media (max-width: 700px) {
+  .m-pager #view-map {
+    position: relative !important;
+    inset: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    width: 100vw;
+    height: 100dvh;
+    display: flex !important;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .m-pager .m-map-wrap {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .m-pager .map-layout {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .m-pager .map-canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .m-pager #mapContainer {
+    position: absolute !important;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  /* Hide old side panel on mobile pager — glass card replaces it */
+  .m-pager .map-side-panel { display: none !important; }
+}
+
   </style>
 </head>
 <body>
@@ -2020,6 +2445,41 @@
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
 
+<!-- ── MOBILE CHROME (mobile-only; CSS-hidden on desktop) ───── -->
+<div class="m-topbar" id="mTopbar">
+  <span class="m-topbar-icon">⌕</span>
+  <input class="m-topbar-input" id="mSearchInput"
+         placeholder="Search figures, places, beliefs…" autocomplete="off" />
+  <span class="m-topbar-badge" id="mResultBadge">—</span>
+</div>
+
+<div class="m-quick-filters" id="mQuickFilters"></div>
+
+<nav class="m-tabbar" id="mTabbar" role="tablist">
+  <button class="m-tab active" data-pane="grid"     onclick="mPagerGoTo(0)">
+    <span class="m-tab-icon">⊞</span>
+    <span class="m-tab-label">Browse</span>
+  </button>
+  <button class="m-tab"        data-pane="timeline" onclick="mPagerGoTo(1)">
+    <span class="m-tab-icon">⌇</span>
+    <span class="m-tab-label">Timeline</span>
+  </button>
+  <button class="m-tab"        data-pane="map"      onclick="mPagerGoTo(2)">
+    <span class="m-tab-icon">◔</span>
+    <span class="m-tab-label">Map</span>
+  </button>
+  <button class="m-tab"        data-pane="saved"    onclick="openMobileSidebar()">
+    <span class="m-tab-icon" style="font-family:'Cormorant Garamond',serif;font-style:italic">☰</span>
+    <span class="m-tab-label">Filter</span>
+  </button>
+</nav>
+
+<div class="m-pager-dots" id="mPagerDots" aria-hidden="true">
+  <div class="m-pager-dot active"></div>
+  <div class="m-pager-dot"></div>
+  <div class="m-pager-dot"></div>
+</div>
+
 <!-- ── MAIN AREA ───────────────────────────────── -->
 <div class="main-area">
 
@@ -2065,8 +2525,10 @@
       </div>
     </div>
 
+    <div class="m-pager" id="mPager">
+
     <!-- Grid View -->
-    <div id="view-grid">
+    <div class="m-pane" data-pane="grid" id="view-grid">
       <div id="pullIndicator" style="display:none;text-align:center;padding:10px 0 4px;font-family:'JetBrains Mono',monospace;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-4)">↓ Pull to refresh</div>
       <!-- Era bands -->
       <div class="stats-banner">
@@ -2118,14 +2580,15 @@
     </div>
 
     <!-- Timeline View -->
-    <div id="view-timeline" style="display:none">
+    <div class="m-pane" data-pane="timeline" id="view-timeline" style="display:none">
       <div class="chrono-view" id="chronoView">
         <div class="loading"><div class="spinner"></div>Loading…</div>
       </div>
     </div>
 
     <!-- Map View -->
-    <div id="view-map" style="display:none">
+    <div class="m-pane" data-pane="map" id="view-map" style="display:none">
+      <div class="m-map-wrap">
       <div class="map-layout">
         <!-- Map canvas -->
         <div class="map-canvas-wrap">
@@ -2148,7 +2611,15 @@
           </div>
         </div>
       </div>
-    </div>
+      <!-- Mobile glass overlay for map -->
+      <div class="m-map-overlay">
+        <div class="m-map-era-rail" id="mMapEraRail"></div>
+        <div class="m-map-selected-card" id="mMapSelected"></div>
+      </div>
+      </div><!-- /.m-map-wrap -->
+    </div><!-- /#view-map -->
+
+    </div><!-- /.m-pager -->
 
   </div>
 </div>
@@ -2182,7 +2653,7 @@
 <div class="graph-overlay" id="graphOverlay" style="display:none"></div>
 
 <!-- MODAL -->
-<div class="modal-overlay" id="modal" style="display:none" onclick="closeOnOverlay(event)">
+<div class="modal-overlay" id="modal" style="display:none" data-mobile-sheet="closed" onclick="closeOnOverlay(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">×</button>
     <div id="modalInner"></div>
@@ -2321,9 +2792,9 @@
       window.addEventListener('scroll', chronoScrollListener);
       if (!timelineLoaded) loadChronoView(); else setTimeout(applyChronoFocus, 50);
     }
-    // Map needs zero-padding flex content-area to fill height correctly
+    // Map needs zero-padding flex content-area to fill height correctly (desktop only)
     const ca = document.getElementById('contentArea');
-    if (ca) ca.classList.toggle('view-map-active', view === 'map');
+    if (ca) ca.classList.toggle('view-map-active', view === 'map' && window.innerWidth > 700);
 
     if (view === 'map') {
       loadMap();
@@ -2556,6 +3027,8 @@
     document.querySelectorAll('.chrono-era-dot').forEach(d => {
       d.classList.toggle('active', parseInt(d.dataset.era) === eraIdx);
     });
+    const tint = ERA_HEX[eraIdx];
+    if (tint) document.documentElement.style.setProperty('--era-tint', tint);
   }
 
   function initChronoMap() { /* map removed from timeline — no-op */ }
@@ -2687,9 +3160,36 @@
         }
       });
 
+      const isMobileView = window.matchMedia('(max-width: 700px)').matches;
+
+      function renderMobileTimelineCard(f, eraIdx) {
+        const initial = (f.name||'?').charAt(0);
+        const tint = ERA_HEX[eraIdx] || ERA_HEX[3];
+        const yearDisplay = f.born
+          ? (f.born < 0 ? `${Math.abs(f.born)} BC` : `${f.born}`)
+          : '—';
+        const dates = formatDates(f.born, f.death, f.era_type);
+        return `<div class="m-timeline-entry" style="--era-tint:${tint}" onclick="openFigure(${f.id})">
+          <div class="m-timeline-node"></div>
+          <div class="m-timeline-year">${yearDisplay}</div>
+          <div class="m-timeline-card">
+            <div class="m-timeline-card-img">
+              ${f.image_url ? `<img src="${f.image_url}" alt="${initial}" loading="lazy" onerror="this.parentElement.textContent='${initial}'">` : initial}
+            </div>
+            <div class="m-timeline-card-body">
+              <div class="m-timeline-card-eyebrow">${f.type||'Person'}${f.is_martyr==='Yes'?' · ✝ Martyr':''}</div>
+              <div class="m-timeline-card-name">${f.name||'Unknown'}</div>
+              <div class="m-timeline-card-meta">${f.role_office||''}${dates?' · '+dates:''}</div>
+              ${f.short_description ? `<div class="m-timeline-card-desc">${f.short_description}</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }
+
       const chaptersHtml = chapters.map((ch, chIdx) => {
         const era = ch.era;
         const entriesHtml = ch.figures.map((f) => {
+          if (isMobileView) return renderMobileTimelineCard(f, ch.eraIdx);
           const dates = formatDates(f.born, f.death, f.era_type);
           const initial = (f.name||'?').charAt(0);
           const yearDisplay = f.born
@@ -2751,12 +3251,26 @@
           ${ERA_ROMAN[i]||i+1}<span class="dot-tip">${era.name}</span>
         </button>`).join('');
 
-      container.innerHTML = `
-        <div class="chrono-layout">
-          <div class="chrono-main">
-            <div class="chrono-entries" id="chronoEntries">${chaptersHtml}</div>
+      if (isMobileView) {
+        const mobileSections = chapters.map(ch => {
+          const tint = ERA_HEX[ch.eraIdx] || ERA_HEX[3];
+          const entries = ch.figures.map(f => renderMobileTimelineCard(f, ch.eraIdx)).join('');
+          return `<div class="m-timeline-era-header" style="--era-tint:${tint}">
+            <div class="m-timeline-era-label">Era ${ch.eraIdx + 1} of 4</div>
+            <div class="m-timeline-era-name">${ch.era.name}</div>
+            <div class="m-timeline-era-dates">${ch.era.dates}</div>
           </div>
-        </div>`;
+          <div class="m-timeline-rail" style="--era-tint:${tint}">${entries}</div>`;
+        }).join('');
+        container.innerHTML = `<div style="padding-bottom:20px">${mobileSections}</div>`;
+      } else {
+        container.innerHTML = `
+          <div class="chrono-layout">
+            <div class="chrono-main">
+              <div class="chrono-entries" id="chronoEntries">${chaptersHtml}</div>
+            </div>
+          </div>`;
+      }
 
       // IntersectionObserver: highlight active era dot as user scrolls
       if (chronoObserver) chronoObserver.disconnect();
@@ -2876,8 +3390,19 @@
           const lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
           if (!isNaN(lat) && !isNaN(lng)) {
             const isSelected = f.id === selectedMapFigId;
-            const marker = L.marker([lat, lng], { icon: makeEraPin(color, isSelected), zIndexOffset: isSelected ? 1000 : 0 });
-            marker.on('click', () => selectMapFigure(f.id));
+            const markerIcon = window.matchMedia('(max-width:700px)').matches
+              ? L.divIcon({ className: '', iconSize: [16,16], iconAnchor: [8,8], html: `<div class="m-map-pin" style="--era-tint:${color}"></div>` })
+              : makeEraPin(color, isSelected);
+            const marker = L.marker([lat, lng], { icon: markerIcon, zIndexOffset: isSelected ? 1000 : 0 });
+            marker.on('click', () => {
+              if (window.matchMedia('(max-width:700px)').matches) {
+                document.querySelectorAll('.m-map-pin').forEach(p => p.classList.remove('is-selected'));
+                marker.getElement()?.querySelector('.m-map-pin')?.classList.add('is-selected');
+                showMobileMapCard(f);
+              } else {
+                selectMapFigure(f.id);
+              }
+            });
             marker.bindTooltip(f.name, { permanent: false, direction: 'top', offset: [0, -8], className: 'map-pin-tip' });
             marker.on('mouseover', function() { const inner = this.getElement()?.querySelector('div'); if (inner) inner.style.transform = 'scale(1.5)'; });
             marker.on('mouseout',  function() { const inner = this.getElement()?.querySelector('div'); if (inner) inner.style.transform = ''; });
@@ -2983,6 +3508,56 @@
     </div>`;
   }
 
+  function showMobileMapCard(f) {
+    const card = document.getElementById('mMapSelected');
+    if (!card) return;
+    const eraIdx = f.century ? getEraFromCenturyStr(f.century) : 3;
+    const tint = ERA_HEX[eraIdx] || ERA_HEX[3];
+    const dates = formatDates(f.born, f.death, f.era_type);
+    const initial = (f.name||'?')[0];
+    card.innerHTML = `
+      <div style="width:56px;height:56px;border-radius:12px;flex-shrink:0;overflow:hidden;
+                  background:linear-gradient(135deg,${tint}40,${tint}18);
+                  display:flex;align-items:center;justify-content:center;
+                  font-family:'Cormorant Garamond',serif;font-style:italic;
+                  font-size:32px;color:${tint};position:relative">
+        ${f.image_url ? `<img src="${f.image_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top" loading="lazy">` : initial}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:${tint};margin-bottom:2px">${f.role_office||f.type||''}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--ink);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</div>
+        <div style="font-family:'Inter Tight',sans-serif;font-size:11.5px;color:var(--ink-3);margin-top:2px">${dates||''}</div>
+      </div>
+      <button onclick="openFigure(${f.id})"
+              style="width:36px;height:36px;border-radius:18px;background:var(--accent);
+                     color:#fff;border:none;font-size:14px;flex-shrink:0;cursor:pointer">›</button>`;
+    card.classList.add('shown');
+  }
+
+  function initMobileMapEraRail() {
+    const rail = document.getElementById('mMapEraRail');
+    if (!rail || rail.children.length) return;
+    CHRONO_ERAS.forEach((era, i) => {
+      const chip = document.createElement('button');
+      chip.className = 'm-map-era-chip';
+      chip.dataset.active = 'false';
+      chip.style.setProperty('--era-tint', ERA_HEX[i]);
+      chip.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${ERA_HEX[i]};flex-shrink:0"></span>${era.name}`;
+      chip.onclick = () => {
+        const isActive = chip.dataset.active === 'true';
+        rail.querySelectorAll('.m-map-era-chip').forEach(c => c.dataset.active = 'false');
+        chip.dataset.active = isActive ? 'false' : 'true';
+        toggleMapEra(isActive ? -1 : i);
+      };
+      rail.appendChild(chip);
+    });
+    // Dismiss mobile glass card when tapping map background
+    document.getElementById('mapContainer')?.addEventListener('click', () => {
+      const card = document.getElementById('mMapSelected');
+      if (card) card.classList.remove('shown');
+    });
+  }
+
   async function loadMap() {
     if (!mapLoaded) {
       mapInstance = L.map('mapContainer', { center: [35, 30], zoom: 4, zoomControl: false });
@@ -3007,6 +3582,11 @@
       }
     }
     renderMapPins();
+    if (window.matchMedia('(max-width:700px)').matches) {
+      initMobileMapEraRail();
+      // Invalidate after pager animation completes (340ms transition)
+      setTimeout(() => mapInstance && mapInstance.invalidateSize(), 380);
+    }
   }
 
   function closeMapPopup() { /* no-op — using side panel now */ }
@@ -3115,11 +3695,46 @@
     }
   }
 
+  function renderMobileHomeHeader() {
+    const viewGrid = document.getElementById('view-grid');
+    if (!viewGrid || viewGrid.querySelector('.m-home-header')) return;
+    const featured = allFigures.find(f => f.image_url) || allFigures[0];
+    if (!featured) return;
+    const counts = CHRONO_ERAS.map((_, i) =>
+      eraRanges[i] ? eraRanges[i].count.toLocaleString() : '—'
+    );
+    const today = new Date().toLocaleDateString('en-US', { month:'long', day:'numeric' });
+    viewGrid.insertAdjacentHTML('afterbegin', `
+      <header class="m-home-header">
+        <div class="m-home-eyebrow">Today · ${today}</div>
+        <h1 class="m-home-title">Two thousand years of <em>faithful witness</em>.</h1>
+      </header>
+      <div class="m-home-featured" onclick="openFigure(${featured.id})">
+        <div class="m-home-featured-img" style="background-image:url('${featured.image_url||''}')"></div>
+        <div class="m-home-featured-veil"></div>
+        <div class="m-home-featured-body">
+          <div class="m-home-eyebrow" style="color:#f5d8b8;margin-bottom:4px">Featured figure</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;line-height:1;letter-spacing:-0.02em;color:#fff">${featured.name}</div>
+          <div style="font-family:'EB Garamond',serif;font-style:italic;font-size:13px;margin-top:4px;opacity:0.85;color:#fff">${featured.role_office||featured.type||''}${featured.born?' · '+featured.born:''}</div>
+        </div>
+      </div>
+      <div class="m-home-eras">
+        ${CHRONO_ERAS.map((e, i) => `
+          <div class="m-home-era-card" style="--era-tint:${e.hex}" onclick="clickEra(${i})">
+            <div class="m-home-era-card-bar"></div>
+            <div class="m-home-era-card-count">${counts[i]}</div>
+            <div class="m-home-era-card-name">${e.name}</div>
+            <div class="m-home-era-card-dates">${e.dates}</div>
+          </div>`).join('')}
+      </div>`);
+  }
+
   function renderCurrentPage() {
     const grid = document.getElementById('grid');
     const start = (state.page - 1) * PAGE_SIZE;
     const pageItems = allFigures.slice(start, start + PAGE_SIZE);
     const total = allFigures.length;
+    if (window.matchMedia('(max-width:700px)').matches && state.page === 1) renderMobileHomeHeader();
     document.getElementById('resultsInfo').innerHTML = total > 0
       ? `Showing <strong>${start+1}–${Math.min(start+PAGE_SIZE, total)}</strong> of <strong>${total}</strong> records`
       : 'No records found';
@@ -3250,6 +3865,8 @@
         fetch(`${API}/figures/${id}/related`).then(r=>r.json()).catch(()=>[])
       ]);
       document.getElementById('modalInner').innerHTML = renderModal(f, related);
+      const sheetEl = document.querySelector('#modal .modal');
+      if (sheetEl) sheetEl.scrollTop = 0;
     } catch(e) {
       document.getElementById('modalInner').innerHTML = `<div style="padding:2rem;color:var(--ink-3)">Failed to load record.</div>`;
     }
@@ -3822,6 +4439,288 @@
   }
 
   boot();
+
+// ─────────────────────────────────────────────────────────────
+// MOBILE PAGER — horizontal swipe between Grid / Timeline / Map
+// ─────────────────────────────────────────────────────────────
+(function () {
+  const MQ = window.matchMedia('(max-width: 700px)');
+  const PANES = ['grid', 'timeline', 'map'];
+  let idx = 0;
+  let dragStartX = null, dragStartY = null, dragDx = 0, locked = null;
+  let lastScrollY = 0;
+
+  const pager = () => document.getElementById('mPager');
+  const getDots = () => document.querySelectorAll('#mPagerDots .m-pager-dot');
+  const getTabs = () => document.querySelectorAll('.m-tab[data-pane]');
+
+  function setIdx(i, animate) {
+    idx = Math.max(0, Math.min(2, i));
+    const p = pager();
+    if (!p) return;
+    if (animate === false) p.classList.add('dragging');
+    else p.classList.remove('dragging');
+    p.style.transform = `translate3d(-${idx * 100}vw, 0, 0)`;
+    getDots().forEach((d, k) => d.classList.toggle('active', k === idx));
+    getTabs().forEach(t => t.classList.toggle('active', t.dataset.pane === PANES[idx]));
+    // switchView hides non-active panes; restore them before + after its 150ms fade
+    if (typeof switchView === 'function') switchView(PANES[idx]);
+    // requestAnimationFrame fires before the 150ms timeout inside switchView
+    requestAnimationFrame(ensurePanesVisible);
+    setTimeout(ensurePanesVisible, 220);
+    if (animate !== false && navigator.vibrate) navigator.vibrate(8);
+  }
+  window.mPagerGoTo = setIdx;
+
+  function ensurePanesVisible() {
+    PANES.forEach(name => {
+      const el = document.getElementById('view-' + name);
+      if (el) el.style.display = '';
+    });
+  }
+
+  function activate() {
+    const p = pager();
+    if (!p) return;
+    p.style.display = 'flex';
+    // Hide the old home view — pager replaces it on mobile
+    const homeEl = document.getElementById('view-home');
+    if (homeEl) homeEl.style.display = 'none';
+    p.addEventListener('touchstart', onStart, { passive: true });
+    p.addEventListener('touchmove',  onMove,  { passive: false });
+    p.addEventListener('touchend',   onEnd);
+    document.querySelectorAll('.m-pane').forEach(pane => {
+      pane.addEventListener('scroll', onPaneScroll, { passive: true });
+    });
+    setIdx(0, false);
+    // Collapse iOS Safari URL bar.
+    // html { height: calc(100vh+1px) } keeps 1px scroll room even after dvh expands,
+    // so scrollY stays at 1 and the bar stays hidden.
+    setTimeout(() => window.scrollTo(0, 1), 400);
+    window.addEventListener('scroll', function () {
+      if (MQ.matches && window.scrollY === 0) {
+        setTimeout(() => window.scrollTo(0, 1), 80);
+      }
+    }, { passive: true });
+  }
+
+  function deactivate() {
+    const p = pager();
+    if (p) p.style.transform = '';
+  }
+
+  function onStart(e) {
+    if (e.touches.length !== 1) return;
+    dragStartX = e.touches[0].clientX;
+    dragStartY = e.touches[0].clientY;
+    dragDx = 0; locked = null;
+  }
+  function onMove(e) {
+    if (dragStartX == null) return;
+    const dx = e.touches[0].clientX - dragStartX;
+    const dy = e.touches[0].clientY - dragStartY;
+    if (locked == null) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) locked = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      else return;
+    }
+    if (locked !== 'x') return;
+    e.preventDefault();
+    dragDx = dx;
+    const p = pager();
+    p.classList.add('dragging');
+    p.style.transform = `translate3d(calc(-${idx * 100}vw + ${dx}px), 0, 0)`;
+  }
+  function onEnd() {
+    if (locked === 'x') {
+      const threshold = window.innerWidth * 0.18;
+      if (dragDx < -threshold && idx < 2) setIdx(idx + 1);
+      else if (dragDx > threshold && idx > 0) setIdx(idx - 1);
+      else setIdx(idx);
+    }
+    dragStartX = dragStartY = null; dragDx = 0; locked = null;
+  }
+
+  function onPaneScroll(e) {
+    const y = e.target.scrollTop;
+    const dy = y - lastScrollY;
+    const tb = document.getElementById('mTabbar');
+    const top = document.getElementById('mTopbar');
+    const dotsEl = document.getElementById('mPagerDots');
+    if (Math.abs(dy) > 6) {
+      const hide = dy > 0 && y > 80;
+      if (tb) tb.classList.toggle('hidden', hide);
+      if (top) top.classList.toggle('hidden', hide);
+      if (dotsEl) dotsEl.style.opacity = hide ? '0' : '1';
+    }
+    lastScrollY = y;
+  }
+
+  function check() { MQ.matches ? activate() : deactivate(); }
+  MQ.addEventListener('change', check);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check);
+  else check();
+
+  const _origSwitch = window.switchView;
+  if (_origSwitch) {
+    window.switchView = function (view) {
+      // On mobile redirect home → grid (pager has no home pane)
+      if (MQ.matches && view === 'home') view = 'grid';
+      _origSwitch.apply(this, [view]);
+      if (MQ.matches) {
+        // Run before _origSwitch's 150ms fade can hide panes
+        requestAnimationFrame(ensurePanesVisible);
+        setTimeout(ensurePanesVisible, 220);
+        const i = PANES.indexOf(view);
+        if (i >= 0) {
+          idx = i;
+          const p = pager();
+          if (p) p.style.transform = `translate3d(-${i * 100}vw, 0, 0)`;
+          getDots().forEach((d, k) => d.classList.toggle('active', k === i));
+          getTabs().forEach(t => t.classList.toggle('active', t.dataset.pane === PANES[i]));
+        }
+      }
+    };
+  }
+})();
+
+// ─────────────────────────────────────────────────────────────
+// MOBILE SHEET — bottom-sheet wrapper around the existing modal
+// ─────────────────────────────────────────────────────────────
+(function () {
+  const MQ = window.matchMedia('(max-width: 700px)');
+  const modal = () => document.getElementById('modal');
+
+  function patchOpen() {
+    const m = modal();
+    if (!m || !MQ.matches) return;
+    m.dataset.mobileSheet = 'open';
+    bindDrag();
+    if (navigator.vibrate) navigator.vibrate(10);
+  }
+
+  function patchClose() {
+    const m = modal();
+    if (!m) return;
+    m.dataset.mobileSheet = 'closed';
+  }
+
+  let dragStartY = null, dragDy = 0, sheetEl = null;
+  function bindDrag() {
+    const m = modal();
+    sheetEl = m.querySelector('.modal');
+    if (!sheetEl) return;
+    sheetEl.removeEventListener('touchstart', onStart);
+    sheetEl.removeEventListener('touchmove',  onMove);
+    sheetEl.removeEventListener('touchend',   onEnd);
+    sheetEl.addEventListener('touchstart', onStart, { passive: true });
+    sheetEl.addEventListener('touchmove',  onMove,  { passive: false });
+    sheetEl.addEventListener('touchend',   onEnd);
+  }
+  function onStart(e) {
+    if (sheetEl.scrollTop > 0) return;
+    if (e.touches[0].clientY > sheetEl.getBoundingClientRect().top + 60) return;
+    dragStartY = e.touches[0].clientY;
+  }
+  function onMove(e) {
+    if (dragStartY == null) return;
+    const dy = e.touches[0].clientY - dragStartY;
+    if (dy < 0) return;
+    e.preventDefault();
+    dragDy = dy;
+    sheetEl.style.transform = `translateY(${dy}px)`;
+    sheetEl.style.transition = 'none';
+  }
+  function onEnd() {
+    if (dragStartY == null) return;
+    sheetEl.style.transition = '';
+    if (dragDy > 120) {
+      sheetEl.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (typeof closeModal === 'function') closeModal();
+        sheetEl.style.transform = '';
+      }, 280);
+    } else {
+      sheetEl.style.transform = '';
+    }
+    dragStartY = null; dragDy = 0;
+  }
+
+  const m = modal();
+  if (m) {
+    let lastDisplay = m.style.display;
+    new MutationObserver(() => {
+      const d = m.style.display;
+      if (d !== lastDisplay) {
+        if (d === 'flex' || d === 'block') patchOpen();
+        else patchClose();
+        lastDisplay = d;
+      }
+    }).observe(m, { attributes: true, attributeFilter: ['style'] });
+  }
+})();
+
+// Mobile glass-topbar search proxies to desktop input
+(function () {
+  const mSearch = document.getElementById('mSearchInput');
+  const dSearch = document.getElementById('searchInput');
+  if (!mSearch || !dSearch) return;
+  mSearch.addEventListener('input', () => {
+    dSearch.value = mSearch.value;
+    dSearch.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  const badge = document.getElementById('mResultBadge');
+  const headerCount = document.getElementById('headerCount');
+  if (badge && headerCount) {
+    new MutationObserver(() => {
+      const n = (headerCount.textContent || '').match(/\d+/);
+      if (n) badge.textContent = n[0];
+    }).observe(headerCount, { childList: true, characterData: true, subtree: true });
+  }
+})();
+
+// Pull-down to reveal quick-filter chips
+(function () {
+  const filters = document.getElementById('mQuickFilters');
+  if (!filters) return;
+  function populateFilters() {
+    if (filters.children.length) return;
+    document.querySelectorAll('.era-chips .era-chip').forEach(chip => {
+      const clone = chip.cloneNode(true);
+      clone.className = 'm-quick-filter' + (chip.classList.contains('active') ? ' active' : '');
+      clone.removeAttribute('onclick');
+      clone.addEventListener('click', () => { chip.click(); filters.classList.remove('shown'); });
+      filters.appendChild(clone);
+    });
+  }
+  let startY = null, dy = 0, pulling = false;
+  const grid = document.getElementById('view-grid');
+  if (!grid) return;
+  grid.addEventListener('touchstart', e => {
+    if (grid.scrollTop > 0) return;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  grid.addEventListener('touchmove', e => {
+    if (startY == null) return;
+    dy = e.touches[0].clientY - startY;
+    if (dy > 60 && !pulling) {
+      pulling = true;
+      populateFilters();
+      filters.classList.add('shown');
+      if (navigator.vibrate) navigator.vibrate(8);
+    }
+  }, { passive: true });
+  grid.addEventListener('touchend', () => {
+    startY = null; dy = 0;
+    setTimeout(() => { pulling = false; }, 400);
+  });
+  document.addEventListener('click', e => {
+    if (!filters.classList.contains('shown')) return;
+    if (!filters.contains(e.target) && !e.target.closest('.m-topbar')) {
+      filters.classList.remove('shown');
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
