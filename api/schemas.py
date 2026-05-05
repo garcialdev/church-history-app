@@ -56,6 +56,7 @@ class FigureDetail(FigureCard):
     external_references: Optional[str] = None
     notes: Optional[str] = None
     deathplace: Optional[str] = None
+    image_credit: Optional[str] = None
     eras: List[EraBase] = []
 
     class Config:

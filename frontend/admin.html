@@ -692,6 +692,11 @@
         </div>
         ${f.cached_image_url ? `<img id="portraitPreview" src="${f.cached_image_url}" style="max-height:130px;max-width:170px;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block" onerror="this.style.display='none'" />` : `<div id="portraitPreview"></div>`}
       </div>
+      <div class="span-2 form-group">
+        <label class="form-label">Image Credit / Attribution</label>
+        <input class="form-input" name="image_credit" value="${v('image_credit')}" placeholder="e.g. By Richard Mortel, CC BY 2.0, via Wikimedia Commons" />
+        <span style="font-size:0.75rem;color:var(--ink-3);margin-top:0.25rem;display:block">Shown as a small caption under the image on the public profile page.</span>
+      </div>
 
       <div class="form-section">Content</div>
       <div class="span-2 form-group">

@@ -275,7 +275,8 @@ def get_figure_by_id(db: Session, figure_id: int):
             ch."Believer_Saved"                          AS believer_saved,
             ch."Thumbnail"                               AS thumbnail_json,
             ch."Wikipedia_Name"                          AS wikipedia_name,
-            ch."Cached_Image_URL"                        AS cached_image_url
+            ch."Cached_Image_URL"                        AS cached_image_url,
+            ch."Image_Credit"                            AS image_credit
         FROM "Church History" ch
         WHERE ch.id = :id
     """), {"id": figure_id}).mappings().first()
@@ -289,6 +290,30 @@ def get_figure_beliefs(db: Session, figure_id: int):
         WHERE m."Church History_id" = :id
         ORDER BY b.nc_order ASC NULLS LAST
     """), {"id": figure_id}).mappings().all()
+
+
+def get_bulk_beliefs(db: Session, figure_ids: list) -> dict:
+    """Fetch beliefs for many figures in one query. Returns {figure_id: [belief_dict, ...]}."""
+    if not figure_ids:
+        return {}
+    id_list = ",".join(str(int(i)) for i in figure_ids)
+    rows = db.execute(text(f"""
+        SELECT m."Church History_id" AS figure_id,
+               b.id, b."Belief_Name" AS belief_name, b."Description" AS description
+        FROM "Beliefs" b
+        JOIN "nc_hxad___nc_m2m_Church History_Beliefs" m ON m."Beliefs_id" = b.id
+        WHERE m."Church History_id" IN ({id_list})
+        ORDER BY b.nc_order ASC NULLS LAST
+    """)).mappings().all()
+    grouped: dict = {}
+    for row in rows:
+        fid = row["figure_id"]
+        grouped.setdefault(fid, []).append({
+            "id": row["id"],
+            "belief_name": row["belief_name"],
+            "description": row["description"],
+        })
+    return grouped
 
 
 def get_figure_eras(db: Session, figure_id: int):
@@ -443,6 +468,7 @@ def admin_get_figure(db: Session, figure_id: int):
             "Region___Location" AS primary_region,
             "Wikipedia_Name" AS wikipedia_name,
             "Cached_Image_URL" AS cached_image_url,
+            "Image_Credit" AS image_credit,
             "Martyr___Yes_No_" AS is_martyr,
             "Believer_Saved" AS believer_saved,
             nc_order
@@ -465,7 +491,7 @@ def admin_create_figure(db: Session, data: dict) -> int:
             "Scripture_References", "Biblical_Books_Mentioned_In",
             "Associated_Movements", "External_References___Sources",
             "Notes", "Birthplace", "Deathplace", "Region___Location",
-            "Wikipedia_Name", "Cached_Image_URL",
+            "Wikipedia_Name", "Cached_Image_URL", "Image_Credit",
             "Martyr___Yes_No_", "Believer_Saved",
             created_at, updated_at
         ) VALUES (
@@ -479,7 +505,7 @@ def admin_create_figure(db: Session, data: dict) -> int:
             :scripture_references, :biblical_books,
             :associated_movements, :external_references,
             :notes, :birthplace, :deathplace, :primary_region,
-            :wikipedia_name, :cached_image_url,
+            :wikipedia_name, :cached_image_url, :image_credit,
             :is_martyr, :believer_saved,
             NOW(), NOW()
         )
@@ -520,6 +546,7 @@ def admin_update_figure(db: Session, figure_id: int, data: dict):
             "Region___Location" = :primary_region,
             "Wikipedia_Name" = :wikipedia_name,
             "Cached_Image_URL" = :cached_image_url,
+            "Image_Credit" = :image_credit,
             "Martyr___Yes_No_" = :is_martyr,
             "Believer_Saved" = :believer_saved,
             updated_at = NOW()

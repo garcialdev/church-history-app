@@ -6,14 +6,14 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from sqlalchemy.orm import Session
 from typing import Optional
-import os, shutil, time, pathlib
+import os, shutil, time, pathlib, asyncio
 
 limiter = Limiter(key_func=get_remote_address)
 
 from database import get_db
 from schemas import FigureCard, FigureDetail, FigureListResponse, FilterOptions, BeliefBase, EraBase
 from queries import (
-    get_figures, get_figure_by_id, get_figure_beliefs,
+    get_figures, get_figure_by_id, get_figure_beliefs, get_bulk_beliefs,
     get_figure_eras, get_all_beliefs, get_all_eras, get_filter_options,
     get_era_range_counts, get_random_figure_id, get_related_figures, get_map_figures,
     get_all_figures_for_caching, save_cached_image_url
@@ -118,6 +118,7 @@ async def get_random_figure(db: Session = Depends(get_db)):
         "external_references": row["external_references"],
         "notes": row["notes"],
         "deathplace": row["deathplace"],
+        "image_credit": row.get("image_credit"),
         "eras": [
             {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
             for e in eras
@@ -146,12 +147,16 @@ async def list_figures(
         db, search, type_filter, century, era_centuries, gender,
         denomination, role_office, belief_id, is_martyr, sort, page, page_size
     )
-    results = []
-    for row in rows:
-        beliefs = get_figure_beliefs(db, row["id"])
-        image_url = await resolve_image(row["thumbnail_json"], row["name"], row["wikipedia_name"], row.get("cached_image_url"))
-        results.append(map_row_to_card(row, beliefs, image_url))
-
+    # Single query for all beliefs, parallel resolution for all images
+    beliefs_map = get_bulk_beliefs(db, [r["id"] for r in rows])
+    image_urls = await asyncio.gather(*[
+        resolve_image(r["thumbnail_json"], r["name"], r["wikipedia_name"], r.get("cached_image_url"))
+        for r in rows
+    ])
+    results = [
+        map_row_to_card(row, beliefs_map.get(row["id"], []), image_url)
+        for row, image_url in zip(rows, image_urls)
+    ]
     return {"total": total, "page": page, "page_size": page_size, "results": results}
 
 
@@ -202,6 +207,7 @@ async def get_figure(figure_id: int, db: Session = Depends(get_db)):
         "external_references": row["external_references"],
         "notes": row["notes"],
         "deathplace": row["deathplace"],
+        "image_credit": row.get("image_credit"),
         "eras": [
             {"id": e["id"], "name": e["name"], "time_span": e["time_span"]}
             for e in eras
@@ -329,6 +335,7 @@ class FigurePayload(BaseModel):
     primary_region: Optional[str] = None
     wikipedia_name: Optional[str] = None
     cached_image_url: Optional[str] = None
+    image_credit: Optional[str] = None
     is_martyr: Optional[str] = None
     believer_saved: Optional[str] = None
 

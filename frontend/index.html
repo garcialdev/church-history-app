@@ -1596,12 +1596,16 @@
     .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink-3); width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; z-index: 10; transition: all 0.15s; line-height: 1; }
     .modal-close:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
 
-    /* Hero: image left + info right */
-    .mpro-hero { display: flex; border-bottom: 1px solid var(--border); }
-    .mpro-hero-img-wrap { width: 270px; flex-shrink: 0; position: relative; background: var(--card-img-bg); overflow: hidden; }
+    /* Hero: CSS grid — image spans both rows, identity top-right, details full-width bottom */
+    .mpro-hero { display: grid; grid-template-columns: 270px 1fr; grid-template-rows: auto auto; border-bottom: 1px solid var(--border); }
+    .mpro-hero-img-wrap { grid-column: 1; grid-row: 1 / 3; background: var(--card-img-bg); overflow: hidden; position: relative; }
+    .mpro-image-credit { position: absolute; bottom: 0; left: 0; right: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: rgba(255,255,255,0.55); line-height: 1.3; padding: 0.35rem 0.5rem; background: linear-gradient(transparent, rgba(0,0,0,0.45)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mpro-image-credit a { color: rgba(255,255,255,0.7); text-decoration: none; margin-left: 0.2em; }
+    .mpro-image-credit a:hover { color: #fff; }
     .mpro-image { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; min-height: 340px; }
     .mpro-img-placeholder { width: 100%; min-height: 340px; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 6rem; font-style: italic; color: var(--ink-5); }
-    .mpro-hero-info { flex: 1; padding: 2.25rem 2.75rem 2rem; display: flex; flex-direction: column; gap: 0.65rem; min-width: 0; }
+    .mpro-hero-ident { grid-column: 2; grid-row: 1; padding: 2.25rem 2.75rem 1rem; display: flex; flex-direction: column; gap: 0.65rem; min-width: 0; }
+    .mpro-hero-details { grid-column: 2; grid-row: 2; padding: 0 2.75rem 2rem; display: flex; flex-direction: column; gap: 0.65rem; }
     .mpro-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
     .mpro-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
     .mpro-name { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; font-style: italic; color: var(--ink); line-height: 1.05; letter-spacing: 0.01em; margin: 0; }
@@ -1695,14 +1699,16 @@
       /* Show hamburger in topbar */
       .topbar-hamburger { display: flex; }
       .card-grid { grid-template-columns: 1fr; }
-      .mpro-hero { flex-direction: column; }
-      .mpro-hero-img-wrap { width: 100%; max-height: 260px; }
-      .mpro-image { min-height: 180px; max-height: 260px; }
-      .mpro-img-placeholder { min-height: 180px; }
-      .mpro-hero-info { padding: 1.5rem; }
+      .mpro-hero { grid-template-columns: 120px 1fr; }
+      .mpro-hero-img-wrap { grid-row: 1; aspect-ratio: 3/4; overflow: hidden; }
+      .mpro-hero-ident { grid-column: 2; grid-row: 1; padding: 1rem 2.5rem 0.75rem 1rem; }
+      .mpro-hero-details { grid-column: 1 / -1; grid-row: 2; padding: 0.75rem 1rem 1.25rem; border-top: 1px solid var(--border-light); }
+      .mpro-image { height: 100%; min-height: 0; max-height: none; object-fit: cover; object-position: center top; }
+      .mpro-img-placeholder { min-height: 160px; }
+      .mpro-name { font-size: clamp(1.6rem, 5vw, 2.4rem); }
       .mpro-body { grid-template-columns: 1fr; }
       .mpro-sidebar { border-top: 1px solid var(--border); }
-      .mpro-content { padding: 1.75rem 1.5rem; }
+      .mpro-content { padding: 1.5rem; }
       .stats-banner { grid-template-columns: repeat(2, 1fr); }
     }
 
@@ -1846,11 +1852,14 @@
       /* Very small phones: profile modal fullscreen */
       .modal-overlay { padding: 0; align-items: flex-start; }
       .modal { border-radius: 0; min-height: 100vh; }
-      .mpro-hero-info { padding: 1.25rem 1rem; }
-      .mpro-name { font-size: 2.2rem; }
-      .mpro-facts { flex-direction: column; }
-      .mpro-fact { border-right: none; border-bottom: 1px solid var(--border-light); }
-      .mpro-content { padding: 1.25rem 1rem; }
+      .mpro-hero { grid-template-columns: 95px 1fr; }
+      .mpro-hero-ident { padding: 0.85rem 2.25rem 0.75rem 0.85rem; gap: 0.35rem; }
+      .mpro-name { font-size: clamp(1.4rem, 6vw, 1.9rem); }
+      .mpro-hero-top { flex-wrap: wrap; gap: 0.4rem; }
+      .mpro-facts { flex-wrap: wrap; }
+      .mpro-fact { min-width: 45%; border-right: none; border-bottom: 1px solid var(--border-light); }
+      .mpro-content { padding: 1rem; }
+      .mpro-sidebar { padding: 1rem; }
       /* Timeline cards: minimal padding */
       .chrono-card-body { padding: 0.65rem 0.75rem; }
       .chrono-card-name { font-size: 1.05rem; }
@@ -3048,12 +3057,26 @@
   }
 
   // ── FIGURES ────────────────────────────────────
-  // Fetch ALL matching records once, sort client-side, paginate locally.
-  // This lets us place century-only figures correctly within the sort order.
+  const FIGURES_CACHE_KEY = 'ecclesia_figures_v1';
+  const FIGURES_CACHE_TTL = 5 * 60 * 1000;
+
+  function getCachedFigures(paramsStr) {
+    try {
+      const raw = sessionStorage.getItem(FIGURES_CACHE_KEY);
+      if (!raw) return null;
+      const { key, data, ts } = JSON.parse(raw);
+      if (key === paramsStr && Date.now() - ts < FIGURES_CACHE_TTL) return data;
+    } catch(e) {}
+    return null;
+  }
+
+  function setCachedFigures(paramsStr, data) {
+    try { sessionStorage.setItem(FIGURES_CACHE_KEY, JSON.stringify({ key: paramsStr, data, ts: Date.now() })); } catch(e) {}
+  }
+
   async function loadFigures() {
     saveState();
     const grid = document.getElementById('grid');
-    grid.innerHTML = Array(8).fill(`<div class="skeleton-card"><div class="skel-header"><div class="skel-line skel-img"></div><div class="skel-body"><div class="skel-line" style="height:11px;width:55%"></div><div class="skel-line" style="height:20px;width:88%;margin-top:2px"></div><div class="skel-line" style="height:13px;width:45%;margin-top:2px"></div><div class="skel-line" style="height:13px;width:60%;margin-top:2px"></div></div></div><div class="skel-line" style="height:12px;width:100%"></div><div class="skel-line" style="height:12px;width:72%"></div></div>`).join('');
     const params = new URLSearchParams({ page:1, page_size:500 });
     if (state.search)       params.set('search', state.search);
     if (state.type)         params.set('type', state.type);
@@ -3068,9 +3091,21 @@
       const keywords = eraCenturyMap[state.era_index];
       if (keywords) params.set('century_keywords', keywords.join(','));
     }
+    const paramsStr = params.toString();
+    const cached = getCachedFigures(paramsStr);
+    if (cached) {
+      allFigures = cached;
+      state.total = allFigures.length;
+      state.page = 1;
+      clientSort(allFigures, state.sort);
+      renderCurrentPage();
+      return;
+    }
+    grid.innerHTML = Array(8).fill(`<div class="skeleton-card"><div class="skel-header"><div class="skel-line skel-img"></div><div class="skel-body"><div class="skel-line" style="height:11px;width:55%"></div><div class="skel-line" style="height:20px;width:88%;margin-top:2px"></div><div class="skel-line" style="height:13px;width:45%;margin-top:2px"></div><div class="skel-line" style="height:13px;width:60%;margin-top:2px"></div></div></div><div class="skel-line" style="height:12px;width:100%"></div><div class="skel-line" style="height:12px;width:72%"></div></div>`).join('');
     try {
-      const data = await fetch(`${API}/figures?${params}`).then(r=>r.json());
+      const data = await fetch(`${API}/figures?${paramsStr}`).then(r=>r.json());
       allFigures = data.results || [];
+      setCachedFigures(paramsStr, allFigures);
       state.total = allFigures.length;
       state.page = 1;
       clientSort(allFigures, state.sort);
@@ -3343,8 +3378,11 @@
 
     return `
       <div class="mpro-hero">
-        <div class="mpro-hero-img-wrap">${imgHtml}</div>
-        <div class="mpro-hero-info">
+        <div class="mpro-hero-img-wrap">
+          ${imgHtml}
+          ${f.image_credit ? `<div class="mpro-image-credit">${f.image_credit.replace(/,?\s*https?:\/\/\S+/g, (m, offset, str) => { const url = m.replace(/^,?\s*/,''); const isFirst = !/https?:\/\//.test(str.slice(0,offset)); return (isFirst ? ' ' : '') + `<a href="${url}" target="_blank" rel="noopener" title="${url}">↗</a>`; })}</div>` : ''}
+        </div>
+        <div class="mpro-hero-ident">
           <div class="mpro-hero-top">
             <span class="mpro-badge">${f.type || 'Historical Figure'}</span>
             <button class="graph-btn" onclick="openConnectionGraph(${f.id},'${name.replace(/'/g,"\\'")}')">⬡ ${related.length} Connection${related.length!==1?'s':''}</button>
@@ -3353,6 +3391,8 @@
           ${f.alternative_names ? `<p class="mpro-alt">Also known as: ${f.alternative_names}</p>` : ''}
           ${subtitle}
           ${f.is_martyr==='Yes' ? `<div class="mpro-martyr">✝ Died as a Martyr</div>` : ''}
+        </div>
+        <div class="mpro-hero-details">
           ${factsHtml}
           ${overviewHtml}
         </div>
