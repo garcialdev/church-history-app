@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ecclesia">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css"/>
@@ -129,7 +130,7 @@
       border-right: 1px solid var(--border-light);
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100dvh;
       overflow-y: auto;
       overflow-x: hidden;
       padding: 24px 16px;
@@ -281,7 +282,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       background: var(--bg);
     }
@@ -1694,7 +1695,7 @@
     /* ── RESPONSIVE ───────────────────────────────── */
     @media (max-width: 960px) {
       /* Sidebar becomes a slide-in drawer — removes it from flex layout */
-      .sidebar { position: fixed; left: -260px; top: 0; width: 240px; height: 100vh; z-index: 500; transition: left 0.25s ease; overflow-y: auto; display: flex; flex-direction: column; }
+      .sidebar { position: fixed; left: -260px; top: 0; width: 240px; height: 100dvh; z-index: 500; transition: left 0.25s ease; overflow-y: auto; display: flex; flex-direction: column; }
       .sidebar.open { left: 0; box-shadow: 4px 0 32px rgba(0,0,0,0.6); }
       /* Show hamburger in topbar */
       .topbar-hamburger { display: flex; }
@@ -1715,7 +1716,7 @@
     @media (max-width: 700px) {
       /* Switch body out of flex for mobile — body scrolls */
       html { overflow-x: hidden; }
-      body { display: block; width: 100%; overflow-x: hidden; overflow-y: auto; height: auto; min-height: 100vh; }
+      body { display: block; width: 100%; overflow-x: hidden; overflow-y: auto; height: auto; min-height: 100dvh; }
       /* Main area fills the block body */
       .main-area { width: 100%; height: auto; overflow-x: hidden; display: flex; flex-direction: column; }
       .content-area { overflow-x: hidden; height: auto; padding: 0.75rem 0.75rem 80px; }
@@ -1851,7 +1852,7 @@
     @media (max-width: 480px) {
       /* Very small phones: profile modal fullscreen */
       .modal-overlay { padding: 0; align-items: flex-start; }
-      .modal { border-radius: 0; min-height: 100vh; }
+      .modal { border-radius: 0; min-height: 100dvh; }
       .mpro-hero { grid-template-columns: 95px 1fr; }
       .mpro-hero-ident { padding: 0.85rem 2.25rem 0.75rem 0.85rem; gap: 0.35rem; }
       .mpro-name { font-size: clamp(1.4rem, 6vw, 1.9rem); }
@@ -1970,8 +1971,13 @@
   .scroll-top-btn { display: none !important; }
   .stats-banner { display: none; }
 
-  html { overflow-y: auto; height: calc(100vh + 1px); overscroll-behavior-x: none; }
-  body { overflow: hidden; height: 100dvh; width: 100%; max-width: 100vw; overscroll-behavior-x: none; }
+  /* Body must NOT have overflow-y:hidden — iOS treats that as non-scrollable and
+     keeps the URL bar expanded. A tiny ::after spacer gives 2px of real scroll
+     room so Safari recognises the document as scrollable and collapses the bar,
+     without creating a visible gap in the layout. */
+  html { overflow-y: auto; overscroll-behavior-x: none; }
+  body { overflow-x: hidden; width: 100%; max-width: 100vw; overscroll-behavior-x: none; }
+  body::after { content: ''; display: block; height: 500px; visibility: hidden; pointer-events: none; }
   .main-area { padding-top: 0; }
   .content-area { padding: 0 !important; height: 100dvh; }
 
@@ -2209,36 +2215,37 @@
   .m-map-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 400; }
   .m-map-era-rail {
     position: absolute; top: 80px; left: 0; right: 0;
-    display: flex; gap: 8px; padding: 0 16px;
-    overflow-x: auto; pointer-events: auto; scrollbar-width: none;
+    display: flex; gap: 6px; padding: 0 12px;
+    overflow-x: visible; pointer-events: auto;
   }
   .m-map-era-rail::-webkit-scrollbar { display: none; }
   .m-map-era-chip {
-    flex-shrink: 0; padding: 7px 14px; border-radius: 18px;
+    flex: 1 1 0; min-width: 0; padding: 7px 6px; border-radius: 18px;
     background: var(--glass);
     -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     font-family: 'Inter Tight', 'Inter', sans-serif;
-    font-size: 11px; font-weight: 600;
+    font-size: 10px; font-weight: 600;
     color: var(--ink-2); white-space: nowrap;
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
     cursor: pointer; pointer-events: auto;
+    overflow: hidden; text-overflow: ellipsis;
   }
   .m-map-era-chip[data-active="true"] {
     background: var(--era-tint, var(--accent)); color: #fff;
     border-color: var(--era-tint, var(--accent));
   }
   .m-map-selected-card {
-    position: absolute; left: 16px; right: 16px; bottom: 110px;
-    border-radius: 18px; padding: 14px;
+    position: absolute; left: 12px; right: 12px; bottom: 108px;
+    border-radius: 20px; padding: 14px 14px 14px 14px;
     background: var(--glass);
-    -webkit-backdrop-filter: blur(24px) saturate(140%); backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(28px) saturate(150%); backdrop-filter: blur(28px) saturate(150%);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 10px 36px rgba(0,0,0,0.3);
-    display: flex; gap: 12px; align-items: center;
-    pointer-events: auto;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12);
+    display: flex; gap: 14px; align-items: center;
+    pointer-events: auto; cursor: default;
     transform: translateY(140%); opacity: 0;
-    transition: transform 0.32s cubic-bezier(0.2,0.7,0.3,1), opacity 0.2s;
+    transition: transform 0.34s cubic-bezier(0.16,1,0.3,1), opacity 0.22s;
   }
   .m-map-selected-card.shown { transform: translateY(0); opacity: 1; }
   .m-map-pin {
@@ -2367,6 +2374,146 @@
   }
   /* Hide old side panel on mobile pager — glass card replaces it */
   .m-pager .map-side-panel { display: none !important; }
+}
+
+/* ── Mobile Figure Profile ──────────────────────────────────── */
+@media (max-width: 700px) {
+  [data-mobile-sheet="open"] .modal.m-profile-mode {
+    min-height: 100dvh; max-height: 100dvh;
+    border-radius: 0; overflow: hidden; padding: 0;
+  }
+  [data-mobile-sheet="open"] .modal.m-profile-mode .modal-close { display: none; }
+  [data-mobile-sheet="open"] .modal.m-profile-mode::before { display: none; }
+
+  .m-profile { display: flex; flex-direction: column; height: 100dvh; }
+
+  .m-profile-hero {
+    position: relative; height: 46dvh; flex-shrink: 0;
+    overflow: hidden; background: #120a04;
+  }
+  .m-profile-hero-bg {
+    position: absolute; inset: -28px;
+    background-size: cover; background-position: center top;
+    filter: blur(24px) brightness(0.52) saturate(1.2);
+    transform: scale(1.12);
+  }
+  .m-profile-hero-portrait {
+    position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    height: 92%; width: auto; max-width: 72%;
+    object-fit: cover; object-position: top center;
+    -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+  }
+  .m-profile-hero-initial {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 96px; color: rgba(255,255,255,0.1);
+  }
+  .m-profile-hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 35%, rgba(8,5,2,0.72) 75%, rgba(8,5,2,0.95) 100%);
+  }
+  .m-profile-btn-back, .m-profile-btn-more {
+    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px);
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,0.36);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.9); font-size: 20px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 10;
+  }
+  .m-profile-btn-back { left: 16px; }
+  .m-profile-btn-more {
+    right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; gap: 3px; width: auto; padding: 0 12px; border-radius: 18px;
+  }
+  .m-profile-hero-text {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 0 20px 20px; z-index: 2;
+  }
+  .m-profile-hero-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .m-profile-hero-name1 {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 58px; font-weight: 300; line-height: 0.95;
+    color: rgba(255,255,255,0.95); letter-spacing: -0.01em;
+  }
+  .m-profile-hero-name2 {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 58px; font-weight: 600; font-style: italic; line-height: 0.95;
+    color: rgba(255,255,255,0.95); letter-spacing: -0.01em;
+  }
+
+  .m-profile-card {
+    flex: 1; min-height: 0;
+    background: var(--bg);
+    border-radius: 22px 22px 0 0;
+    margin-top: -22px;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 0 20px 80px;
+  }
+  .m-profile-handle {
+    width: 38px; height: 4px; border-radius: 2px;
+    background: var(--border); margin: 12px auto 20px;
+  }
+
+  .m-profile-pills {
+    display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px;
+  }
+  .m-profile-pill {
+    padding: 5px 12px; border-radius: 20px; border: 1.5px solid;
+    font-family: 'Inter Tight', sans-serif; font-size: 11.5px; font-weight: 500;
+    background: transparent; cursor: default;
+  }
+
+  .m-profile-desc {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14.5px; line-height: 1.62; color: var(--ink-2);
+    margin-bottom: 22px;
+  }
+
+  .m-profile-stats {
+    display: flex; border-top: 1px solid var(--border);
+    padding-top: 20px; margin-bottom: 28px;
+  }
+  .m-profile-stat { flex: 1; }
+  .m-profile-stat + .m-profile-stat { border-left: 1px solid var(--border); padding-left: 16px; }
+  .m-profile-stat-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 600; color: var(--ink); line-height: 1; margin-bottom: 3px;
+  }
+  .m-profile-stat-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 2px;
+  }
+  .m-profile-stat-place {
+    font-family: 'Inter Tight', sans-serif; font-size: 10.5px; color: var(--ink-3);
+  }
+
+  .m-profile-section { margin-bottom: 24px; }
+  .m-profile-section-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--ink-3); padding-bottom: 8px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .m-profile-section .md-prose { font-size: 14px; line-height: 1.65; }
+  .m-profile-section .mpro-quote {
+    border-left: 2px solid var(--accent); padding-left: 14px;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 18px; color: var(--ink-2); margin: 0;
+  }
 }
 
   </style>
@@ -2987,6 +3134,17 @@
     state.century = '';
     loadFigures();
     if (currentView === 'map') renderMapPins();
+    // On mobile, scroll the grid pane so the first figure card is visible
+    if (window.matchMedia('(max-width: 700px)').matches) {
+      const pane = document.getElementById('view-grid');
+      const gridEl = document.getElementById('grid');
+      if (pane && gridEl) {
+        setTimeout(() => {
+          const offset = pane.scrollTop + gridEl.getBoundingClientRect().top - pane.getBoundingClientRect().top - 12;
+          pane.scrollTo({ top: offset, behavior: 'smooth' });
+        }, 80);
+      }
+    }
   }
 
   function clickEraChip(el, index) {
@@ -3177,7 +3335,7 @@
               ${f.image_url ? `<img src="${f.image_url}" alt="${initial}" loading="lazy" onerror="this.parentElement.textContent='${initial}'">` : initial}
             </div>
             <div class="m-timeline-card-body">
-              <div class="m-timeline-card-eyebrow">${f.type||'Person'}${f.is_martyr==='Yes'?' · ✝ Martyr':''}</div>
+              <div class="m-timeline-card-eyebrow">${f.type||'Person'}${f.is_martyr==='Yes'?' <span class="martyr-badge">✝ Martyr</span>':''}</div>
               <div class="m-timeline-card-name">${f.name||'Unknown'}</div>
               <div class="m-timeline-card-meta">${f.role_office||''}${dates?' · '+dates:''}</div>
               ${f.short_description ? `<div class="m-timeline-card-desc">${f.short_description}</div>` : ''}
@@ -3213,7 +3371,7 @@
               </div>
               ${f.short_description ? `<p class="codex-entry-desc">${f.short_description}</p>` : ''}
               ${beliefs ? `<p class="codex-beliefs">${beliefs}</p>` : ''}
-              ${f.is_martyr === 'Yes' ? `<span class="codex-martyr-mark">✝ martyr</span>` : ''}
+              ${f.is_martyr === 'Yes' ? `<span class="martyr-badge">✝ Martyr</span>` : ''}
             </div>
           </div>`;
         }).join('');
@@ -3515,22 +3673,28 @@
     const tint = ERA_HEX[eraIdx] || ERA_HEX[3];
     const dates = formatDates(f.born, f.death, f.era_type);
     const initial = (f.name||'?')[0];
+    const imgSrc = f.image_url || '';
+    const region = f.primary_region || '';
+    const topLine = [region, dates].filter(Boolean).join(' · ');
+    const subParts = [f.role_office, f.denomination_tradition].filter(Boolean);
+    const subLine = subParts.length ? subParts.join(' · ') : (f.type || '');
     card.innerHTML = `
-      <div style="width:56px;height:56px;border-radius:12px;flex-shrink:0;overflow:hidden;
-                  background:linear-gradient(135deg,${tint}40,${tint}18);
+      <div style="width:52px;height:52px;border-radius:12px;flex-shrink:0;overflow:hidden;
+                  background:linear-gradient(135deg,${tint}33,${tint}12);
                   display:flex;align-items:center;justify-content:center;
                   font-family:'Cormorant Garamond',serif;font-style:italic;
-                  font-size:32px;color:${tint};position:relative">
-        ${f.image_url ? `<img src="${f.image_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top" loading="lazy">` : initial}
+                  font-size:26px;color:${tint};position:relative">
+        ${imgSrc ? `<img src="${imgSrc}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top" loading="lazy">` : initial}
       </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:${tint};margin-bottom:2px">${f.role_office||f.type||''}</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--ink);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</div>
-        <div style="font-family:'Inter Tight',sans-serif;font-size:11.5px;color:var(--ink-3);margin-top:2px">${dates||''}</div>
+      <div style="flex:1;min-width:0;overflow:hidden">
+        ${topLine ? `<div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:${tint};margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${topLine}</div>` : ''}
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--ink);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${f.name}</div>
+        ${subLine ? `<div style="font-family:'Inter Tight',sans-serif;font-size:11px;color:var(--ink-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${subLine}</div>` : ''}
       </div>
       <button onclick="openFigure(${f.id})"
-              style="width:36px;height:36px;border-radius:18px;background:var(--accent);
-                     color:#fff;border:none;font-size:14px;flex-shrink:0;cursor:pointer">›</button>`;
+              style="width:40px;height:40px;border-radius:50%;background:var(--accent);
+                     color:#fff;border:none;font-size:20px;line-height:1;flex-shrink:0;
+                     cursor:pointer;display:flex;align-items:center;justify-content:center">›</button>`;
     card.classList.add('shown');
   }
 
@@ -3542,7 +3706,8 @@
       chip.className = 'm-map-era-chip';
       chip.dataset.active = 'false';
       chip.style.setProperty('--era-tint', ERA_HEX[i]);
-      chip.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${ERA_HEX[i]};flex-shrink:0"></span>${era.name}`;
+      const mapLabel = ['Apostolic', 'Early Church', 'Medieval', 'Reformation +'][i] ?? era.name;
+      chip.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${ERA_HEX[i]};flex-shrink:0"></span>${mapLabel}`;
       chip.onclick = () => {
         const isActive = chip.dataset.active === 'true';
         rail.querySelectorAll('.m-map-era-chip').forEach(c => c.dataset.active = 'false');
@@ -3550,11 +3715,6 @@
         toggleMapEra(isActive ? -1 : i);
       };
       rail.appendChild(chip);
-    });
-    // Dismiss mobile glass card when tapping map background
-    document.getElementById('mapContainer')?.addEventListener('click', () => {
-      const card = document.getElementById('mMapSelected');
-      if (card) card.classList.remove('shown');
     });
   }
 
@@ -3566,8 +3726,14 @@
         attribution: '© OpenStreetMap · CartoDB', subdomains: 'abcd', maxZoom: 19
       }).addTo(mapInstance);
       L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
+      // Leaflet map click only fires on background taps (not markers) — safe to dismiss card here
       mapInstance.on('click', () => {
-        if (window.innerWidth <= 700) document.getElementById('mapSidePanel')?.classList.remove('map-panel-open');
+        if (window.innerWidth <= 700) {
+          document.getElementById('mapSidePanel')?.classList.remove('map-panel-open');
+          const card = document.getElementById('mMapSelected');
+          if (card) card.classList.remove('shown');
+          document.querySelectorAll('.m-map-pin').forEach(p => p.classList.remove('is-selected'));
+        }
       });
       mapLoaded = true;
     }
@@ -3637,7 +3803,7 @@
   }
 
   // ── FIGURES ────────────────────────────────────
-  const FIGURES_CACHE_KEY = 'ecclesia_figures_v1';
+  const FIGURES_CACHE_KEY = 'ecclesia_figures_v2';
   const FIGURES_CACHE_TTL = 5 * 60 * 1000;
 
   function getCachedFigures(paramsStr) {
@@ -3856,6 +4022,9 @@
 
   // ── MODAL ──────────────────────────────────────
   async function openFigure(id) {
+    const isMobile = window.matchMedia('(max-width: 700px)').matches;
+    const modalEl = document.querySelector('#modal .modal');
+    if (isMobile && modalEl) modalEl.classList.add('m-profile-mode');
     document.getElementById('modalInner').innerHTML = `<div style="padding:4rem;text-align:center"><div class="spinner"></div></div>`;
     document.getElementById('modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -3865,8 +4034,10 @@
         fetch(`${API}/figures/${id}/related`).then(r=>r.json()).catch(()=>[])
       ]);
       document.getElementById('modalInner').innerHTML = renderModal(f, related);
-      const sheetEl = document.querySelector('#modal .modal');
-      if (sheetEl) sheetEl.scrollTop = 0;
+      if (!isMobile) {
+        const sheetEl = document.querySelector('#modal .modal');
+        if (sheetEl) sheetEl.scrollTop = 0;
+      }
     } catch(e) {
       document.getElementById('modalInner').innerHTML = `<div style="padding:2rem;color:var(--ink-3)">Failed to load record.</div>`;
     }
@@ -3927,6 +4098,7 @@
   }
 
   function renderModal(f, related=[]) {
+    if (window.matchMedia('(max-width: 700px)').matches) return renderMobileProfile(f, related);
     const name = f.name || 'Unknown';
     const initial = name.charAt(0);
 
@@ -4024,7 +4196,114 @@
   function mprosec(title, content) {
     return `<div class="mpro-section"><h3 class="mpro-section-head">${title}</h3>${content}</div>`;
   }
-  function closeModal() { document.getElementById('modal').style.display='none'; document.body.style.overflow=''; }
+
+  function renderMobileProfile(f, related = []) {
+    const name = f.name || 'Unknown';
+    const words = name.trim().split(/\s+/);
+    const lastWord = words.length > 1 ? words.pop() : '';
+    const firstName = words.join(' ');
+
+    const eraIdx = f.century ? getEraFromCenturyStr(f.century) : 3;
+    const tint = ERA_HEX[eraIdx] || ERA_HEX[3];
+
+    const rolePart = [f.role_office, f.type].filter(Boolean)[0] || '';
+    const datesPart = formatDates(f.born, f.death, f.era_type);
+    const metaLine = [rolePart, datesPart].filter(Boolean).join(' · ').toUpperCase();
+
+    const imgSrc = f.image_url || '';
+    const heroMedia = imgSrc
+      ? `<div class="m-profile-hero-bg" style="background-image:url('${imgSrc}')"></div>
+         <img class="m-profile-hero-portrait" src="${imgSrc}" alt="${name}">`
+      : `<div class="m-profile-hero-initial">${name.charAt(0)}</div>`;
+
+    // Belief pills — cycle through era palette + extras
+    const pillColors = ['#6db3d4','#9b7fd4','#d4903a','#c96a3a','#7aaf8a','#c47a7a'];
+    const pillsHtml = (f.beliefs || []).slice(0, 8).map((b, i) => {
+      const c = pillColors[i % pillColors.length];
+      return `<span class="m-profile-pill" style="border-color:${c};color:${c}">${b.belief_name}</span>`;
+    }).join('');
+
+    // Stats
+    const isBC = (f.era_type || '').toUpperCase().includes('BC') && !(f.era_type || '').toUpperCase().includes('AD');
+    const bornDisp = f.born ? `${Math.abs(f.born)}${isBC ? ' BC' : ''}` : '—';
+    const diedDisp = f.death ? String(f.death) : '—';
+    const bornPlace = f.birthplace && !f.birthplace.includes(';') ? f.birthplace : (f.primary_region || '');
+    const diedPlace = f.deathplace || '';
+    const centuryDisp = f.century ? `${f.century} c.` : (f.denomination_tradition || '');
+
+    // Sections
+    const sections = [
+      f.long_biography   && { t: 'Biography',    h: `<div class="md-prose">${renderMarkdown(f.long_biography)}</div>` },
+      f.key_life_events  && { t: 'Key Events',   h: `<div class="md-prose">${renderMarkdown(f.key_life_events)}</div>` },
+      f.primary_contributions && { t: 'Contributions', h: `<p class="m-profile-desc" style="margin:0">${f.primary_contributions}</p>` },
+      f.famous_quotes    && { t: 'Famous Quotes', h: `<blockquote class="mpro-quote">${f.famous_quotes}</blockquote>` },
+    ].filter(Boolean).map(s =>
+      `<div class="m-profile-section"><div class="m-profile-section-head">${s.t}</div>${s.h}</div>`
+    ).join('');
+
+    // Related figures
+    let relatedHtml = '';
+    if (related && related.length) {
+      const cards = related.map(r => {
+        const ri = (r.name || '?').charAt(0);
+        const rImg = r.image_url
+          ? `<img class="related-card-img" src="${r.image_url}" alt="${r.name}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'related-card-placeholder\\'>${ri}</div>'">`
+          : `<div class="related-card-placeholder">${ri}</div>`;
+        const meta = [r.role_office, r.century ? `${r.century} c.` : ''].filter(Boolean).join(' · ');
+        return `<div class="related-card" onclick="closeModal();setTimeout(()=>openFigure(${r.id}),150)">${rImg}<div class="related-card-body"><div class="related-card-name">${r.name}</div>${meta ? `<div class="related-card-meta">${meta}</div>` : ''}</div></div>`;
+      }).join('');
+      relatedHtml = `<div class="m-profile-section"><div class="m-profile-section-head">Related Figures</div><div class="related-grid">${cards}</div></div>`;
+    }
+
+    const graphBtn = related.length
+      ? `<button class="m-profile-btn-more" onclick="openConnectionGraph(${f.id},'${name.replace(/'/g,"\\'")}')">⬡ ${related.length}</button>`
+      : '';
+
+    return `
+    <div class="m-profile">
+      <div class="m-profile-hero">
+        ${heroMedia}
+        <div class="m-profile-hero-overlay"></div>
+        <button class="m-profile-btn-back" onclick="closeModal()">‹</button>
+        ${graphBtn}
+        <div class="m-profile-hero-text">
+          ${metaLine ? `<div class="m-profile-hero-meta">${metaLine}</div>` : ''}
+          <span class="m-profile-hero-name1">${firstName}</span>
+          ${lastWord ? `<span class="m-profile-hero-name2">${lastWord}.</span>` : ''}
+        </div>
+      </div>
+      <div class="m-profile-card">
+        <div class="m-profile-handle"></div>
+        ${pillsHtml ? `<div class="m-profile-pills">${pillsHtml}</div>` : ''}
+        ${f.short_description ? `<p class="m-profile-desc">${f.short_description}</p>` : ''}
+        <div class="m-profile-stats">
+          <div class="m-profile-stat">
+            <div class="m-profile-stat-val">${bornDisp}</div>
+            <div class="m-profile-stat-key">Born</div>
+            <div class="m-profile-stat-place">${bornPlace}</div>
+          </div>
+          <div class="m-profile-stat">
+            <div class="m-profile-stat-val">${diedDisp}</div>
+            <div class="m-profile-stat-key">Died</div>
+            <div class="m-profile-stat-place">${diedPlace}</div>
+          </div>
+          <div class="m-profile-stat">
+            <div class="m-profile-stat-val">${centuryDisp}</div>
+            <div class="m-profile-stat-key">Century</div>
+            <div class="m-profile-stat-place">${f.denomination_tradition || ''}</div>
+          </div>
+        </div>
+        ${sections}
+        ${relatedHtml}
+      </div>
+    </div>`;
+  }
+
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    document.body.style.overflow = '';
+    document.querySelector('#modal .modal')?.classList.remove('m-profile-mode');
+  }
   function closeOnOverlay(e) { if(e.target===document.getElementById('modal')) closeModal(); }
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 
@@ -4421,21 +4700,7 @@
     } catch(e) {}
   }
   function restoreState() {
-    try {
-      const saved = JSON.parse(localStorage.getItem('archivist_state') || 'null');
-      if (!saved) return;
-      Object.assign(state, saved);
-      // Restore sort select
-      const ss = document.getElementById('sortSelect');
-      if (ss && state.sort) ss.value = state.sort;
-      // Restore era chips/bands
-      if (state.era_index >= 0) {
-        document.querySelectorAll('.era-band').forEach((el,i) => el.classList.toggle('active', i === state.era_index));
-        document.querySelectorAll('.era-chip').forEach(c => c.classList.toggle('active', c.dataset.era === String(state.era_index)));
-      }
-      // Restore search input
-      if (state.search) document.getElementById('searchInput').value = state.search;
-    } catch(e) {}
+    localStorage.removeItem('archivist_state');
   }
 
   boot();
@@ -4494,14 +4759,12 @@
     });
     setIdx(0, false);
     // Collapse iOS Safari URL bar.
-    // html { height: calc(100vh+1px) } keeps 1px scroll room even after dvh expands,
-    // so scrollY stays at 1 and the bar stays hidden.
-    setTimeout(() => window.scrollTo(0, 1), 400);
-    window.addEventListener('scroll', function () {
-      if (MQ.matches && window.scrollY === 0) {
-        setTimeout(() => window.scrollTo(0, 1), 80);
-      }
-    }, { passive: true });
+    // body { min-height: calc(100vh+2px) } makes the document genuinely scrollable
+    // (body always 2px taller than viewport), so iOS recognises it and collapses the bar.
+    setTimeout(() => {
+      window.scrollTo(0, 1);
+      document.documentElement.scrollTop = 1;
+    }, 800);
   }
 
   function deactivate() {
@@ -4511,12 +4774,13 @@
 
   function onStart(e) {
     if (e.touches.length !== 1) return;
+    if (idx === 2) return; // map pane: let Leaflet handle all touch events
     dragStartX = e.touches[0].clientX;
     dragStartY = e.touches[0].clientY;
     dragDx = 0; locked = null;
   }
   function onMove(e) {
-    if (dragStartX == null) return;
+    if (idx === 2 || dragStartX == null) return;
     const dx = e.touches[0].clientX - dragStartX;
     const dy = e.touches[0].clientY - dragStartY;
     if (locked == null) {
@@ -4531,7 +4795,7 @@
     p.style.transform = `translate3d(calc(-${idx * 100}vw + ${dx}px), 0, 0)`;
   }
   function onEnd() {
-    if (locked === 'x') {
+    if (idx !== 2 && locked === 'x') {
       const threshold = window.innerWidth * 0.18;
       if (dragDx < -threshold && idx < 2) setIdx(idx + 1);
       else if (dragDx > threshold && idx > 0) setIdx(idx - 1);
@@ -4540,6 +4804,7 @@
     dragStartX = dragStartY = null; dragDx = 0; locked = null;
   }
 
+  let _urlBarMinimized = false;
   function onPaneScroll(e) {
     const y = e.target.scrollTop;
     const dy = y - lastScrollY;
@@ -4553,6 +4818,15 @@
       if (dotsEl) dotsEl.style.opacity = hide ? '0' : '1';
     }
     lastScrollY = y;
+
+    // Mirror pane scroll to window.scrollY so iOS collapses URL bar to minimal (domain-only) state
+    if (y > 80 && !_urlBarMinimized) {
+      _urlBarMinimized = true;
+      window.scrollTo(0, 400);
+    } else if (y <= 10 && _urlBarMinimized) {
+      _urlBarMinimized = false;
+      window.scrollTo(0, 1);
+    }
   }
 
   function check() { MQ.matches ? activate() : deactivate(); }

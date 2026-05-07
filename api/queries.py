@@ -36,6 +36,9 @@ def get_figures(
             'OR ch."Associated_Movements" ILIKE :search)'
         )
         params["search"] = f"%{search}%"
+        params["search_exact"] = search
+        params["search_start"] = f"{search}%"
+        params["search_name"] = f"%{search}%"
 
     if type_filter:
         where_clauses.append('ch."Type" = :type_filter')
@@ -91,7 +94,20 @@ def get_figures(
         "century_desc": 'CAST(REGEXP_REPLACE(ch."Century", \'[^0-9]\', \'\', \'g\') AS INTEGER) DESC NULLS LAST',
         "type":         'ch."Type" ASC NULLS LAST, ch."Name_Event" ASC NULLS LAST',
     }
-    order_clause = sort_map.get(sort, 'ch.nc_order ASC NULLS LAST, ch.id ASC')
+
+    if search and not sort:
+        # Rank by name match relevance: exact > starts-with > contains > alt-names > everything else
+        order_clause = (
+            'CASE '
+            'WHEN ch."Name_Event" ILIKE :search_exact THEN 1 '
+            'WHEN ch."Name_Event" ILIKE :search_start THEN 2 '
+            'WHEN ch."Name_Event" ILIKE :search_name  THEN 3 '
+            'WHEN ch."Alternative_Names___Titles" ILIKE :search_name THEN 4 '
+            'ELSE 5 END ASC, '
+            'ch."Name_Event" ASC NULLS LAST'
+        )
+    else:
+        order_clause = sort_map.get(sort, 'ch.nc_order ASC NULLS LAST, ch.id ASC')
 
     rows = db.execute(text(f"""
         SELECT
@@ -136,6 +152,8 @@ def get_map_figures(db: Session):
             ch."Death___End"        AS death,
             ch."Era_Type__BC_AD_"   AS era_type,
             ch."Birthplace"         AS birthplace,
+            ch."Region___Location"  AS primary_region,
+            ch."Denomination___Tradition" AS denomination_tradition,
             ch."Thumbnail"          AS thumbnail_json,
             ch."Wikipedia_Name"     AS wikipedia_name,
             ch."Cached_Image_URL"   AS cached_image_url,

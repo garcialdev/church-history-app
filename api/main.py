@@ -90,7 +90,12 @@ async def get_map_figures_route(db: Session = Depends(get_db)):
             "type": row["type"],
             "role_office": row["role_office"],
             "century": row["century"],
+            "born": row["born"],
+            "death": row["death"],
+            "era_type": row["era_type"],
             "birthplace": row["birthplace"],
+            "primary_region": row.get("primary_region"),
+            "denomination_tradition": row.get("denomination_tradition"),
             "image_url": image_url,
         })
     return results
