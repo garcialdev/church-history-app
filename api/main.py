@@ -41,6 +41,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_private_network_access_header(request: Request, call_next):
+    # Chrome sends a preflight with Access-Control-Request-Private-Network on local-network requests.
+    # We must echo the permission header on both the preflight (OPTIONS) and the real response.
+    if request.method == "OPTIONS":
+        from fastapi.responses import Response as FastResponse
+        resp = FastResponse(status_code=204)
+        resp.headers["Access-Control-Allow-Origin"] = request.headers.get("origin", "*")
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
+        resp.headers["Access-Control-Allow-Private-Network"] = "true"
+        resp.headers["Access-Control-Max-Age"] = "86400"
+        return resp
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Private-Network"] = "true"
+    return response
+
 UPLOADS_DIR = pathlib.Path("/app/uploads")
 UPLOADS_DIR.mkdir(exist_ok=True)
 PUBLIC_API_URL = os.environ.get("PUBLIC_API_URL", "https://churcharchiveapi.bbs1.net")

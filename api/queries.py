@@ -26,14 +26,8 @@ def get_figures(
         where_clauses.append(
             '(ch."Name_Event" ILIKE :search '
             'OR ch."Alternative_Names___Titles" ILIKE :search '
-            'OR ch."Short_Description" ILIKE :search '
-            'OR ch."Denomination___Tradition" ILIKE :search '
-            'OR ch."Long_Biography_Notes" ILIKE :search '
-            'OR ch."Famous_Quotes" ILIKE :search '
-            'OR ch."Key_Life_Events" ILIKE :search '
-            'OR ch."Major_Works___Writings" ILIKE :search '
-            'OR ch."Primary_Contributions___Accomplishments" ILIKE :search '
-            'OR ch."Associated_Movements" ILIKE :search)'
+            'OR ch."Role___Office" ILIKE :search '
+            'OR ch."Denomination___Tradition" ILIKE :search)'
         )
         params["search"] = f"%{search}%"
         params["search_exact"] = search
@@ -95,19 +89,23 @@ def get_figures(
         "type":         'ch."Type" ASC NULLS LAST, ch."Name_Event" ASC NULLS LAST',
     }
 
-    if search and not sort:
-        # Rank by name match relevance: exact > starts-with > contains > alt-names > everything else
-        order_clause = (
+    base_order = sort_map.get(sort, 'ch.nc_order ASC NULLS LAST, ch.id ASC')
+
+    if search:
+        # Always put name/alt-name matches first (tier 0), then bio/quote matches (tier 1).
+        # Within each tier, apply the user's chosen sort (or default order).
+        # This means "Oldest first" still works, but Johns always appear before Pontius Pilate.
+        name_tier = (
             'CASE '
-            'WHEN ch."Name_Event" ILIKE :search_exact THEN 1 '
-            'WHEN ch."Name_Event" ILIKE :search_start THEN 2 '
-            'WHEN ch."Name_Event" ILIKE :search_name  THEN 3 '
-            'WHEN ch."Alternative_Names___Titles" ILIKE :search_name THEN 4 '
-            'ELSE 5 END ASC, '
-            'ch."Name_Event" ASC NULLS LAST'
+            'WHEN ch."Name_Event" ILIKE :search_exact THEN 0 '
+            'WHEN ch."Name_Event" ILIKE :search_start THEN 1 '
+            'WHEN ch."Name_Event" ILIKE :search_name  THEN 2 '
+            'WHEN ch."Alternative_Names___Titles" ILIKE :search_name THEN 3 '
+            'ELSE 4 END ASC'
         )
+        order_clause = f'{name_tier}, {base_order}'
     else:
-        order_clause = sort_map.get(sort, 'ch.nc_order ASC NULLS LAST, ch.id ASC')
+        order_clause = base_order
 
     rows = db.execute(text(f"""
         SELECT

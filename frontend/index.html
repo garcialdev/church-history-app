@@ -3803,7 +3803,7 @@
   }
 
   // ── FIGURES ────────────────────────────────────
-  const FIGURES_CACHE_KEY = 'ecclesia_figures_v2';
+  const FIGURES_CACHE_KEY = 'ecclesia_figures_v4';
   const FIGURES_CACHE_TTL = 5 * 60 * 1000;
 
   function getCachedFigures(paramsStr) {
@@ -3975,6 +3975,9 @@
     return CENTURY_TO_YEAR[c] ?? 9999;
   }
   function clientSort(results, sortKey) {
+    // When searching, the server already applies name-relevance + the chosen sort together.
+    // Re-sorting client-side would destroy the relevance order, so we skip it.
+    if (!sortKey || state.search) return results;
     if (sortKey === 'name_asc') return results.sort((a,b) => (a.name||'').localeCompare(b.name||''));
     if (sortKey === 'name_desc') return results.sort((a,b) => (b.name||'').localeCompare(a.name||''));
     const desc = sortKey === 'date_desc';
