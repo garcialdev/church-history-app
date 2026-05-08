@@ -1451,6 +1451,13 @@
     .chrono-era-block, .chrono-entry { }
 
     /* ── MAP VIEW ─────────────────────────────────── */
+    /* On desktop, .m-pager and .m-map-wrap are transparent flex pass-throughs */
+    .content-area.view-map-active > .m-pager {
+      display: flex; flex-direction: column; flex: 1; min-height: 0;
+    }
+    .content-area.view-map-active .m-map-wrap {
+      display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;
+    }
     #view-map { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 0; min-height: 0; }
     .map-layout { display: flex; flex: 1; overflow: hidden; min-height: 0; }
     .map-canvas-wrap { flex: 1; position: relative; overflow: hidden; min-height: 0; }
@@ -2180,6 +2187,86 @@
     color: var(--ink-3); margin-top: 4px;
   }
 
+  /* ── Era Hero Cards ─────────────────────────────── */
+  .m-era-hero {
+    position: relative;
+    height: calc(100dvh - 132px);
+    margin: 8px 0;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    padding: 44px 28px 28px;
+  }
+  .m-era-hero-bg {
+    position: absolute; inset: 0;
+    pointer-events: none;
+  }
+  [data-theme="dark"] .m-era-hero-bg {
+    background: linear-gradient(155deg,
+      color-mix(in oklch, var(--era-tint) 28%, #0e0804) 0%,
+      color-mix(in oklch, var(--era-tint) 10%, #0e0804) 50%,
+      #080401 100%);
+  }
+  [data-theme="light"] .m-era-hero-bg {
+    background: linear-gradient(155deg,
+      var(--era-tint) 0%,
+      color-mix(in oklch, var(--era-tint) 65%, #2a1508) 55%,
+      color-mix(in oklch, var(--era-tint) 40%, #1a0d04) 100%);
+  }
+  .m-era-hero-orb {
+    position: absolute; border-radius: 50%;
+    background: var(--era-tint);
+    pointer-events: none;
+  }
+  .m-era-hero-content-top { position: relative; z-index: 1; }
+  .m-era-hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: rgba(255,255,255,0.55); margin-bottom: 14px;
+  }
+  .m-era-hero-title {
+    font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+    font-size: clamp(52px, 16vw, 68px);
+    font-style: italic; font-weight: 300;
+    color: #fff; line-height: 0.92; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .m-era-hero-divider {
+    width: 36px; height: 1px;
+    background: rgba(255,255,255,0.35);
+    margin-bottom: 18px;
+  }
+  .m-era-hero-desc {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 15.5px; line-height: 1.58;
+    color: rgba(255,255,255,0.75);
+    max-width: 320px;
+  }
+  .m-era-hero-content-bottom { position: relative; z-index: 1; }
+  .m-era-hero-stats {
+    display: flex; gap: 0; align-items: flex-start;
+    margin-bottom: 18px;
+  }
+  .m-era-hero-stat {
+    flex: 1; padding-right: 8px;
+  }
+  .m-era-hero-stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px; font-weight: 300;
+    color: #fff; line-height: 1;
+  }
+  .m-era-hero-stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45); margin-top: 3px;
+  }
+  .m-era-hero-cta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(255,255,255,0.3); text-align: center;
+  }
+
   /* ── 6 · Bottom-sheet figure profile ────────────── */
   .modal-overlay[data-mobile-sheet="open"] {
     background: rgba(0,0,0,0.45);
@@ -2328,6 +2415,13 @@
 
   @media (prefers-reduced-motion: reduce) {
     .m-home-featured-img { animation: none; }
+    .discover-loading-icon { animation: none; }
+    .discover-loading-bar-fill { animation: none; }
+    .codex-entry {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
   }
 }
 
@@ -2388,32 +2482,42 @@
   .m-profile { display: flex; flex-direction: column; height: 100dvh; }
 
   .m-profile-hero {
-    position: relative; height: 46dvh; flex-shrink: 0;
+    position: relative; height: 52dvh; flex-shrink: 0;
     overflow: hidden; background: #120a04;
   }
   .m-profile-hero-bg {
-    position: absolute; inset: -28px;
+    position: absolute; inset: -40px;
     background-size: cover; background-position: center top;
-    filter: blur(24px) brightness(0.52) saturate(1.2);
-    transform: scale(1.12);
+    filter: blur(40px) brightness(0.52) saturate(1.25);
+    transform: scale(1.18);
+  }
+  .m-profile-hero::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 1;
+    background:
+      radial-gradient(ellipse 120% 100% at 50% 50%, transparent 40%, rgba(8,5,2,0.55) 75%, rgba(8,5,2,0.9) 100%),
+      linear-gradient(to right, rgba(8,5,2,0.45) 0%, transparent 22%, transparent 78%, rgba(8,5,2,0.45) 100%);
+    pointer-events: none;
   }
   .m-profile-hero-portrait {
     position: absolute; bottom: 0; left: 50%;
-    transform: translateX(-50%);
-    height: 92%; width: auto; max-width: 72%;
+    transform: translateX(-50%) scale(1.08);
+    transform-origin: bottom center;
+    height: 100%; width: auto; max-width: 88%;
     object-fit: cover; object-position: top center;
-    -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
-    mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 78% 92% at 50% 38%, black 30%, rgba(0,0,0,0.85) 55%, transparent 92%);
+    mask-image: radial-gradient(ellipse 78% 92% at 50% 38%, black 30%, rgba(0,0,0,0.85) 55%, transparent 92%);
+    z-index: 2;
   }
   .m-profile-hero-initial {
-    position: absolute; inset: 0;
+    position: absolute; inset: 0; z-index: 2;
     display: flex; align-items: center; justify-content: center;
     font-family: 'Cormorant Garamond', serif; font-style: italic;
     font-size: 96px; color: rgba(255,255,255,0.1);
   }
   .m-profile-hero-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 35%, rgba(8,5,2,0.72) 75%, rgba(8,5,2,0.95) 100%);
+    position: absolute; inset: 0; z-index: 3;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0) 30%, color-mix(in oklch, var(--bg) 60%, transparent) 78%, var(--bg) 100%);
   }
   .m-profile-btn-back, .m-profile-btn-more {
     position: absolute; top: calc(env(safe-area-inset-top, 0px) + 16px);
@@ -2433,7 +2537,7 @@
   }
   .m-profile-hero-text {
     position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 0 20px 20px; z-index: 2;
+    padding: 0 20px 20px; z-index: 4;
   }
   .m-profile-hero-meta {
     font-family: 'JetBrains Mono', monospace;
@@ -2929,14 +3033,23 @@
   let _chronoEraStartIdx = {}; // eraIdx → slide index of its intro card
 
   // ── THEME ──────────────────────────────────────
+  let _tileLayer = null;
   function toggleTheme() {
     const html = document.documentElement;
     const isDark = html.getAttribute('data-theme') === 'dark';
-    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    const newTheme = isDark ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
     document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀️';
     document.getElementById('themeLabel').textContent = isDark ? 'Dark Mode' : 'Light Mode';
-    // Reload map tiles if map is visible
-    if (mapInstance) { setTimeout(() => mapInstance.invalidateSize(), 100); }
+    // Swap map tiles to match the new theme
+    if (mapInstance) {
+      if (_tileLayer) { mapInstance.removeLayer(_tileLayer); }
+      const tileVariant = newTheme === 'dark' ? 'dark_all' : 'light_all';
+      _tileLayer = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${tileVariant}/{z}/{x}/{y}{r}.png`, {
+        attribution: '© OpenStreetMap · CartoDB', subdomains: 'abcd', maxZoom: 19
+      }).addTo(mapInstance);
+      setTimeout(() => mapInstance.invalidateSize(), 100);
+    }
   }
 
   // ── VIEW SWITCHING ─────────────────────────────
@@ -3190,6 +3303,9 @@
 
   // ── ANIMATED COUNTERS ──────────────────────────
   function animateCount(el, target, delay = 0) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = target; return;
+    }
     const duration = 900;
     const start = performance.now() + delay;
     el.textContent = '0';
@@ -3484,12 +3600,41 @@
 
       if (isMobileView) {
         const mobileSections = chapters.map(ch => {
+          const era = ERAS[ch.eraIdx];
           const tint = ERA_HEX[ch.eraIdx] || ERA_HEX[3];
           const entries = ch.figures.map(f => renderMobileTimelineCard(f, ch.eraIdx)).join('');
-          return `<div class="m-timeline-era-header" style="--era-tint:${tint}">
-            <div class="m-timeline-era-label">Era ${ch.eraIdx + 1} of 4</div>
-            <div class="m-timeline-era-name">${ch.era.name}</div>
-            <div class="m-timeline-era-dates">${ch.era.dates}</div>
+          const yearEnd = era.yearEnd === Infinity ? new Date().getFullYear() : era.yearEnd;
+          const yearStart = ch.eraIdx === 0 ? 30 : ERAS[ch.eraIdx - 1].yearEnd;
+          const span = yearEnd - yearStart;
+          const traditions = new Set(ch.figures.map(f => f.denomination_tradition).filter(Boolean)).size;
+          return `<div class="m-era-hero" style="--era-tint:${tint}">
+            <div class="m-era-hero-bg"></div>
+            <div class="m-era-hero-orb" style="width:260px;height:260px;right:-80px;top:-70px;opacity:0.13"></div>
+            <div class="m-era-hero-orb" style="width:160px;height:160px;right:70px;top:140px;opacity:0.07"></div>
+            <div class="m-era-hero-orb" style="width:90px;height:90px;left:-24px;bottom:200px;opacity:0.09"></div>
+            <div class="m-era-hero-content-top">
+              <div class="m-era-hero-eyebrow">Era ${era.roman} · ${era.dates}</div>
+              <div class="m-era-hero-title">${era.name}</div>
+              <div class="m-era-hero-divider"></div>
+              <div class="m-era-hero-desc">${era.desc}</div>
+            </div>
+            <div class="m-era-hero-content-bottom">
+              <div class="m-era-hero-stats">
+                <div class="m-era-hero-stat">
+                  <div class="m-era-hero-stat-value">${ch.figures.length}</div>
+                  <div class="m-era-hero-stat-label">Figures</div>
+                </div>
+                <div class="m-era-hero-stat">
+                  <div class="m-era-hero-stat-value">${span}y</div>
+                  <div class="m-era-hero-stat-label">Span</div>
+                </div>
+                ${traditions > 0 ? `<div class="m-era-hero-stat">
+                  <div class="m-era-hero-stat-value">${traditions}</div>
+                  <div class="m-era-hero-stat-label">Traditions</div>
+                </div>` : ''}
+              </div>
+              <div class="m-era-hero-cta">▾ &nbsp; Scroll to explore</div>
+            </div>
           </div>
           <div class="m-timeline-rail" style="--era-tint:${tint}">${entries}</div>`;
         }).join('');
@@ -4124,7 +4269,11 @@
         fetch(`${API}/figures/${id}/related`).then(r=>r.json()).catch(()=>[])
       ]);
       document.getElementById('modalInner').innerHTML = renderModal(f, related);
-      if (!isMobile) {
+      if (isMobile) {
+        const card = document.querySelector('.m-profile-card');
+        const modal = document.querySelector('#modal .modal');
+        attachProfileSwipeDown(card, modal);
+      } else {
         const sheetEl = document.querySelector('#modal .modal');
         if (sheetEl) sheetEl.scrollTop = 0;
       }
@@ -4390,11 +4539,44 @@
   }
 
   function closeModal() {
+    const modalEl = document.querySelector('#modal .modal');
+    if (modalEl) { modalEl.style.transform = ''; modalEl.style.transition = ''; }
     document.getElementById('modal').style.display = 'none';
     document.body.style.overflow = '';
-    document.querySelector('#modal .modal')?.classList.remove('m-profile-mode');
+    modalEl?.classList.remove('m-profile-mode');
   }
   function closeOnOverlay(e) { if(e.target===document.getElementById('modal')) closeModal(); }
+
+  function attachProfileSwipeDown(card, modal) {
+    if (!card || !modal) return;
+    let startY = 0, dragging = false;
+    card.addEventListener('touchstart', e => {
+      startY = e.touches[0].clientY;
+      dragging = false;
+      modal.style.transition = '';
+    }, { passive: true });
+    card.addEventListener('touchmove', e => {
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 0 && card.scrollTop <= 0) {
+        e.preventDefault();
+        dragging = true;
+        modal.style.transform = `translateY(${(dy * 0.65).toFixed(1)}px)`;
+      }
+    }, { passive: false });
+    card.addEventListener('touchend', e => {
+      if (!dragging) return;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (dy > 110) {
+        modal.style.transition = 'transform 0.26s cubic-bezier(0.4,0,1,1)';
+        modal.style.transform = 'translateY(100%)';
+        setTimeout(closeModal, 250);
+      } else {
+        modal.style.transition = 'transform 0.32s cubic-bezier(0.16,1,0.3,1)';
+        modal.style.transform = 'translateY(0)';
+      }
+      dragging = false;
+    }, { passive: true });
+  }
   document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 
   // ── FILTER HANDLERS ────────────────────────────
