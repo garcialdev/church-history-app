@@ -111,14 +111,14 @@
       display: flex;
       overflow: hidden;
     }
-    /* Subtle parchment texture overlay */
+    /* Subtle parchment texture overlay — sits behind UI, never blocks input */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 9999;
+      z-index: 0;
       opacity: 1;
     }
 
@@ -2710,7 +2710,6 @@
             <option value="date_desc">Newest first</option>
             <option value="name_asc">Name A → Z</option>
             <option value="name_desc">Name Z → A</option>
-            <option value="date_desc">Newest first</option>
             <option value="century_asc">Century ↑</option>
             <option value="century_desc">Century ↓</option>
             <option value="type">By type</option>
@@ -2833,17 +2832,99 @@
   let currentView = 'grid';
 
   const CENTURY_ORDER = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th','16th','17th','18th','19th','20th','21st'];
-  const ERA_CENTURY_MAP = [['1st'],['2nd','3rd'],['4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th'],['16th','17th','18th','19th','20th','21st']];
-  const ERA_HEX = ['#6db3d4','#9b7fd4','#d4903a','#c96a3a'];
-  const CHRONO_ERAS = [
-    { color:'var(--era1)', hex:'#38bdf8', name:'Apostolic Age',       dates:'AD 30 – 100',       desc:'The period following the resurrection of Jesus, defined by the ministry of the twelve apostles, the founding of the early church at Pentecost, and the composition of the New Testament. The gospel spread rapidly through the Roman Empire despite early opposition.' },
-    { color:'var(--era2)', hex:'#a78bfa', name:'Early Church',         dates:'AD 100 – 313',       desc:'The age of the church fathers and apologists. Despite fierce Roman persecution, Christianity expanded dramatically. Brilliant theologians defended the faith against early heresies, clarifying the doctrines of the Trinity and the person of Christ.' },
-    { color:'var(--era3)', hex:'#f0c040', name:'Medieval Church',       dates:'AD 313 – 1517',      desc:"Constantine's Edict of Milan brought tolerance; Christianity eventually became the Roman state religion. This long era encompassed the great ecumenical councils, the rise of monasticism, the East–West Schism, the Crusades, and the flowering of scholastic theology." },
-    { color:'var(--era4)', hex:'#c0502a', name:'Reformation & Beyond', dates:'AD 1517 – present',   desc:"Luther's 95 Theses ignited a reformation that fractured and reshaped Western Christianity. Protestantism emerged alongside the Catholic Counter-Reformation. The following centuries brought global missions, the rise of evangelical movements, and the modern denominational landscape." },
+
+  // ── ERAS — single source of truth ──────────────
+  // Edit this array to add, rename, or rebound an era. Every other constant,
+  // helper, and view-specific palette is derived from it.
+  const ERAS = [
+    {
+      name: 'Apostolic Age',
+      shortName: 'Apostolic',
+      roman: 'I',
+      icon: '✝',
+      dates: 'AD 30 – 100',
+      datesShort: 'AD 30–100',
+      yearEnd: 100,
+      centuries: ['1st'],
+      hex: '#6db3d4',          // card / map base palette
+      timelineHex: '#38bdf8',  // brighter timeline tint
+      mapHex: '#6baed6',
+      cssVar: '--era1',
+      desc: 'The period following the resurrection of Jesus, defined by the ministry of the twelve apostles, the founding of the early church at Pentecost, and the composition of the New Testament. The gospel spread rapidly through the Roman Empire despite early opposition.',
+    },
+    {
+      name: 'Early Church',
+      shortName: 'Early',
+      roman: 'II',
+      icon: '✦',
+      dates: 'AD 100 – 313',
+      datesShort: 'AD 100–313',
+      yearEnd: 313,
+      centuries: ['2nd','3rd'],
+      hex: '#9b7fd4',
+      timelineHex: '#a78bfa',
+      mapHex: '#9e7faf',
+      cssVar: '--era2',
+      desc: 'The age of the church fathers and apologists. Despite fierce Roman persecution, Christianity expanded dramatically. Brilliant theologians defended the faith against early heresies, clarifying the doctrines of the Trinity and the person of Christ.',
+    },
+    {
+      name: 'Medieval Church',
+      shortName: 'Medieval',
+      roman: 'III',
+      icon: '⛪',
+      dates: 'AD 313 – 1517',
+      datesShort: 'AD 313–1517',
+      yearEnd: 1517,
+      centuries: ['4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th'],
+      hex: '#d4903a',
+      timelineHex: '#f0c040',
+      mapHex: '#7a4a3a',
+      cssVar: '--era3',
+      desc: "Constantine's Edict of Milan brought tolerance; Christianity eventually became the Roman state religion. This long era encompassed the great ecumenical councils, the rise of monasticism, the East–West Schism, the Crusades, and the flowering of scholastic theology.",
+    },
+    {
+      name: 'Reformation & Beyond',
+      shortName: 'Reformation',
+      roman: 'IV',
+      icon: '📖',
+      dates: 'AD 1517 – present',
+      datesShort: 'AD 1517+',
+      yearEnd: Infinity,
+      centuries: ['16th','17th','18th','19th','20th','21st'],
+      hex: '#c96a3a',
+      timelineHex: '#c0502a',
+      mapHex: '#c0502a',
+      cssVar: '--era4',
+      desc: "Luther's 95 Theses ignited a reformation that fractured and reshaped Western Christianity. Protestantism emerged alongside the Catholic Counter-Reformation. The following centuries brought global missions, the rise of evangelical movements, and the modern denominational landscape.",
+    },
   ];
+
+  // ── Derived constants (kept as named aliases so existing call sites keep working) ──
+  const ERA_CENTURY_MAP = ERAS.map(e => e.centuries);
+  const ERA_HEX         = ERAS.map(e => e.hex);
+  const CHRONO_ERAS     = ERAS.map(e => ({
+    color: `var(${e.cssVar})`,
+    hex:   e.timelineHex,
+    name:  e.name,
+    dates: e.dates,
+    desc:  e.desc,
+  }));
+
+  // Look up an era index from any of: century label, numeric year, century-string.
+  // All three view-layer call sites (cards, map, timeline, profile) flow through these.
   function getEraFromCentury(century) {
     if (!century) return -1;
-    return ERA_CENTURY_MAP.findIndex(ks => ks.includes(century));
+    return ERAS.findIndex(e => e.centuries.includes(century));
+  }
+  function getEraFromYear(year) {
+    if (year === null || year === undefined) return -1;
+    const idx = ERAS.findIndex(e => year <= e.yearEnd);
+    return idx === -1 ? ERAS.length - 1 : idx;
+  }
+  // Convenience: list of centuries a given era covers (replaces the inline arrays
+  // that used to live in loadFigures() and renderMapPins()).
+  function getEraCenturies(eraIdx) {
+    return ERAS[eraIdx]?.centuries || [];
   }
   let _chronoEraStartIdx = {}; // eraIdx → slide index of its intro card
 
@@ -3014,9 +3095,9 @@
       const randomData = await randomRes.json();
       const featured = randomData.items?.[0];
 
-      const eraNames = ['Apostolic Age', 'Early Church', 'Medieval', 'Reformation'];
-      const eraIcons = ['✝', '✦', '⛪', '📖'];
-      const eraDates = ['AD 30–100', 'AD 100–313', 'AD 313–1517', 'AD 1517–1648'];
+      const eraNames = ERAS.map(e => e.name);
+      const eraIcons = ERAS.map(e => e.icon);
+      const eraDates = ERAS.map(e => e.datesShort);
 
       inner.innerHTML = `
         <div class="home-eras-section">
@@ -3163,14 +3244,6 @@
     return map[c] || null;
   }
   function getFigureYear(f) { return f.born || f.death || centuryToYear(f.century); }
-  // Derive era index from numeric year — single source of truth, consistent with sort order
-  function getEraFromYear(year) {
-    if (year === null || year === undefined) return -1;
-    if (year <= 100)  return 0;  // Apostolic Age: AD 30–100
-    if (year <= 313)  return 1;  // Early Church: AD 100–313
-    if (year <= 1517) return 2;  // Medieval Church: AD 313–1517
-    return 3;                    // Reformation & Beyond: AD 1517+
-  }
 
   // ── CHRONO VIEW (scrollable map+card) ──────────
   function makePulseDot() {
@@ -3463,7 +3536,7 @@
   }
 
   // ── MAP ────────────────────────────────────────
-  const MAP_ERA_COLORS = ['#6baed6', '#9e7faf', '#7a4a3a', '#c0502a'];
+  const MAP_ERA_COLORS = ERAS.map(e => e.mapHex);
   let allMapFigures = [];
   let mapMarkers = [];
   let deathMarkers = [];
@@ -3490,15 +3563,8 @@
     });
   }
 
-  function getEraFromCenturyStr(century) {
-    const era0 = ['1st'];
-    const era1 = ['2nd','3rd'];
-    const era2 = ['4th','5th','6th','7th','8th','9th','10th','11th','12th','13th','14th','15th'];
-    if (era0.includes(century)) return 0;
-    if (era1.includes(century)) return 1;
-    if (era2.includes(century)) return 2;
-    return 3;
-  }
+  // Alias kept for clarity at call sites that pass a century string into the map layer.
+  const getEraFromCenturyStr = getEraFromCentury;
 
   function toggleMapEra(idx) {
     mapEraFilter = mapEraFilter === idx ? -1 : idx;
@@ -3605,7 +3671,6 @@
   function renderMapCard(f, related = []) {
     const eraIdx = f.century ? getEraFromCenturyStr(f.century) : 3;
     const eraColor = MAP_ERA_COLORS[eraIdx];
-    const eraNames = ['Apostolic Age', 'Early Church', 'Medieval Church', 'Reformation & Beyond'];
     const century = f.century || deriveCentury(f.born, f.death);
     const centuryLabel = century ? `${century} C.` : '';
     const eraLabel = eraNames[eraIdx] || '';
@@ -3833,9 +3898,8 @@
     if (state.belief_id)    params.set('belief_id', state.belief_id);
     if (state.is_martyr !== '') params.set('is_martyr', state.is_martyr);
     if (state.era_index >= 0 && eraRanges[state.era_index]) {
-      const eraCenturyMap = [["1st"],["2nd","3rd"],["4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th"],["16th","17th","18th","19th","20th","21st"]];
-      const keywords = eraCenturyMap[state.era_index];
-      if (keywords) params.set('century_keywords', keywords.join(','));
+      const keywords = getEraCenturies(state.era_index);
+      if (keywords.length) params.set('century_keywords', keywords.join(','));
     }
     const paramsStr = params.toString();
     const cached = getCachedFigures(paramsStr);
@@ -3978,8 +4042,31 @@
     // When searching, the server already applies name-relevance + the chosen sort together.
     // Re-sorting client-side would destroy the relevance order, so we skip it.
     if (!sortKey || state.search) return results;
-    if (sortKey === 'name_asc') return results.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    if (sortKey === 'name_asc')  return results.sort((a,b) => (a.name||'').localeCompare(b.name||''));
     if (sortKey === 'name_desc') return results.sort((a,b) => (b.name||'').localeCompare(a.name||''));
+    if (sortKey === 'century_asc' || sortKey === 'century_desc') {
+      const dir = sortKey === 'century_desc' ? -1 : 1;
+      const ord = c => CENTURY_ORDER.indexOf(c);
+      return results.sort((a,b) => {
+        const ac = a.century || deriveCentury(a.born, a.death);
+        const bc = b.century || deriveCentury(b.born, b.death);
+        const ai = ord(ac), bi = ord(bc);
+        // Unknown centuries sink to the bottom regardless of direction
+        if (ai === -1 && bi === -1) return figureYear(a) - figureYear(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        if (ai !== bi) return dir * (ai - bi);
+        return figureYear(a) - figureYear(b); // stable within same century
+      });
+    }
+    if (sortKey === 'type') {
+      const rank = { 'Person': 0, 'Event': 1, 'Group': 2 };
+      return results.sort((a,b) => {
+        const ar = rank[a.type] ?? 99, br = rank[b.type] ?? 99;
+        if (ar !== br) return ar - br;
+        return figureYear(a) - figureYear(b);
+      });
+    }
     const desc = sortKey === 'date_desc';
     return results.sort((a,b) => desc ? figureYear(b)-figureYear(a) : figureYear(a)-figureYear(b));
   }
@@ -3999,7 +4086,7 @@
     const suffix = isBC ? ' BC' : ' AD';
     if (born && death) return `${born}–${death}${suffix}`;
     if (born)  return `b. ${born}${suffix}`;
-    if (death) return `d. ${death} AD`;
+    if (death) return `d. ${death}${suffix}`;
     return '';
   }
 
@@ -4703,7 +4790,32 @@
     } catch(e) {}
   }
   function restoreState() {
-    localStorage.removeItem('archivist_state');
+    try {
+      const raw = localStorage.getItem('archivist_state');
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      Object.assign(state, saved);
+      // Reflect restored filter state in sidebar nav
+      if (state.type) {
+        const id = state.type === 'Person' ? 'nav-person'
+                 : state.type === 'Event'  ? 'nav-event'
+                 : state.type === 'Group'  ? 'nav-group' : null;
+        if (id) {
+          document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          const target = document.getElementById(id);
+          if (target) target.classList.add('active');
+        }
+      }
+      if (state.is_martyr === 'Yes') {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const m = document.getElementById('nav-martyr');
+        if (m) m.classList.add('active');
+      }
+      const sortSel = document.getElementById('sortSelect');
+      if (sortSel && state.sort) sortSel.value = state.sort;
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput && state.search) searchInput.value = state.search;
+    } catch(e) { /* ignore — fall through to defaults */ }
   }
 
   boot();
