@@ -3931,8 +3931,8 @@
   async function loadMap() {
     if (!mapLoaded) {
       mapInstance = L.map('mapContainer', { center: [35, 30], zoom: 4, zoomControl: false });
-      // Light parchment-appropriate tile
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      const initTileVariant = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark_all' : 'light_all';
+      _tileLayer = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${initTileVariant}/{z}/{x}/{y}{r}.png`, {
         attribution: '© OpenStreetMap · CartoDB', subdomains: 'abcd', maxZoom: 19
       }).addTo(mapInstance);
       L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
