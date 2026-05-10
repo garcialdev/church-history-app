@@ -1452,6 +1452,8 @@
 
     /* ── MAP VIEW ─────────────────────────────────── */
     /* On desktop, .m-pager and .m-map-wrap are transparent flex pass-throughs */
+    /* Hide the mobile-only glass overlay so it doesn't participate in desktop flex layout */
+    .m-map-overlay { display: none; }
     .content-area.view-map-active > .m-pager {
       display: flex; flex-direction: column; flex: 1; min-height: 0;
     }
@@ -2299,7 +2301,7 @@
   /* ── 7 · Map glass overlays ──────────────────────── */
   .m-map-wrap { position: relative; width: 100vw; height: 100dvh; padding: 0; }
   .m-map-wrap #mapContainer { width: 100%; height: 100% !important; border-radius: 0 !important; border: none !important; }
-  .m-map-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 400; }
+  .m-map-overlay { display: block; position: absolute; inset: 0; pointer-events: none; z-index: 400; }
   .m-map-era-rail {
     position: absolute; top: 80px; left: 0; right: 0;
     display: flex; gap: 6px; padding: 0 12px;
@@ -3151,6 +3153,7 @@
     await loadFigures();
     initGridKeyNav();
     initPullToRefresh();
+    fetch(`${API}/figures/map`).then(r => r.json()).then(d => { allMapFigures = d; }).catch(() => {});
   }
 
   // ── STATS ──────────────────────────────────────
@@ -3790,24 +3793,22 @@
 
   async function selectMapFigure(id) {
     selectedMapFigId = id;
-    // Redraw markers to show selection ring
-    renderMapPins();
 
     const panel = document.getElementById('mapSidePanel');
     if (!panel) return;
     panel.innerHTML = `<div class="map-side-empty"><div class="spinner"></div></div>`;
+
+    // Defer pin re-render outside the Leaflet click-event call stack
+    setTimeout(() => renderMapPins(), 0);
 
     try {
       const [f, related] = await Promise.all([
         fetch(`${API}/figures/${id}`).then(r => r.json()),
         fetch(`${API}/figures/${id}/related`).then(r => r.json()).catch(() => [])
       ]);
-      panel.classList.add('map-panel-pop');
       panel.innerHTML = `<div class="map-panel-handle" onclick="if(window.innerWidth<=700)document.getElementById('mapSidePanel').classList.remove('map-panel-open')"></div>` + renderMapCard(f, related);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        panel.classList.remove('map-panel-pop');
-        if (window.innerWidth <= 700) panel.classList.add('map-panel-open');
-      }));
+      panel.classList.remove('map-panel-pop');
+      if (window.innerWidth <= 700) panel.classList.add('map-panel-open');
     } catch(e) {
       panel.innerHTML = `<div class="map-side-empty"><p>Failed to load figure.</p></div>`;
     }
@@ -3818,7 +3819,7 @@
     const eraColor = MAP_ERA_COLORS[eraIdx];
     const century = f.century || deriveCentury(f.born, f.death);
     const centuryLabel = century ? `${century} C.` : '';
-    const eraLabel = eraNames[eraIdx] || '';
+    const eraLabel = ERAS[eraIdx]?.name || '';
 
     const heroHtml = f.image_url
       ? `<img src="${f.image_url}" alt="${f.name}" onerror="this.parentElement.style.backgroundImage='none'">`
