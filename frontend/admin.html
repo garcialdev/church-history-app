@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>The Archivist — Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -233,7 +233,6 @@
       /* ── Search / filter toolbar ── */
       .table-toolbar { flex-direction: column; align-items: stretch; gap: 0.5rem; }
       .search-input { width: 100%; font-size: 1rem; padding: 0.65rem 0.5rem; }
-      td, th { white-space: nowrap; }
 
       /* ── Drawer: slides up from bottom ── */
       .drawer-overlay { align-items: flex-end; }
@@ -256,6 +255,18 @@
       .form-textarea { font-size: 1rem; padding: 0.7rem; }
       .form-group { margin-bottom: 0.85rem; }
       .form-label { font-size: 0.62rem; }
+
+      /* ── Safe-area insets (notched phones) ── */
+      .bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+        height: calc(60px + env(safe-area-inset-bottom));
+      }
+      .main { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+      .mobile-fab { bottom: calc(74px + env(safe-area-inset-bottom)); }
+
+      /* ── Stat cards — readable on 320px screens ── */
+      .stats-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+      .stat-value { font-size: 1.6rem; }
     }
   </style>
 </head>
