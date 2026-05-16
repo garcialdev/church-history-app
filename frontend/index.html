@@ -1640,8 +1640,8 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); max-width: 1120px; width: 100%; position: relative; box-shadow: var(--shadow-lg); animation: slideUp 0.25s ease; overflow: hidden; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink-3); width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; z-index: 10; transition: all 0.15s; line-height: 1; }
-    .modal-close:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-2); width: 2.2rem; height: 2.2rem; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; z-index: 10; transition: all 0.15s; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+    .modal-close:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); transform: scale(1.08); }
 
     /* Hero: CSS grid — image spans both rows, identity top-right, details full-width bottom */
     .mpro-hero { display: grid; grid-template-columns: 270px 1fr; grid-template-rows: auto auto; border-bottom: 1px solid var(--border); }
@@ -1653,7 +1653,7 @@
     .mpro-img-placeholder { width: 100%; min-height: 340px; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 6rem; font-style: italic; color: var(--ink-5); }
     .mpro-hero-ident { grid-column: 2; grid-row: 1; padding: 2.25rem 2.75rem 1rem; display: flex; flex-direction: column; gap: 0.65rem; min-width: 0; }
     .mpro-hero-details { grid-column: 2; grid-row: 2; padding: 0 2.75rem 2rem; display: flex; flex-direction: column; gap: 0.65rem; }
-    .mpro-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .mpro-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding-right: 2.75rem; }
     .mpro-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
     .mpro-name { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; font-style: italic; color: var(--ink); line-height: 1.05; letter-spacing: 0.01em; margin: 0; }
     .mpro-alt { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-4); font-size: 0.88rem; margin: 0; }
