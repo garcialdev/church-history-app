@@ -451,8 +451,9 @@
     if (!res) return;
     const s = await res.json();
 
-    const maxCentury = Math.max(...(s.by_century||[]).map(r=>r.count), 1);
-    const centuryBars = (s.by_century||[]).map(r => {
+    const centurySorted = (s.by_century||[]).slice().sort((a,b) => parseInt(a.century||0) - parseInt(b.century||0));
+    const maxCentury = Math.max(...centurySorted.map(r=>r.count), 1);
+    const centuryBars = centurySorted.map(r => {
       const pct = Math.round((r.count/maxCentury)*100);
       return `<div class="century-row">
         <div class="century-label">${r.century}</div>

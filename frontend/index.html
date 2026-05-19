@@ -4249,9 +4249,7 @@
     return CENTURY_TO_YEAR[c] ?? 9999;
   }
   function clientSort(results, sortKey) {
-    // When searching, the server already applies name-relevance + the chosen sort together.
-    // Re-sorting client-side would destroy the relevance order, so we skip it.
-    if (!sortKey || state.search) return results;
+    if (!sortKey) return results;
     if (sortKey === 'name_asc')  return results.sort((a,b) => (a.name||'').localeCompare(b.name||''));
     if (sortKey === 'name_desc') return results.sort((a,b) => (b.name||'').localeCompare(a.name||''));
     if (sortKey === 'century_asc' || sortKey === 'century_desc') {
