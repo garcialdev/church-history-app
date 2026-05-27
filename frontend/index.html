@@ -1950,6 +1950,18 @@
     .skel-img { width: 88px; height: 104px; border-radius: var(--radius); flex-shrink: 0; }
     .skel-header { display: flex; gap: 12px; align-items: flex-start; }
     .skel-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+    /* Profile modal skeleton */
+    .mpro-skel { display: flex; flex-direction: column; }
+    .mpro-skel-hero { display: grid; grid-template-columns: 270px 1fr; border-bottom: 1px solid var(--border); }
+    .mpro-skel-img { height: 340px; border-radius: 0; }
+    .mpro-skel-ident { padding: 2.25rem 2.75rem 2rem 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+    .mpro-skel-facts { display: flex; gap: 10px; margin-top: 6px; }
+    .mpro-skel-body { padding: 2rem 2.75rem; display: flex; flex-direction: column; gap: 10px; max-width: 640px; }
+    /* Timeline skeleton */
+    .chrono-skel { padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 2.5rem; }
+    .chrono-skel-era { display: flex; flex-direction: column; gap: 12px; }
+    .chrono-skel-dots { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+    .chrono-skel-dot { width: 80px; height: 96px; border-radius: 8px; }
 
     /* ── MAP CLUSTER ───────────────────────────────── */
     .map-cluster { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.35); cursor: pointer; transition: transform 0.15s; }
@@ -2871,7 +2883,35 @@
     <!-- Timeline View -->
     <div class="m-pane" data-pane="timeline" id="view-timeline" style="display:none">
       <div class="chrono-view" id="chronoView">
-        <div class="loading"><div class="spinner"></div>Loading…</div>
+        <div class="chrono-skel">
+          <div class="chrono-skel-era">
+            <div class="skel-line" style="height:11px;width:40%"></div>
+            <div class="skel-line" style="height:8px;width:60%;margin-top:-4px"></div>
+            <div class="chrono-skel-dots">
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+              <div class="skel-line chrono-skel-dot"></div>
+            </div>
+          </div>
+          <div class="chrono-skel-era">
+            <div class="skel-line" style="height:11px;width:35%"></div>
+            <div class="skel-line" style="height:8px;width:55%;margin-top:-4px"></div>
+            <div class="chrono-skel-dots">
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+              <div class="skel-line chrono-skel-dot"></div>
+            </div>
+          </div>
+          <div class="chrono-skel-era">
+            <div class="skel-line" style="height:11px;width:30%"></div>
+            <div class="skel-line" style="height:8px;width:50%;margin-top:-4px"></div>
+            <div class="chrono-skel-dots">
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+              <div class="skel-line chrono-skel-dot"></div><div class="skel-line chrono-skel-dot"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -4323,7 +4363,45 @@
     const isMobile = window.matchMedia('(max-width: 700px)').matches;
     const modalEl = document.querySelector('#modal .modal');
     if (isMobile && modalEl) modalEl.classList.add('m-profile-mode');
-    document.getElementById('modalInner').innerHTML = `<div style="padding:4rem;text-align:center"><div class="spinner"></div></div>`;
+    document.getElementById('modalInner').innerHTML = isMobile
+      ? `<div class="mpro-skel">
+           <div class="skel-line" style="height:300px;border-radius:0;width:100%"></div>
+           <div class="mpro-skel-ident" style="padding:20px 16px 12px">
+             <div class="skel-line" style="height:10px;width:38%"></div>
+             <div class="skel-line" style="height:26px;width:68%;margin-top:4px"></div>
+             <div class="skel-line" style="height:12px;width:50%"></div>
+           </div>
+           <div class="mpro-skel-body" style="padding:0 16px">
+             <div class="skel-line" style="height:12px;width:100%"></div>
+             <div class="skel-line" style="height:12px;width:92%"></div>
+             <div class="skel-line" style="height:12px;width:85%"></div>
+             <div class="skel-line" style="height:12px;width:97%"></div>
+             <div class="skel-line" style="height:12px;width:63%"></div>
+           </div>
+         </div>`
+      : `<div class="mpro-skel">
+           <div class="mpro-skel-hero">
+             <div class="skel-line mpro-skel-img"></div>
+             <div class="mpro-skel-ident">
+               <div class="skel-line" style="height:10px;width:36%"></div>
+               <div class="skel-line" style="height:28px;width:70%;margin-top:4px"></div>
+               <div class="skel-line" style="height:13px;width:46%"></div>
+               <div class="mpro-skel-facts">
+                 <div class="skel-line chrono-skel-dot" style="flex:1;height:44px;border-radius:6px"></div>
+                 <div class="skel-line chrono-skel-dot" style="flex:1;height:44px;border-radius:6px"></div>
+                 <div class="skel-line chrono-skel-dot" style="flex:1;height:44px;border-radius:6px"></div>
+                 <div class="skel-line chrono-skel-dot" style="flex:1;height:44px;border-radius:6px"></div>
+               </div>
+             </div>
+           </div>
+           <div class="mpro-skel-body">
+             <div class="skel-line" style="height:12px;width:100%"></div>
+             <div class="skel-line" style="height:12px;width:88%"></div>
+             <div class="skel-line" style="height:12px;width:94%"></div>
+             <div class="skel-line" style="height:12px;width:79%"></div>
+             <div class="skel-line" style="height:12px;width:68%"></div>
+           </div>
+         </div>`;
     document.getElementById('modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
     try {
