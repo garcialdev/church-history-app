@@ -33,17 +33,17 @@
       --ink-3:        #9a886f;
       --ink-4:        #6b5c48;
       --ink-5:        #3a2d1e;
-      --accent:       #e8956a;
-      --accent-dim:   #d47e52;
+      --accent:       #dc7a4a;
+      --accent-dim:   #c86840;
       --accent-2:     #9bb888;
-      --accent-glow:  rgba(232,149,106,0.12);
+      --accent-glow:  rgba(220,122,74,0.12);
       --sidebar-bg:   #1f1812;
-      --sidebar-active: rgba(232,149,106,0.12);
+      --sidebar-active: rgba(220,122,74,0.12);
       --sidebar-text: #9a886f;
-      --sidebar-active-text: #e8956a;
+      --sidebar-active-text: #dc7a4a;
       --card-img-bg:  #3a2a1a;
       --stripe-a:     #1f1812;
-      --stripe-b:     rgba(232,149,106,0.14);
+      --stripe-b:     rgba(220,122,74,0.14);
       --gold:         #d9b066;
       --gold-dim:     #8a6e35;
       --gold-glow:    rgba(217,176,102,0.1);
@@ -52,7 +52,7 @@
       --martyr-bg:    rgba(192,57,43,0.13);
       --martyr-fg:    #e88a7a;
       --green:        #9bb888;
-      --era1: #7fa7c4; --era2: #b29ad8; --era3: #e8956a; --era4: #c0502a;
+      --era1: #3e7d8a; --era2: #6d5e8a; --era3: #9a7a32; --era4: #c0502a;
       --radius: 14px; --radius-lg: 18px; --radius-xl: 24px;
       --shadow-sm: 0 1px 4px rgba(0,0,0,0.4);
       --shadow:    0 4px 20px rgba(0,0,0,0.55);
@@ -92,7 +92,7 @@
       --martyr-bg:    rgba(192,57,43,0.08);
       --martyr-fg:    #a93a2a;
       --green:        #6a8558;
-      --era1: #6a8da8; --era2: #8b6ba5; --era3: #b0462b; --era4: #a03d1f;
+      --era1: #2f6a78; --era2: #5a4d76; --era3: #7a5f24; --era4: #9a3822;
       --radius: 14px; --radius-lg: 18px; --radius-xl: 24px;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
       --shadow:    0 4px 16px rgba(0,0,0,0.10);
@@ -195,7 +195,7 @@
     .nav-item.active { background: var(--surface); color: var(--accent); font-weight: 500; box-shadow: var(--shadow-sm); border-left: 3px solid var(--accent); padding-left: calc(1rem - 3px); }
 
     .nav-item-left { display: flex; align-items: center; gap: 8px; }
-    .nav-icon { font-size: 0.85rem; flex-shrink: 0; opacity: 0.75; }
+    .nav-icon { font-size: 0.85rem; flex-shrink: 0; opacity: 0.75; display: inline-block; width: 1.3em; text-align: center; }
     .nav-count {
       font-family: 'JetBrains Mono', ui-monospace, monospace;
       font-size: 0.68rem;
@@ -305,15 +305,6 @@
     }
     .theme-toggle:hover { background: var(--sidebar-active); color: var(--ink-2); }
 
-    .sidebar-tagline {
-      text-align: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      color: var(--ink-4);
-      text-transform: uppercase;
-      padding: 4px 0 2px;
-    }
 
     /* ── MAIN AREA ─────────────────────────────────── */
     .main-area {
@@ -359,7 +350,7 @@
       font-family: 'Inter Tight', sans-serif;
       font-size: 0.84rem;
       padding: 0 38px 0 34px;
-      height: 34px;
+      height: 32px;
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -500,8 +491,8 @@
       transition: opacity 0.18s ease, height 0.18s ease;
     }
     .era-band:hover {
-      border-color: color-mix(in srgb, currentColor 40%, var(--border));
-      transform: translateY(-1px);
+      border-color: color-mix(in srgb, currentColor 45%, var(--border));
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.04);
     }
     .era-band:hover::before { opacity: 1; height: 3px; }
     .era-band.active {
@@ -525,7 +516,7 @@
     }
     .era-band-count {
       font-family: 'Fraunces', 'Cormorant Garamond', serif;
-      font-size: 2.75rem;
+      font-size: 3rem;
       font-weight: 400;
       line-height: 1;
       color: var(--ink);
@@ -573,8 +564,8 @@
     /* ── ARCHIVIST CARD — Hearth ─────────────────── */
     .arch-card {
       background: var(--surface);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius);
+      border: 1px solid color-mix(in srgb, var(--border-light) 70%, transparent);
+      border-radius: 10px;
       padding: 18px;
       cursor: pointer;
       transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease, border-color 200ms ease;
@@ -602,13 +593,13 @@
     }
 
     .arch-card-img {
-      width: 88px; height: 104px;
-      border-radius: 8px;
+      width: 76px; height: 96px;
+      border-radius: 4px;
       object-fit: cover;
       object-position: top center;
       flex-shrink: 0;
       background: var(--card-img-bg);
-      filter: sepia(1) saturate(0.4) contrast(0.85) brightness(0.9);
+      filter: grayscale(0.85) contrast(1.05);
       transition: filter 420ms ease;
     }
     .arch-card:hover .arch-card-img {
@@ -616,9 +607,9 @@
     }
 
     .arch-card-placeholder {
-      width: 88px; height: 104px;
-      border-radius: 8px;
-      background: repeating-linear-gradient(135deg, var(--stripe-a) 0 8px, var(--stripe-b) 8px 16px);
+      width: 76px; height: 96px;
+      border-radius: 4px;
+      background: var(--card-img-bg);
       display: flex; align-items: center; justify-content: center;
       font-family: 'Fraunces', 'Fraunces', 'Cormorant Garamond', serif;
       font-size: 2rem; font-style: italic;
@@ -697,20 +688,25 @@
 
     .belief-tag {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.6rem;
+      font-size: 0.62rem;
       padding: 2px 7px;
-      border-radius: 4px;
-      background: var(--accent-glow);
+      border-radius: 3px;
+      background: transparent;
+      border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
       color: var(--accent);
     }
 
     .martyr-badge {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.04em;
+      font-size: 0.58rem; letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: var(--martyr-fg);
-      background: var(--martyr-bg);
-      padding: 2px 7px;
-      border-radius: 4px;
+      background: transparent;
+      border: 1px solid color-mix(in srgb, var(--martyr-fg) 55%, transparent);
+      padding: 1px 6px;
+      border-radius: 3px;
+      align-self: flex-start;
+      width: fit-content;
     }
 
     /* ── LOADING / EMPTY ──────────────────────────── */
@@ -799,7 +795,7 @@
     .home-hero {
       padding: 44px 52px 48px;
       border-radius: 20px;
-      background: linear-gradient(135deg, var(--bg-alt) 0%, color-mix(in srgb, var(--accent) 8%, var(--bg-alt)) 100%);
+      background: var(--bg-alt);
       border: 1px solid var(--border-light);
       margin-bottom: 36px;
       position: relative;
@@ -858,18 +854,7 @@
       transition: background 0.15s;
     }
     .home-cta-secondary:hover { background: var(--sidebar-active); }
-    .home-hero-watermark {
-      position: absolute;
-      right: -30px; bottom: -50px;
-      font-family: 'Fraunces', serif;
-      font-style: italic;
-      font-size: 14rem;
-      color: var(--accent);
-      opacity: 0.06;
-      line-height: 1;
-      user-select: none;
-      pointer-events: none;
-    }
+    .home-hero-watermark { display: none; }
     .home-section-head {
       display: flex;
       align-items: baseline;
@@ -943,7 +928,7 @@
     .home-featured-placeholder {
       width: 100%; height: 200px;
       border-radius: 8px;
-      background: repeating-linear-gradient(135deg, var(--stripe-a) 0 8px, var(--stripe-b) 8px 16px);
+      background: var(--card-img-bg);
       display: flex; align-items: flex-end; justify-content: flex-start;
       font-family: 'Fraunces', serif; font-style: italic;
       font-size: 3rem; color: var(--ink-4);
@@ -1846,7 +1831,7 @@
       .era-band-label { font-size: 0.72rem; }
       /* Tighter cards */
       .arch-card { padding: 0.85rem; gap: 0.6rem; }
-      .arch-card-img, .arch-card-placeholder { width: 88px; height: 88px; }
+      .arch-card-img, .arch-card-placeholder { width: 72px; height: 72px; }
       .arch-card-name { font-size: 1rem; }
       .arch-card-desc { font-size: 0.83rem; }
       .arch-card-beliefs { display: flex; flex-wrap: wrap; gap: 0.25rem; }
@@ -1978,7 +1963,7 @@
     @keyframes skel-sweep { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .skeleton-card { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 12px; pointer-events: none; }
     .skel-line { border-radius: 4px; background: linear-gradient(90deg, var(--surface-2) 25%, var(--raised) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: skel-sweep 1.4s ease-in-out infinite; }
-    .skel-img { width: 88px; height: 104px; border-radius: var(--radius); flex-shrink: 0; }
+    .skel-img { width: 76px; height: 96px; border-radius: 4px; flex-shrink: 0; }
     .skel-header { display: flex; gap: 12px; align-items: flex-start; }
     .skel-body { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
 
@@ -3157,7 +3142,7 @@
       document.getElementById('nav-persons').textContent = persons.total;
       document.getElementById('nav-events').textContent  = events.total;
       document.getElementById('nav-groups').textContent  = groups.total;
-      document.getElementById('headerCount').textContent = `${total.toLocaleString()} records`;
+      if (total) document.getElementById('headerCount').textContent = `${total.toLocaleString()} records`;
 
       const maxCount = Math.max(...eraRanges.map(e => e.count), 1);
       eraRanges.forEach((era, i) => {
@@ -5223,4 +5208,4 @@
 
 </script>
 </body>
-</html>s
+</html>
