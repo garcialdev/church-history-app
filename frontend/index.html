@@ -907,55 +907,50 @@
       grid-template-columns: 1.4fr 1fr;
       gap: 18px;
     }
+    /* Featured figure — editorial split: full-height portrait + centered content */
     .home-featured {
-      padding: 22px;
-      border-radius: 16px;
-      background: var(--surface);
+      display: grid; grid-template-columns: 210px 1fr; gap: 0;
+      padding: 0; border-radius: 16px;
       border: 1px solid var(--border-light);
-      display: flex;
-      gap: 20px;
-      cursor: pointer;
+      background: var(--surface); overflow: hidden; align-items: stretch;
       transition: box-shadow 0.15s;
     }
     .home-featured:hover { box-shadow: var(--shadow); }
-    .home-featured-img {
-      width: 140px; height: 180px;
-      border-radius: 8px;
-      object-fit: cover;
-      object-position: top center;
-      flex-shrink: 0;
+    .home-featured-media {
+      position: relative; background: var(--card-img-bg);
+      overflow: hidden; cursor: pointer; min-height: 280px;
     }
-    .home-featured-placeholder {
-      width: 100%; height: 200px;
-      border-radius: 8px;
-      background: var(--card-img-bg);
-      display: flex; align-items: flex-end; justify-content: flex-start;
-      font-family: 'Fraunces', serif; font-style: italic;
-      font-size: 3rem; color: var(--ink-4);
-      flex-shrink: 0; position: relative; overflow: hidden; cursor: pointer;
+    .home-featured-media img {
+      width: 100%; height: 100%; object-fit: cover; object-position: top center;
+      display: block; filter: grayscale(0.85) contrast(1.05); transition: filter 420ms ease;
     }
-    .home-featured-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--accent);
-      margin-bottom: 6px;
+    .home-featured:hover .home-featured-media img { filter: none; }
+    .home-featured-initial {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 300; font-size: 6rem; color: var(--accent); opacity: 0.5;
+      background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%);
     }
-    .home-featured-name {
-      font-family: 'Fraunces', serif;
-      font-size: 1.7rem; font-weight: 500; line-height: 1.1;
+    .home-featured-content {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 26px 30px; min-width: 0;
     }
+    .home-featured-title {
+      font-family: 'Fraunces', 'Cormorant Garamond', serif; font-weight: 400;
+      font-size: 2rem; line-height: 1.05; letter-spacing: -0.01em;
+      margin: 10px 0 4px; cursor: pointer;
+    }
+    .home-featured-title:hover { text-decoration: underline; text-underline-offset: 3px; }
     .home-featured-role {
-      font-family: 'Fraunces', serif; font-style: italic;
-      font-size: 0.9rem; color: var(--ink-3); margin-top: 2px;
+      font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic;
+      font-size: 1rem; color: var(--ink-3); margin: 0 0 12px;
     }
-    .home-featured-desc {
-      font-family: 'Fraunces', serif;
-      font-size: 0.9rem; color: var(--ink-2);
-      line-height: 1.6; margin: 10px 0 0;
-      display: -webkit-box; -webkit-line-clamp: 4;
-      -webkit-box-orient: vertical; overflow: hidden;
+    .home-featured-bio {
+      font-family: 'Fraunces', 'EB Garamond', Georgia, serif;
+      font-size: 0.98rem; color: var(--ink-2); line-height: 1.65; margin: 0;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .home-featured-cta { margin-top: 14px; font-size: 0.82rem; color: var(--accent); font-family: 'Inter Tight', sans-serif; }
+    .home-featured-cta { margin-top: 16px; font-size: 0.85rem; color: var(--accent); font-family: 'Inter Tight', sans-serif; background: none; border: none; cursor: pointer; padding: 0; text-align: left; }
     .home-sidebar-panel {
       padding: 22px;
       border-radius: 16px;
@@ -1021,20 +1016,6 @@
     /* Era card sub-elements */
     .home-era-icon { font-size: 1.4rem; margin-bottom: 8px; }
 
-    /* Featured figure (column layout in the grid) */
-    .home-featured { flex-direction: column; }
-    .home-featured-overlay {
-      padding: 10px 14px; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
-      border-radius: 0 0 8px 8px; margin-top: -40px; position: relative;
-      color: #fff;
-    }
-    .home-featured-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; opacity: 0.7; margin-top: 2px; }
-    .home-featured-title {
-      font-family: 'Fraunces', serif; font-weight: 400;
-      font-size: 1.4rem; margin: 12px 0 6px; cursor: pointer;
-    }
-    .home-featured-title:hover { text-decoration: underline; text-underline-offset: 3px; }
-    .home-featured-bio { font-family: 'Fraunces', serif; font-size: 0.9rem; color: var(--ink-2); line-height: 1.6; margin: 0; }
 
     /* OTD button */
     .home-otd-btn {
@@ -1727,6 +1708,91 @@
     .mpro-quote { position: relative; border-left: 3px solid var(--gold-dim); padding: 1.25rem 1.5rem 1.25rem 1.75rem; background: var(--gold-glow); color: var(--ink-2); font-family: 'Fraunces', 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; line-height: 1.7; white-space: pre-wrap; border-radius: 0 var(--radius) var(--radius) 0; }
     .mpro-quote::before { content: '\201C'; position: absolute; top: -0.5rem; left: 0.75rem; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 5rem; line-height: 1; color: var(--gold); opacity: 0.18; pointer-events: none; }
 
+    /* ── Modal v2 — per-figure era accent + livelier body ──────────────── */
+    .mpro-root { --fig-accent: var(--accent); }
+    .mpro-root .mpro-hero { position: relative; }
+    .mpro-root .mpro-hero::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+      background: linear-gradient(90deg, var(--fig-accent) 0%, transparent 55%);
+      opacity: 0.6; pointer-events: none;
+    }
+    .mpro-root .mpro-badge { color: var(--fig-accent); }
+    .mpro-root .graph-btn {
+      border: 1px solid color-mix(in srgb, var(--fig-accent) 38%, var(--border));
+      color: var(--fig-accent); border-radius: 999px; padding: 0.4rem 0.9rem;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    }
+    .mpro-root .graph-btn:hover { background: var(--fig-accent); color: #fff; border-color: var(--fig-accent); }
+    .mpro-root .mpro-facts {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      border: none; border-radius: 0; overflow: visible; margin-top: 0.5rem;
+    }
+    .mpro-root .mpro-fact {
+      flex: 1; min-width: 96px; padding: 12px 14px 13px;
+      background: var(--surface-2); border: 1px solid var(--border-light);
+      border-radius: 10px; position: relative; overflow: hidden;
+    }
+    .mpro-root .mpro-fact::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--fig-accent); opacity: 0.55;
+    }
+    .mpro-root .mpro-fact-label { color: var(--fig-accent); opacity: 1; }
+    .mpro-root .mpro-fact-value {
+      display: block; margin-top: 4px; font-size: 1.4rem; line-height: 1.05;
+      color: var(--ink); letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
+    }
+    .mpro-root .mpro-overview-label { color: var(--fig-accent); }
+    .mpro-root .mpro-overview-text::first-letter {
+      float: left; font-family: 'Fraunces', 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 500; font-size: 3.3rem; line-height: 0.74;
+      padding: 0.08em 0.1em 0 0; color: var(--fig-accent);
+    }
+    .mpro-root .mpro-section-head { display: flex; align-items: center; gap: 9px; }
+    .mpro-root .mpro-section-head::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--fig-accent); flex-shrink: 0;
+    }
+    .mpro-root .mpro-side-label { color: var(--fig-accent); }
+    .mpro-root .mpro-sidebar .belief-tag {
+      border-color: color-mix(in srgb, var(--fig-accent) 45%, transparent);
+      color: var(--fig-accent);
+    }
+    .mpro-quotes { display: flex; flex-direction: column; gap: 14px; }
+    .mpro-q {
+      position: relative; margin: 0; padding: 20px 24px 18px 30px;
+      background: var(--surface-2); border: 1px solid var(--border-light);
+      border-left: 3px solid var(--fig-accent, var(--gold-dim));
+      border-radius: 0 12px 12px 0;
+    }
+    .mpro-q::before {
+      content: '\201C'; position: absolute; top: 2px; left: 9px;
+      font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 3.1rem;
+      line-height: 1; color: var(--fig-accent, var(--gold)); opacity: 0.24; pointer-events: none;
+    }
+    .mpro-q-text {
+      margin: 0; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 1.2rem; line-height: 1.6; color: var(--ink);
+    }
+    .mpro-q-cite {
+      display: block; margin-top: 11px; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fig-accent, var(--ink-3));
+    }
+    @keyframes mproRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    .mpro-root .mpro-section { animation: mproRise 0.5s ease both; }
+    .mpro-root .mpro-content > .mpro-section:nth-child(1) { animation-delay: 0.04s; }
+    .mpro-root .mpro-content > .mpro-section:nth-child(2) { animation-delay: 0.10s; }
+    .mpro-root .mpro-content > .mpro-section:nth-child(3) { animation-delay: 0.16s; }
+    .mpro-root .mpro-content > .mpro-section:nth-child(4) { animation-delay: 0.22s; }
+    .mpro-root .mpro-content > .mpro-section:nth-child(n+5) { animation-delay: 0.28s; }
+    .mpro-quotes .mpro-q { animation: mproRise 0.5s ease both; }
+    .mpro-quotes .mpro-q:nth-child(2) { animation-delay: 0.08s; }
+    .mpro-quotes .mpro-q:nth-child(3) { animation-delay: 0.16s; }
+    .mpro-quotes .mpro-q:nth-child(n+4) { animation-delay: 0.22s; }
+    @media (prefers-reduced-motion: reduce) {
+      .mpro-root .mpro-section, .mpro-quotes .mpro-q { animation: none; }
+    }
+
     /* Related figures */
     .mpro-related { border-top: 1px solid var(--border); padding: 1.75rem 2.25rem 2.25rem; background: var(--surface-2); }
     .mpro-related-head { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-4); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-light); margin-bottom: 1.25rem; }
@@ -1762,6 +1828,9 @@
       /* Show hamburger in topbar */
       .topbar-hamburger { display: flex; }
       .card-grid { grid-template-columns: 1fr; }
+      .home-feature-grid { grid-template-columns: 1fr; }
+      .home-featured { grid-template-columns: 150px 1fr; }
+      .home-featured-media { min-height: 0; }
       .mpro-hero { grid-template-columns: 120px 1fr; }
       .mpro-hero-img-wrap { grid-row: 1; aspect-ratio: 3/4; overflow: hidden; }
       .mpro-hero-ident { grid-column: 2; grid-row: 1; padding: 1rem 2.5rem 0.75rem 1rem; }
@@ -2512,7 +2581,7 @@
   }
   .m-profile-hero-text {
     position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 0 20px 20px; z-index: 2;
+    padding: 0 20px 20px; z-index: 4;
   }
   .m-profile-hero-meta {
     font-family: 'JetBrains Mono', monospace;
@@ -3169,11 +3238,14 @@
     try {
       const [eraRes, randomRes] = await Promise.all([
         fetch(`${API}/era-ranges`),
-        fetch(`${API}/figures?page_size=1&sort=random`)
+        fetch(`${API}/figures?page_size=50&sort=name_asc`)
       ]);
       const eras = await eraRes.json();
       const randomData = await randomRes.json();
-      const featured = randomData.items?.[0];
+      const pool = (randomData.results || []).filter(f => f.image_url && f.short_description);
+      const featured = pool[Math.floor(Math.random() * pool.length)]
+        || (randomData.results || []).find(f => f.image_url)
+        || (randomData.results || [])[0];
 
       const eraNames = ERAS.map(e => e.name);
       const eraIcons = ERAS.map(e => e.icon);
@@ -3197,16 +3269,18 @@
         ${featured ? `
         <div class="home-feature-grid">
           <div class="home-featured">
-            <div class="home-section-eyebrow">Featured Figure</div>
-            <div class="home-featured-placeholder" onclick="openFigure(${featured.id})">
-              <div class="home-featured-overlay">
-                <div class="home-featured-name">${featured.name}</div>
-                <div class="home-featured-meta">${featured.birth_year ? `b. ${featured.birth_year}` : ''} ${featured.type || ''}</div>
-              </div>
+            <div class="home-featured-media" onclick="openFigure(${featured.id})">
+              ${featured.image_url
+                ? `<img src="${featured.image_url}" alt="${featured.name}" loading="lazy" onerror="this.outerHTML='<div class=\\'home-featured-initial\\'>${(featured.name||'?').charAt(0)}</div>'">`
+                : `<div class="home-featured-initial">${(featured.name||'?').charAt(0)}</div>`}
             </div>
-            <h3 class="home-featured-title" onclick="openFigure(${featured.id})">${featured.name}</h3>
-            <p class="home-featured-bio">${(featured.biography || 'No biography available.').slice(0, 200)}…</p>
-            <button class="home-featured-cta" onclick="openFigure(${featured.id})">Read more →</button>
+            <div class="home-featured-content">
+              <div class="home-section-eyebrow">Featured Figure</div>
+              <h3 class="home-featured-title" onclick="openFigure(${featured.id})">${featured.name}</h3>
+              ${featured.role_office ? `<p class="home-featured-role">${featured.role_office}</p>` : ''}
+              <p class="home-featured-bio">${(featured.short_description || featured.long_biography || '').slice(0, 280)}${(featured.short_description || featured.long_biography || '').length > 280 ? '…' : ''}</p>
+              <button class="home-featured-cta" onclick="openFigure(${featured.id})">Read more →</button>
+            </div>
           </div>
           <div class="home-sidebar-panel">
             <div class="home-otd-card">
@@ -4305,7 +4379,7 @@
     if (f.major_works)           sections.push(mprosec('Major Works',     `<div class="mpro-text">${f.major_works}</div>`));
     if (f.associated_movements)  sections.push(mprosec('Movements',       `<div class="mpro-text">${f.associated_movements}</div>`));
     if (f.scripture_references)  sections.push(mprosec('Scripture',       `<div class="mpro-text">${f.scripture_references}</div>`));
-    if (f.famous_quotes)         sections.push(mprosec('Famous Quotes',   `<blockquote class="mpro-quote">${f.famous_quotes}</blockquote>`));
+    if (f.famous_quotes)         sections.push(mprosec('Famous Quotes',   renderQuotes(f.famous_quotes)));
     if (f.notes)                 sections.push(mprosec('Notes',           `<div class="md-prose">${renderMarkdown(f.notes)}</div>`));
 
     // Sidebar
@@ -4335,7 +4409,11 @@
 
     const hasBody = sections.length || sideHtml;
 
+    const eraIdx = getEraFromCentury(century);
+    const figAccent = eraIdx >= 0 ? `var(${ERAS[eraIdx].cssVar})` : 'var(--accent)';
+
     return `
+      <div class="mpro-root" style="--fig-accent:${figAccent}">
       <div class="mpro-hero">
         <div class="mpro-hero-img-wrap">
           ${imgHtml}
@@ -4360,11 +4438,26 @@
         <div class="mpro-content">${sections.join('')}</div>
         ${sideHtml ? `<div class="mpro-sidebar">${sideHtml}</div>` : ''}
       </div>` : ''}
-      ${relatedHtml}`;
+      ${relatedHtml}</div>`;
   }
 
   function mprosec(title, content) {
     return `<div class="mpro-section"><h3 class="mpro-section-head">${title}</h3>${content}</div>`;
+  }
+
+  function renderQuotes(raw) {
+    const blocks = String(raw).split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+    const lines = blocks.length > 1 ? blocks : String(raw).split(/\n/).map(s => s.trim()).filter(Boolean);
+    const list = lines.length ? lines : [String(raw).trim()];
+    const items = list.map(line => {
+      const m = line.match(/^[“”"'](.+?)[“”"']\s*[—–-]?\s*(.*)$/s);
+      let text, cite;
+      if (m) { text = m[1].trim(); cite = (m[2] || '').trim(); }
+      else { text = line.replace(/^[“”"']+|[“”"']+$/g, '').trim(); cite = ''; }
+      if (!text) return '';
+      return `<figure class="mpro-q"><p class="mpro-q-text">“${text}”</p>${cite ? `<figcaption class="mpro-q-cite">${cite}</figcaption>` : ''}</figure>`;
+    }).join('');
+    return `<div class="mpro-quotes">${items}</div>`;
   }
 
   function renderMobileProfile(f, related = []) {
@@ -4406,7 +4499,7 @@
       f.long_biography   && { t: 'Biography',    h: `<div class="md-prose">${renderMarkdown(f.long_biography)}</div>` },
       f.key_life_events  && { t: 'Key Events',   h: `<div class="md-prose">${renderMarkdown(f.key_life_events)}</div>` },
       f.primary_contributions && { t: 'Contributions', h: `<p class="m-profile-desc" style="margin:0">${f.primary_contributions}</p>` },
-      f.famous_quotes    && { t: 'Famous Quotes', h: `<blockquote class="mpro-quote">${f.famous_quotes}</blockquote>` },
+      f.famous_quotes    && { t: 'Famous Quotes', h: renderQuotes(f.famous_quotes) },
     ].filter(Boolean).map(s =>
       `<div class="m-profile-section"><div class="m-profile-section-head">${s.t}</div>${s.h}</div>`
     ).join('');
