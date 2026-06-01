@@ -456,6 +456,14 @@
       display: flex;
       flex-direction: column;
     }
+    /* On desktop, #view-map lives inside .m-pager which is the direct flex child.
+       .m-pager must grow to fill content-area before #view-map can flex inside it. */
+    .content-area.view-map-active .m-pager {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
     .content-area::-webkit-scrollbar { width: 5px; }
     .content-area::-webkit-scrollbar-track { background: transparent; }
     .content-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -1495,6 +1503,7 @@
 
     /* ── MAP VIEW ─────────────────────────────────── */
     #view-map { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 0; min-height: 0; }
+    .m-map-wrap { display: flex; flex-direction: column; flex: 1; min-height: 0; position: relative; }
     .map-layout { display: flex; flex: 1; overflow: hidden; min-height: 0; }
     .map-canvas-wrap { flex: 1; position: relative; overflow: hidden; min-height: 0; }
     #mapContainer { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -2039,6 +2048,8 @@
     /* ── MAP CLUSTER ───────────────────────────────── */
     .map-cluster { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 2px 8px rgba(0,0,0,0.35); cursor: pointer; transition: transform 0.15s; }
     .map-cluster:hover { transform: scale(1.15); }
+    @keyframes pinPop { 0% { opacity: 0; transform: scale(0.2); } 70% { transform: scale(1.18); } 100% { opacity: 1; transform: scale(1); } }
+    .map-pin-anim { animation: pinPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
 
     /* ── FILTER PILLS ──────────────────────────────── */
     .filter-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.7rem; }
@@ -2478,6 +2489,7 @@
     display: flex !important;
     flex-direction: column;
     overflow: hidden;
+    padding: 0 !important;
   }
   .m-pager .m-map-wrap {
     flex: 1;
@@ -3169,12 +3181,15 @@
       window.addEventListener('scroll', chronoScrollListener);
       if (!timelineLoaded) loadChronoView(); else setTimeout(applyChronoFocus, 50);
     }
-    // Map needs zero-padding flex content-area to fill height correctly (desktop only)
+    // Map needs zero-padding flex content-area to fill height correctly (desktop only).
+    // IMPORTANT: apply the class BEFORE loadMap() so Leaflet measures the final layout.
     const ca = document.getElementById('contentArea');
     if (ca) ca.classList.toggle('view-map-active', view === 'map' && window.innerWidth > 700);
 
     if (view === 'map') {
-      loadMap();
+      // Double rAF ensures the browser has reflowed the view-map-active layout
+      // change before Leaflet initializes its canvas or calls invalidateSize.
+      requestAnimationFrame(() => requestAnimationFrame(() => loadMap()));
     }
   }
 
@@ -3699,12 +3714,13 @@
   let mapShowDeath = false;
   let selectedMapFigId = null;
 
-  function makeEraPin(color, selected = false) {
+  function makeEraPin(color, selected = false, name = null, delay = '0ms') {
     const size = selected ? 20 : 14;
     const ring = selected ? `box-shadow:0 0 0 4px ${color}55, 0 2px 8px rgba(0,0,0,0.3);` : `box-shadow:0 1px 4px rgba(0,0,0,0.25);`;
+    const anim = `animation:pinPop 0.35s cubic-bezier(0.34,1.56,0.64,1) ${delay} both`;
     return L.divIcon({
       className: '',
-      html: `<div style="width:${size}px;height:${size}px;background:${color};border:2px solid rgba(255,255,255,0.9);border-radius:50%;${ring}cursor:pointer;transition:all .2s"></div>`,
+      html: `<div style="width:${size}px;height:${size}px;background:${color};border:2px solid rgba(255,255,255,0.9);border-radius:50%;${ring}cursor:pointer;transition:transform .2s;${anim}"></div>`,
       iconSize: [size, size], iconAnchor: [size/2, size/2]
     });
   }
@@ -3755,12 +3771,14 @@
       return true;
     });
 
+    const isMobile = window.matchMedia('(max-width:700px)').matches;
+    const batchMarkers = [];
     let plotted = 0;
-    filtered.forEach(f => {
+
+    filtered.forEach((f, idx) => {
       const eraIdx = f.century ? getEraFromCenturyStr(f.century) : 3;
       const color = MAP_ERA_COLORS[eraIdx] || MAP_ERA_COLORS[3];
 
-      // Birth place marker — accepts both "lat;lng" and "lat,lng" formats
       if (f.birthplace) {
         const sep = f.birthplace.includes(';') ? ';' : ',';
         const parts = f.birthplace.split(sep);
@@ -3768,12 +3786,14 @@
           const lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
           if (!isNaN(lat) && !isNaN(lng)) {
             const isSelected = f.id === selectedMapFigId;
-            const markerIcon = window.matchMedia('(max-width:700px)').matches
-              ? L.divIcon({ className: '', iconSize: [16,16], iconAnchor: [8,8], html: `<div class="m-map-pin" style="--era-tint:${color}"></div>` })
-              : makeEraPin(color, isSelected);
+            const delay = `${Math.min(idx * 6, 400)}ms`;
+            const markerIcon = isMobile
+              ? L.divIcon({ className: '', iconSize: [16,16], iconAnchor: [8,8],
+                  html: `<div class="m-map-pin map-pin-anim" style="--era-tint:${color};animation-delay:${delay}"></div>` })
+              : makeEraPin(color, isSelected, null, delay);
             const marker = L.marker([lat, lng], { icon: markerIcon, zIndexOffset: isSelected ? 1000 : 0 });
             marker.on('click', () => {
-              if (window.matchMedia('(max-width:700px)').matches) {
+              if (isMobile) {
                 document.querySelectorAll('.m-map-pin').forEach(p => p.classList.remove('is-selected'));
                 marker.getElement()?.querySelector('.m-map-pin')?.classList.add('is-selected');
                 showMobileMapCard(f);
@@ -3784,14 +3804,16 @@
             marker.bindTooltip(f.name, { permanent: false, direction: 'top', offset: [0, -8], className: 'map-pin-tip' });
             marker.on('mouseover', function() { const inner = this.getElement()?.querySelector('div'); if (inner) inner.style.transform = 'scale(1.5)'; });
             marker.on('mouseout',  function() { const inner = this.getElement()?.querySelector('div'); if (inner) inner.style.transform = ''; });
-            clusterGroup.addLayer(marker);
+            batchMarkers.push(marker);
             mapMarkers.push(marker);
             plotted++;
           }
         }
       }
-
     });
+
+    // addLayers() is far faster than individual addLayer() calls — one redraw pass
+    clusterGroup.addLayers(batchMarkers);
 
     const countEl = document.getElementById('mapCount');
     if (countEl) countEl.textContent = `${plotted} plotted`;
@@ -3799,24 +3821,24 @@
 
   async function selectMapFigure(id) {
     selectedMapFigId = id;
-    // Redraw markers to show selection ring
-    renderMapPins();
 
     const panel = document.getElementById('mapSidePanel');
     if (!panel) return;
+
+    // Show spinner immediately
+    panel.classList.remove('map-panel-pop');
     panel.innerHTML = `<div class="map-side-empty"><div class="spinner"></div></div>`;
+    if (window.innerWidth <= 700) panel.classList.add('map-panel-open');
+
+    // Defer the pin redraw so it doesn't race with the fetch
+    setTimeout(() => renderMapPins(), 0);
 
     try {
       const [f, related] = await Promise.all([
         fetch(`${API}/figures/${id}`).then(r => r.json()),
         fetch(`${API}/figures/${id}/related`).then(r => r.json()).catch(() => [])
       ]);
-      panel.classList.add('map-panel-pop');
       panel.innerHTML = `<div class="map-panel-handle" onclick="if(window.innerWidth<=700)document.getElementById('mapSidePanel').classList.remove('map-panel-open')"></div>` + renderMapCard(f, related);
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        panel.classList.remove('map-panel-pop');
-        if (window.innerWidth <= 700) panel.classList.add('map-panel-open');
-      }));
     } catch(e) {
       panel.innerHTML = `<div class="map-side-empty"><p>Failed to load figure.</p></div>`;
     }
@@ -3827,7 +3849,7 @@
     const eraColor = MAP_ERA_COLORS[eraIdx];
     const century = f.century || deriveCentury(f.born, f.death);
     const centuryLabel = century ? `${century} C.` : '';
-    const eraLabel = eraNames[eraIdx] || '';
+    const eraLabel = ERAS[eraIdx]?.name || '';
 
     const heroHtml = f.image_url
       ? `<img src="${f.image_url}" alt="${f.name}" onerror="this.parentElement.style.backgroundImage='none'">`
@@ -3954,23 +3976,44 @@
           document.querySelectorAll('.m-map-pin').forEach(p => p.classList.remove('is-selected'));
         }
       });
+      // ResizeObserver fires whenever the container physically changes size —
+      // handles pager transitions, orientation changes, and CSS layout updates
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(() => {
+          if (mapInstance) mapInstance.invalidateSize({ animate: false });
+        }).observe(document.getElementById('mapContainer'));
+      }
       mapLoaded = true;
     }
-    setTimeout(() => mapInstance && mapInstance.invalidateSize(), 80);
-    setTimeout(() => mapInstance && mapInstance.invalidateSize(), 220);
+    // Staggered invalidations to catch pager slide animation at every stage
+    [80, 220, 380, 600].forEach(ms =>
+      setTimeout(() => mapInstance && mapInstance.invalidateSize({ animate: false }), ms)
+    );
 
     if (allMapFigures.length === 0) {
+      // Serve from cache immediately, then refresh in the background
+      const CACHE_KEY = 'ecclesia_map_figures_v1';
       try {
-        allMapFigures = await fetch(`${API}/figures/map`).then(r => r.json());
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          allMapFigures = JSON.parse(cached);
+          renderMapPins(); // instant render from cache
+        }
+      } catch(e) {}
+      try {
+        const fresh = await fetch(`${API}/figures/map`).then(r => r.json());
+        const changed = JSON.stringify(fresh) !== JSON.stringify(allMapFigures);
+        allMapFigures = fresh;
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(fresh)); } catch(e) {}
+        if (changed) renderMapPins(); // re-render only if data changed
       } catch(e) {
-        console.error('Map error', e); return;
+        if (!allMapFigures.length) { console.error('Map error', e); return; }
       }
+    } else {
+      renderMapPins();
     }
-    renderMapPins();
     if (window.matchMedia('(max-width:700px)').matches) {
       initMobileMapEraRail();
-      // Invalidate after pager animation completes (340ms transition)
-      setTimeout(() => mapInstance && mapInstance.invalidateSize(), 380);
     }
   }
 
