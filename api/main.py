@@ -309,9 +309,9 @@ def list_filter_options(db: Session = Depends(get_db)):
 
 # ── ADMIN ROUTES ──────────────────────────────────────────────────────────────
 
-import csv, io
+import csv, io, base64, datetime
 from fastapi import Header
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, HTMLResponse
 from config import ADMIN_PASSWORD, create_token, validate_token, revoke_token
 from queries import (
     admin_get_all_figures, admin_get_figure, admin_create_figure,
@@ -481,23 +481,37 @@ def admin_delete_belief_route(belief_id: int, db: Session = Depends(get_db), _=D
     admin_delete_belief(db, belief_id)
     return {"status": "deleted"}
 
+ALL_EXPORT_COLUMNS = [
+    "id", "name", "type", "gender", "century", "born", "death",
+    "era_type", "role_office", "denomination_tradition",
+    "short_description", "alternative_names", "birthplace",
+    "primary_region", "is_martyr", "believer_saved",
+    "wikipedia_name", "cached_image_url", "beliefs",
+]
+
 @app.get("/admin/export/csv")
-def export_figures_csv(db: Session = Depends(get_db), _=Depends(require_admin)):
+def export_figures_csv(
+    fields: Optional[str] = None,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
     figures = admin_get_all_figures(db)
-    beliefs_map = get_all_beliefs_grouped(db)
-    columns = [
-        "id", "name", "type", "gender", "century", "born", "death",
-        "era_type", "role_office", "denomination_tradition",
-        "short_description", "alternative_names", "birthplace",
-        "primary_region", "is_martyr", "believer_saved",
-        "wikipedia_name", "cached_image_url", "beliefs",
-    ]
+    needs_beliefs = fields is None or "beliefs" in fields.split(",")
+    beliefs_map = get_all_beliefs_grouped(db) if needs_beliefs else {}
+
+    if fields:
+        requested = [f.strip() for f in fields.split(",")]
+        columns = [c for c in ALL_EXPORT_COLUMNS if c in requested]
+    else:
+        columns = ALL_EXPORT_COLUMNS
+
     output = io.StringIO()
     writer = csv.DictWriter(output, fieldnames=columns, extrasaction="ignore")
     writer.writeheader()
     for f in figures:
         row = dict(f)
-        row["beliefs"] = "; ".join(beliefs_map.get(f["id"], []))
+        if "beliefs" in columns:
+            row["beliefs"] = "; ".join(beliefs_map.get(f["id"], []))
         writer.writerow(row)
     output.seek(0)
     return StreamingResponse(
@@ -505,3 +519,193 @@ def export_figures_csv(db: Session = Depends(get_db), _=Depends(require_admin)):
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=ecclesia_export.csv"},
     )
+
+
+def _esc(s) -> str:
+    return (str(s or "")
+        .replace("&", "&amp;").replace("<", "&lt;")
+        .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def _image_src(url: str) -> str:
+    if not url:
+        return ""
+    if "/uploads/" in url:
+        filepath = UPLOADS_DIR / url.split("/uploads/")[-1]
+        if filepath.exists():
+            ext = filepath.suffix.lstrip(".").lower()
+            mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
+            try:
+                return f"data:{mime};base64,{base64.b64encode(filepath.read_bytes()).decode()}"
+            except Exception:
+                pass
+    return url
+
+
+@app.get("/admin/export/report", response_class=HTMLResponse)
+def export_figures_report(
+    fields: Optional[str] = None,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    figures = list(admin_get_all_figures(db))
+    beliefs_map = get_all_beliefs_grouped(db)
+
+    requested = set(fields.split(",")) if fields else set(ALL_EXPORT_COLUMNS)
+    requested.add("name")
+
+    include_img = "cached_image_url" in requested
+    today = datetime.date.today().strftime("%B %d, %Y")
+    total = len(figures)
+
+    cards = []
+    for f in figures:
+        name = _esc(f.get("name") or "—")
+        ftype = f.get("type") or ""
+        bcls = ftype.lower() if ftype in ("Person", "Event", "Group") else "x"
+
+        src = _image_src(f["cached_image_url"]) if include_img and f.get("cached_image_url") else ""
+        initial = (f.get("name") or "?")[0].upper()
+        img_html = (f'<div class="ci"><img src="{src}" alt="" /></div>' if src
+                    else f'<div class="ci cin"><span>{initial}</span></div>')
+
+        meta = []
+        if "century" in requested and f.get("century"):
+            meta.append(_esc(f["century"]) + " cent.")
+        if "born" in requested and f.get("born"):
+            meta.append(f"b.&thinsp;{f['born']}")
+        if "death" in requested and f.get("death"):
+            meta.append(f"d.&thinsp;{f['death']}")
+
+        meta_inner = (f'<span class="b b-{bcls}">{_esc(ftype)}</span>' if "type" in requested and ftype else "")
+        meta_inner += (f'<span class="cd">{" &middot; ".join(meta)}</span>' if meta else "")
+        meta_block = f'<div class="cm">{meta_inner}</div>' if meta_inner else ""
+
+        role   = f'<div class="cr">{_esc(f["role_office"])}</div>'              if "role_office"            in requested and f.get("role_office")            else ""
+        denom  = f'<div class="cde">{_esc(f["denomination_tradition"])}</div>'  if "denomination_tradition" in requested and f.get("denomination_tradition") else ""
+        desc   = f'<p class="cdesc">{_esc(f["short_description"])}</p>'         if "short_description"      in requested and f.get("short_description")      else ""
+
+        beliefs_list = beliefs_map.get(f["id"], [])
+        tags   = (f'<div class="ctags">{"".join(f"<span class=tag>{_esc(b)}</span>" for b in beliefs_list)}</div>'
+                  if "beliefs" in requested and beliefs_list else "")
+
+        flags = ""
+        if "is_martyr" in requested and f.get("is_martyr") == "Yes":
+            flags += '<span class="fl flm">Martyr</span>'
+        if "believer_saved" in requested and f.get("believer_saved") == "Yes":
+            flags += '<span class="fl fls">Saved</span>'
+        flags = f'<div class="cfl">{flags}</div>' if flags else ""
+
+        cards.append(f"""<div class="card">{img_html}<div class="cb"><div class="ch"><h2 class="cn">{name}</h2>{meta_block}</div>{role}{denom}{desc}{tags}{flags}</div></div>""")
+
+    return HTMLResponse(content=_build_report_html(today, total, "\n".join(cards)))
+
+
+def _build_report_html(today: str, total: int, cards_html: str) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Archivist — Ecclesia Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{{--bg:#08080d;--s:#13131f;--s2:#1a1a2a;--bdr:#2a2a42;--bdr2:#1e1e32;--ink:#e8e4f0;--ink2:#b0aac8;--ink3:#706a88;--acc:#d4903a;--red:#c0392b;--grn:#5a9a6a;--blu:#6db3d4;}}
+*,*::before,*::after{{box-sizing:border-box;margin:0;padding:0;}}
+html{{background:var(--bg);color:var(--ink);font-family:'EB Garamond',Georgia,serif;font-size:15px;}}
+.topbar{{background:var(--s);border-bottom:1px solid var(--bdr);padding:.55rem 1.5rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:10;}}
+.topbar-note{{font-family:'DM Mono',monospace;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-right:auto;}}
+.btn{{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;padding:.42rem 1rem;border:none;cursor:pointer;border-radius:2px;}}
+.btn-print{{background:var(--acc);color:#1a0e00;}}
+.btn-print:hover{{background:#e8a050;}}
+.hdr{{padding:2rem 2.5rem 1.75rem;border-bottom:1px solid var(--bdr);display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:linear-gradient(180deg,#0a0a18,var(--bg));}}
+.hdr-logo{{font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-style:italic;font-weight:600;color:var(--ink);line-height:1;}}
+.hdr-div{{color:var(--acc);font-size:.65rem;letter-spacing:.25em;display:block;margin:.25rem 0;}}
+.hdr-sub{{font-family:'DM Mono',monospace;font-size:.55rem;text-transform:uppercase;letter-spacing:.2em;color:var(--ink3);}}
+.hdr-meta{{font-family:'DM Mono',monospace;font-size:.58rem;text-align:right;color:var(--ink3);line-height:1.9;}}
+.hdr-meta strong{{color:var(--acc);}}
+.body{{padding:1.75rem 2rem;}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem;}}
+.card{{background:var(--s);border:1px solid var(--bdr);display:flex;overflow:hidden;transition:border-color .18s;}}
+.card:hover{{border-color:var(--acc);}}
+.ci{{width:86px;flex-shrink:0;background:var(--s2);overflow:hidden;display:flex;align-items:center;justify-content:center;align-self:stretch;}}
+.ci img{{width:100%;height:100%;object-fit:cover;display:block;}}
+.cin{{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-style:italic;font-weight:600;color:var(--ink3);}}
+.cb{{flex:1;padding:.8rem .95rem;display:flex;flex-direction:column;gap:.28rem;min-width:0;}}
+.ch{{display:flex;flex-direction:column;gap:.18rem;}}
+.cn{{font-family:'Cormorant Garamond',serif;font-size:1.08rem;font-weight:600;color:var(--ink);line-height:1.25;}}
+.cm{{display:flex;align-items:center;flex-wrap:wrap;gap:.35rem;}}
+.b{{font-family:'DM Mono',monospace;font-size:.52rem;padding:.1rem .42rem;letter-spacing:.06em;text-transform:uppercase;}}
+.b-person{{background:rgba(109,179,212,.13);color:var(--blu);}}
+.b-event{{background:rgba(212,144,58,.12);color:var(--acc);}}
+.b-group{{background:rgba(90,154,106,.13);color:var(--grn);}}
+.b-x{{background:var(--s2);color:var(--ink3);}}
+.cd{{font-family:'DM Mono',monospace;font-size:.56rem;color:var(--ink3);}}
+.cr{{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--acc);text-transform:uppercase;letter-spacing:.06em;}}
+.cde{{font-family:'DM Mono',monospace;font-size:.56rem;color:var(--ink3);}}
+.cdesc{{font-size:.87rem;color:var(--ink2);line-height:1.55;flex:1;}}
+.ctags{{display:flex;flex-wrap:wrap;gap:.22rem;margin-top:auto;padding-top:.2rem;}}
+.tag{{background:var(--s2);border:1px solid var(--bdr2);color:var(--ink3);font-family:'DM Mono',monospace;font-size:.52rem;padding:.08rem .38rem;letter-spacing:.04em;}}
+.cfl{{display:flex;gap:.28rem;flex-wrap:wrap;}}
+.fl{{font-family:'DM Mono',monospace;font-size:.52rem;padding:.1rem .42rem;text-transform:uppercase;letter-spacing:.06em;}}
+.flm{{background:rgba(192,57,43,.14);color:var(--red);}}
+.fls{{background:rgba(90,154,106,.14);color:var(--grn);}}
+.ftr{{text-align:center;padding:1.75rem;border-top:1px solid var(--bdr);font-family:'DM Mono',monospace;font-size:.55rem;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-top:1rem;}}
+
+@media(max-width:600px){{.grid{{grid-template-columns:1fr;}}.hdr{{padding:1.25rem 1rem;}}.body{{padding:1rem;}}}}
+
+@media print{{
+  .topbar{{display:none!important;}}
+  html,body{{background:#faf8f3;color:#1e1810;font-size:13px;}}
+  .hdr{{background:#faf8f3;border-bottom:2px solid #c9b898;padding:1.2rem 1.5rem .9rem;}}
+  .hdr-logo{{color:#1e1810;font-size:1.75rem;}}
+  .hdr-div{{color:#a07840;}}
+  .hdr-sub,.hdr-meta{{color:#7a6850;}}
+  .hdr-meta strong{{color:#8a5c20;}}
+  .body{{padding:1rem 1.25rem;}}
+  .grid{{grid-template-columns:repeat(2,1fr);gap:.65rem;}}
+  .card{{background:#fff;border:1px solid #d8cfc0;break-inside:avoid;}}
+  .ci{{background:#f0ece4;}}
+  .cin{{color:#c8b89a;}}
+  .cn{{color:#1e1810;}}
+  .cd{{color:#7a6850;}}
+  .cr{{color:#8a5c20;}}
+  .cde{{color:#7a6850;}}
+  .cdesc{{color:#3a3028;}}
+  .b-person{{background:#daeef7;color:#3a7a98;}}
+  .b-event{{background:#fbecd8;color:#8a5c20;}}
+  .b-group{{background:#dff0e4;color:#3a6a48;}}
+  .b-x{{background:#f0ece4;color:#7a6850;}}
+  .tag{{background:#f0ece4;border-color:#d8cfc0;color:#7a6850;}}
+  .flm{{background:#fde8e5;color:#8a2018;}}
+  .fls{{background:#dff0e4;color:#3a6a48;}}
+  .ftr{{color:#7a6850;border-color:#d8cfc0;}}
+  @page{{margin:1.25cm 1.5cm;}}
+}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-note">The Archivist &mdash; Visual Report &mdash; {total} records</span>
+  <button class="btn btn-print" onclick="window.print()">&#128438; Print &frasl; Save as PDF</button>
+</div>
+<div class="hdr">
+  <div>
+    <div class="hdr-logo">The Archivist</div>
+    <span class="hdr-div">&mdash; &#10022; &mdash;</span>
+    <div class="hdr-sub">Ecclesia Visual Report</div>
+  </div>
+  <div class="hdr-meta">
+    <div>Generated <strong>{today}</strong></div>
+    <div><strong>{total}</strong> records</div>
+  </div>
+</div>
+<div class="body">
+  <div class="grid">
+    {cards_html}
+  </div>
+</div>
+<div class="ftr">The Archivist &mdash; Ecclesiastical Archive &mdash; {today}</div>
+</body>
+</html>"""

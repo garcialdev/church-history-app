@@ -167,6 +167,52 @@
     .dialog-msg { font-family: 'EB Garamond', serif; color: var(--ink-2); font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6; }
     .dialog-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
 
+    /* ── EXPORT MODAL ──────────────────────────── */
+    .export-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.18s ease; }
+    .export-modal { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--accent); width: 560px; max-width: 95vw; max-height: 88vh; display: flex; flex-direction: column; box-shadow: var(--shadow); animation: slideUp 0.22s ease; }
+    @keyframes slideUp { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .export-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; justify-content: space-between; flex-shrink: 0; background: var(--surface-2); }
+    .export-header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; color: var(--ink); }
+    .export-header-sub { font-family: 'DM Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); margin-top: 0.15rem; }
+    .export-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
+    .export-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--surface-2); }
+    .export-footer-left { display: flex; gap: 0.5rem; }
+
+    .export-group-title { font-family: 'DM Mono', monospace; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); padding: 0.6rem 0 0.45rem; border-bottom: 1px solid var(--border-light); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .export-group-title::before { content: ''; display: block; width: 2px; height: 10px; background: var(--accent); flex-shrink: 0; }
+    .export-group + .export-group { margin-top: 0.85rem; }
+
+    .export-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.75rem; }
+    .export-field-label { display: flex; align-items: center; gap: 0.55rem; padding: 0.3rem 0.4rem; cursor: pointer; border-radius: 2px; transition: background 0.12s; user-select: none; }
+    .export-field-label:hover { background: var(--surface-2); }
+    .export-field-label input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 13px; height: 13px; border: 1.5px solid var(--border); background: var(--surface-2); cursor: pointer; flex-shrink: 0; position: relative; transition: border-color 0.15s, background 0.15s; }
+    .export-field-label input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+    .export-field-label input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 2px; top: -1px; width: 5px; height: 8px; border: 1.5px solid #1a0e00; border-top: none; border-left: none; transform: rotate(40deg); }
+    .export-field-name { font-family: 'EB Garamond', serif; font-size: 0.9rem; color: var(--ink-2); }
+    .export-field-label:has(input:checked) .export-field-name { color: var(--ink); }
+
+    .export-count { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-3); letter-spacing: 0.06em; }
+    .export-count strong { color: var(--accent); }
+
+    .export-format-tabs { display: flex; gap: 0; border: 1px solid var(--border); margin-bottom: 1rem; overflow: hidden; border-radius: 2px; }
+    .export-format-tab { flex: 1; padding: 0.55rem 0.75rem; background: var(--surface-2); border: none; color: var(--ink-3); font-family: 'DM Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; border-right: 1px solid var(--border); }
+    .export-format-tab:last-child { border-right: none; }
+    .export-format-tab.active { background: var(--accent-dim); color: var(--accent); border-bottom: 2px solid var(--accent); }
+    .export-format-tab:hover:not(.active) { background: var(--raised); color: var(--ink-2); }
+    .export-format-note { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 0.6rem 0.85rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--ink-3); line-height: 1.7; letter-spacing: 0.04em; margin-bottom: 1rem; }
+    .export-format-note strong { color: var(--ink-2); }
+
+    /* ── REPORT PREVIEW OVERLAY ─────────────────── */
+    .report-overlay { position: fixed; inset: 0; z-index: 400; background: #000; display: flex; flex-direction: column; animation: fadeIn 0.18s ease; }
+    .report-topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.65rem; flex-shrink: 0; }
+    .report-topbar-note { font-family: 'DM Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-3); margin-right: auto; }
+    .report-iframe { flex: 1; border: none; background: #fff; }
+
+    @media (max-width: 640px) {
+      .export-modal { max-height: 96vh; }
+      .export-fields { grid-template-columns: 1fr; }
+    }
+
     /* ── TOAST ─────────────────────────────────── */
     .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.85rem 1.25rem; font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; box-shadow: 0 8px 32px rgba(0,0,0,0.6); z-index: 300; animation: slideIn 0.2s ease; display: flex; align-items: center; gap: 0.6rem; min-width: 260px; border-left: 3px solid; }
     .toast.success { background: var(--green-dim); border-color: var(--green); color: var(--green); }
@@ -356,6 +402,30 @@
   </div>
 </div>
 
+<!-- EXPORT MODAL -->
+<div class="export-overlay" id="exportModal" style="display:none">
+  <div class="export-modal">
+    <div class="export-header">
+      <div>
+        <div class="export-header-title">Export Records</div>
+        <div class="export-header-sub">Select fields to include in the CSV</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="closeExportModal()" style="align-self:flex-start">✕</button>
+    </div>
+    <div class="export-body" id="exportModalBody"></div>
+    <div class="export-footer">
+      <div class="export-footer-left">
+        <button class="btn btn-ghost btn-sm" onclick="exportSelectAll()">Select All</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportSelectNone()">Clear</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <span class="export-count"><strong id="exportFieldCount">0</strong> fields selected</span>
+        <button class="btn btn-primary btn-sm" id="exportActionBtn" onclick="doExport()">⬇ Download CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM DIALOG -->
 <div class="dialog-overlay" id="confirmDialog" style="display:none">
   <div class="dialog">
@@ -445,7 +515,7 @@
     document.getElementById('topbarTitle').textContent = 'Dashboard';
     document.getElementById('topbarActions').innerHTML = `
       <button class="btn btn-ghost btn-sm" onclick="runCacheWarmer()">🔄 Refresh Image Cache</button>
-      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export CSV</button>`;
+      <button class="btn btn-ghost btn-sm" onclick="openExportModal()">⬇ Export CSV</button>`;
     document.getElementById('content').innerHTML = '<div class="loading"><div class="spinner"></div>Loading stats…</div>';
     const res = await apiFetch('/admin/stats');
     if (!res) return;
@@ -493,9 +563,143 @@
     loadDashboard();
   }
 
-  async function exportCSV() {
+  const EXPORT_FIELD_GROUPS = [
+    {
+      label: 'Core',
+      fields: [
+        { key: 'id',          label: 'ID' },
+        { key: 'name',        label: 'Name / Event' },
+        { key: 'type',        label: 'Type' },
+        { key: 'gender',      label: 'Gender' },
+        { key: 'century',     label: 'Century' },
+        { key: 'era_type',    label: 'Era (BC/AD)' },
+        { key: 'born',        label: 'Born / Start' },
+        { key: 'death',       label: 'Death / End' },
+      ]
+    },
+    {
+      label: 'Role & Background',
+      fields: [
+        { key: 'role_office',            label: 'Role / Office' },
+        { key: 'denomination_tradition', label: 'Denomination' },
+        { key: 'alternative_names',      label: 'Alternative Names' },
+        { key: 'beliefs',                label: 'Beliefs / Traditions' },
+      ]
+    },
+    {
+      label: 'Location',
+      fields: [
+        { key: 'birthplace',     label: 'Birthplace' },
+        { key: 'primary_region', label: 'Region / Location' },
+      ]
+    },
+    {
+      label: 'Flags & Content',
+      fields: [
+        { key: 'is_martyr',         label: 'Martyred?' },
+        { key: 'believer_saved',    label: 'Believer / Saved?' },
+        { key: 'short_description', label: 'Short Description' },
+      ]
+    },
+    {
+      label: 'Media & Technical',
+      fields: [
+        { key: 'wikipedia_name',   label: 'Wikipedia Name' },
+        { key: 'cached_image_url', label: 'Cached Image URL' },
+      ]
+    },
+  ];
+
+  let exportSelectedFields = new Set();
+  let exportFormat = 'csv'; // 'csv' | 'report'
+
+  function openExportModal() {
+    exportSelectedFields = new Set(EXPORT_FIELD_GROUPS.flatMap(g => g.fields.map(f => f.key)));
+    exportFormat = 'csv';
+    renderExportModal();
+    document.getElementById('exportModal').style.display = 'flex';
+  }
+
+  function closeExportModal() {
+    document.getElementById('exportModal').style.display = 'none';
+  }
+
+  function setExportFormat(fmt) {
+    exportFormat = fmt;
+    renderExportModal();
+  }
+
+  function renderExportModal() {
+    const body = document.getElementById('exportModalBody');
+    const isReport = exportFormat === 'report';
+
+    const formatNote = isReport
+      ? `<div class="export-format-note">
+          <strong>Visual Report</strong> — A formatted HTML page with portrait images, ready to open in any browser and save as PDF via Ctrl+P.<br>
+          Fields marked below control what appears on each record card.
+         </div>`
+      : '';
+
+    const fieldGroups = EXPORT_FIELD_GROUPS.map(group => `
+      <div class="export-group">
+        <div class="export-group-title">${group.label}</div>
+        <div class="export-fields">
+          ${group.fields.map(f => `
+            <label class="export-field-label">
+              <input type="checkbox" data-key="${f.key}" ${exportSelectedFields.has(f.key) ? 'checked' : ''}
+                onchange="exportToggleField('${f.key}', this.checked)" />
+              <span class="export-field-name">${f.label}</span>
+            </label>`).join('')}
+        </div>
+      </div>`).join('');
+
+    body.innerHTML = `
+      <div class="export-format-tabs">
+        <button class="export-format-tab ${exportFormat==='csv'?'active':''}" onclick="setExportFormat('csv')">⬇ CSV Spreadsheet</button>
+        <button class="export-format-tab ${exportFormat==='report'?'active':''}" onclick="setExportFormat('report')">📄 Visual Report</button>
+      </div>
+      ${formatNote}
+      ${fieldGroups}`;
+
+    // Update footer button label
+    const btn = document.getElementById('exportActionBtn');
+    if (btn) btn.textContent = isReport ? '🔍 Preview Report' : '⬇ Download CSV';
+
+    updateExportCount();
+  }
+
+  function exportToggleField(key, checked) {
+    if (checked) exportSelectedFields.add(key);
+    else exportSelectedFields.delete(key);
+    updateExportCount();
+  }
+
+  function exportSelectAll() {
+    EXPORT_FIELD_GROUPS.forEach(g => g.fields.forEach(f => exportSelectedFields.add(f.key)));
+    renderExportModal();
+  }
+
+  function exportSelectNone() {
+    exportSelectedFields.clear();
+    renderExportModal();
+  }
+
+  function updateExportCount() {
+    const el = document.getElementById('exportFieldCount');
+    if (el) el.textContent = exportSelectedFields.size;
+  }
+
+  function doExport() {
+    if (exportFormat === 'report') doExportReport();
+    else doExportCSV();
+  }
+
+  async function doExportCSV() {
+    if (exportSelectedFields.size === 0) { showToast('Select at least one field', 'error'); return; }
+    closeExportModal();
     showToast('⏳ Preparing export…', 'info');
-    const res = await fetch(`${API}/admin/export/csv`, { headers: { 'x-admin-token': token } });
+    const fields = [...exportSelectedFields].join(',');
+    const res = await fetch(`${API}/admin/export/csv?fields=${encodeURIComponent(fields)}`, { headers: { 'x-admin-token': token } });
     if (!res || !res.ok) { showToast('✗ Export failed', 'error'); return; }
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -505,6 +709,40 @@
     a.click();
     URL.revokeObjectURL(url);
     showToast('✓ Export downloaded', 'success');
+  }
+
+  async function doExportReport() {
+    if (exportSelectedFields.size === 0) { showToast('Select at least one field', 'error'); return; }
+    closeExportModal();
+    showToast('⏳ Building visual report…', 'info');
+    const fields = [...exportSelectedFields].join(',');
+    const res = await fetch(`${API}/admin/export/report?fields=${encodeURIComponent(fields)}`, { headers: { 'x-admin-token': token } });
+    if (!res || !res.ok) { showToast('✗ Report failed', 'error'); return; }
+    const html = await res.text();
+    showReportPreview(html);
+    showToast('✓ Report ready', 'success');
+  }
+
+  function showReportPreview(html) {
+    const existing = document.getElementById('reportPreviewOverlay');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'reportPreviewOverlay';
+    overlay.className = 'report-overlay';
+    overlay.innerHTML = `
+      <div class="report-topbar">
+        <span class="report-topbar-note">Visual Report Preview — use Print button or Ctrl+P to save as PDF</span>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('reportPreviewOverlay').remove()">✕ Close</button>
+      </div>
+      <iframe class="report-iframe" id="reportIframe"></iframe>`;
+    document.body.appendChild(overlay);
+
+    const iframe = document.getElementById('reportIframe');
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    iframe.src = url;
+    iframe.onload = () => URL.revokeObjectURL(url);
   }
 
   // ── FIGURES TABLE ───────────────────────────────
@@ -1078,7 +1316,7 @@
   function closeDrawer() { document.getElementById('drawer').style.display = 'none'; }
   function closeDrawerOnOverlay(e) { if(e.target===document.getElementById('drawer')) closeDrawer(); }
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDrawer(); closeConfirm(); return; }
+    if (e.key === 'Escape') { closeDrawer(); closeConfirm(); closeExportModal(); document.getElementById('reportPreviewOverlay')?.remove(); return; }
     const drawerOpen = document.getElementById('drawer').style.display !== 'none';
     if (!drawerOpen || !currentFigureId) return;
     // Don't intercept when typing in a form field

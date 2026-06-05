@@ -479,62 +479,64 @@
     /* Era bands — sleeker: top-rule indicator, no watermark, no tinted fill */
     .era-band {
       border-radius: 10px;
-      padding: 14px 16px 16px;
-      border: 1px solid var(--border-light);
-      background: var(--surface);
+      padding: 11px 14px 13px;
+      border: 1px solid color-mix(in srgb, currentColor 18%, var(--border-light));
+      border-top: 2px solid color-mix(in srgb, currentColor 55%, transparent);
+      background: color-mix(in srgb, currentColor 9%, var(--bg));
       cursor: pointer;
-      transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+      transition: border-color 0.18s ease, border-top-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
       position: relative;
       overflow: hidden;
-      min-height: 104px;
       display: flex; flex-direction: column;
     }
-    /* Top-rule indicator (era color) */
-    .era-band::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 2px;
-      background: currentColor;
-      opacity: 0.7;
-      transition: opacity 0.18s ease, height 0.18s ease;
-    }
+    .era-band::before { display: none; }
     .era-band:hover {
-      border-color: color-mix(in srgb, currentColor 45%, var(--border));
-      box-shadow: inset 0 1px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.04);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+      border-color: color-mix(in srgb, currentColor 40%, var(--border-light));
+      border-top-color: currentColor;
     }
-    .era-band:hover::before { opacity: 1; height: 3px; }
     .era-band.active {
-      border-color: color-mix(in srgb, currentColor 55%, var(--border));
+      background: color-mix(in srgb, currentColor 14%, var(--bg));
+      border-color: color-mix(in srgb, currentColor 40%, var(--border-light));
+      border-top-color: currentColor;
     }
-    .era-band.active::before { opacity: 1; height: 3px; }
 
     .era-band-1 { color: var(--era1); }
     .era-band-2 { color: var(--era2); }
     .era-band-3 { color: var(--era3); }
     .era-band-4 { color: var(--era4); }
 
+    .era-band-watermark {
+      position: absolute;
+      right: -6px; bottom: -14px;
+      font-family: 'Fraunces', serif;
+      font-style: italic; font-weight: 700;
+      font-size: 4.2rem; line-height: 1;
+      color: currentColor; opacity: 0.09;
+      pointer-events: none; user-select: none; white-space: nowrap;
+      letter-spacing: -0.02em;
+    }
     .era-band-dates {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 0.58rem;
+      letter-spacing: 0.04em;
       color: var(--ink-3);
-      margin-bottom: auto;
-      padding-bottom: 18px;
+      margin-bottom: 3px;
     }
     .era-band-count {
       font-family: 'Fraunces', 'Cormorant Garamond', serif;
-      font-size: 3rem;
+      font-size: 2rem;
       font-weight: 400;
-      line-height: 1;
-      color: var(--ink);
+      line-height: 1.05;
+      color: currentColor;
       letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
     .era-band-label {
       font-family: 'Fraunces', serif;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-style: italic;
       color: var(--ink-2);
     }
@@ -884,32 +886,47 @@
     .home-eras-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 36px;
+      gap: 10px;
+      margin-bottom: 28px;
     }
     .home-era-card {
-      padding: 20px 18px 22px;
-      border-radius: 14px;
-      background: var(--surface);
-      border: 1px solid var(--border-light);
+      position: relative;
+      padding: 11px 14px 13px;
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--era-hex, var(--accent)) 9%, var(--bg));
+      border: 1px solid color-mix(in srgb, var(--era-hex, var(--accent)) 18%, var(--border-light));
+      border-top: 2px solid color-mix(in srgb, var(--era-hex, var(--accent)) 55%, transparent);
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .home-era-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-    .home-era-bar { height: 3px; width: 32px; border-radius: 2px; margin-bottom: 12px; }
-    .home-era-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--ink-3); margin-bottom: 6px; }
-    .home-era-count { font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 400; color: var(--ink); line-height: 1; }
-    .home-era-name { font-family: 'Fraunces', serif; font-size: 1rem; font-style: italic; color: var(--ink); margin-top: 4px; }
-    .home-era-desc {
-      font-size: 0.78rem;
-      color: var(--ink-3);
-      line-height: 1.55;
-      margin-top: 8px;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
       overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
     }
+    .home-era-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.45);
+      border-color: color-mix(in srgb, var(--era-hex, var(--accent)) 40%, var(--border-light));
+      border-top-color: var(--era-hex, var(--accent));
+    }
+    .home-era-watermark {
+      position: absolute;
+      right: -6px;
+      bottom: -14px;
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 700;
+      font-size: 4.2rem;
+      line-height: 1;
+      color: var(--era-hex, var(--accent));
+      opacity: 0.09;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      letter-spacing: -0.02em;
+    }
+    .home-era-dates { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: var(--ink-3); margin-bottom: 3px; letter-spacing: 0.04em; }
+    .home-era-count { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 400; color: var(--era-hex, var(--ink)); line-height: 1.05; letter-spacing: -0.02em; }
+    .home-era-name { font-family: 'Fraunces', serif; font-size: 0.82rem; font-style: italic; color: var(--ink-2); margin-top: 3px; }
+    .home-era-bar { display: none; }
+    .home-era-desc { display: none; }
     .home-feature-grid {
       display: grid;
       grid-template-columns: 1.4fr 1fr;
@@ -1903,10 +1920,11 @@
       .chrono-era-intro-name { font-size: 1.4rem; }
       /* Tighter era bands */
       .stats-banner { gap: 0.5rem; margin-bottom: 1rem; }
-      .era-band { padding: 0.65rem 0.75rem; }
-      .era-band-count { font-size: 1.5rem; }
-      .era-band-dates { font-size: 0.6rem; }
+      .era-band { padding: 0.55rem 0.7rem 0.65rem; }
+      .era-band-count { font-size: 1.4rem; }
+      .era-band-dates { font-size: 0.55rem; }
       .era-band-label { font-size: 0.72rem; }
+      .era-band-watermark { font-size: 3rem; bottom: -10px; }
       /* Tighter cards */
       .arch-card { padding: 0.85rem; gap: 0.6rem; }
       .arch-card-img, .arch-card-placeholder { width: 72px; height: 72px; }
@@ -2449,14 +2467,24 @@
     margin-bottom: 16px;
   }
   .m-home-era-card {
-    padding: 12px; border-radius: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border-light); cursor: pointer;
+    position: relative; overflow: hidden;
+    padding: 10px 12px 11px; border-radius: 10px;
+    background: color-mix(in srgb, var(--era-tint, var(--accent)) 9%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--era-tint, var(--accent)) 18%, var(--border-light));
+    border-top: 2px solid color-mix(in srgb, var(--era-tint, var(--accent)) 55%, transparent);
+    cursor: pointer;
   }
-  .m-home-era-card-bar { height: 3px; width: 28px; border-radius: 2px; background: var(--era-tint, var(--accent)); margin-bottom: 10px; }
-  .m-home-era-card-count { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--ink); line-height: 1; letter-spacing: -0.02em; }
-  .m-home-era-card-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13px; color: var(--ink); margin-top: 4px; }
-  .m-home-era-card-dates { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--ink-3); margin-top: 4px; letter-spacing: 0.04em; }
+  .m-home-era-card-watermark {
+    position: absolute; right: -4px; bottom: -10px;
+    font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 700;
+    font-size: 3rem; line-height: 1;
+    color: var(--era-tint, var(--accent)); opacity: 0.09;
+    pointer-events: none; user-select: none; white-space: nowrap;
+  }
+  .m-home-era-card-bar { display: none; }
+  .m-home-era-card-count { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; color: var(--era-tint, var(--ink)); line-height: 1; letter-spacing: -0.02em; }
+  .m-home-era-card-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px; color: var(--ink-2); margin-top: 3px; }
+  .m-home-era-card-dates { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--ink-3); margin-bottom: 3px; letter-spacing: 0.04em; }
 
   /* ── 9 · Shared keyframes ────────────────────────── */
   @keyframes mhRise {
@@ -2841,24 +2869,28 @@
       <!-- Era bands -->
       <div class="stats-banner">
         <div class="era-band era-band-1" id="era-0" data-name="Apostolic" onclick="clickEra(0)">
-          <div class="era-band-dates">AD 30 – 100</div>
+          <div class="era-band-dates">AD 30–100</div>
           <div class="era-band-count" id="era-count-0">—</div>
           <div class="era-band-label">Apostolic Age</div>
+          <div class="era-band-watermark">Apostolic</div>
         </div>
         <div class="era-band era-band-2" id="era-1" data-name="Early" onclick="clickEra(1)">
-          <div class="era-band-dates">AD 100 – 313</div>
+          <div class="era-band-dates">AD 100–313</div>
           <div class="era-band-count" id="era-count-1">—</div>
           <div class="era-band-label">Early Church</div>
+          <div class="era-band-watermark">Early</div>
         </div>
         <div class="era-band era-band-3" id="era-2" data-name="Medieval" onclick="clickEra(2)">
-          <div class="era-band-dates">AD 313 – 1517</div>
+          <div class="era-band-dates">AD 313–1517</div>
           <div class="era-band-count" id="era-count-2">—</div>
           <div class="era-band-label">Medieval Church</div>
+          <div class="era-band-watermark">Medieval</div>
         </div>
         <div class="era-band era-band-4" id="era-3" data-name="Reform" onclick="clickEra(3)">
-          <div class="era-band-dates">AD 1517 – 1900</div>
+          <div class="era-band-dates">AD 1517–present</div>
           <div class="era-band-count" id="era-count-3">—</div>
           <div class="era-band-label">Reformation & Beyond</div>
+          <div class="era-band-watermark">Reformation</div>
         </div>
       </div>
 
@@ -3271,11 +3303,11 @@
           <h2 class="home-section-title">Browse by Era</h2>
           <div class="home-eras-grid">
             ${eras.map((era, i) => `
-              <div class="home-era-card" onclick="clickEra(${i}); switchView('grid')">
-                <div class="home-era-icon">${eraIcons[i] || '✦'}</div>
-                <div class="home-era-name">${eraNames[i] || era.name}</div>
+              <div class="home-era-card" style="--era-hex:${ERAS[i].hex}" onclick="clickEra(${i}); switchView('grid')">
                 <div class="home-era-dates">${eraDates[i] || ''}</div>
-                <div class="home-era-count">${era.count.toLocaleString()} records</div>
+                <div class="home-era-count">${era.count}</div>
+                <div class="home-era-name">${eraNames[i] || era.name}</div>
+                <div class="home-era-watermark">${ERAS[i].shortName}</div>
               </div>
             `).join('')}
           </div>
@@ -4148,10 +4180,10 @@
       <div class="m-home-eras">
         ${CHRONO_ERAS.map((e, i) => `
           <div class="m-home-era-card" style="--era-tint:${e.hex}" onclick="clickEra(${i})">
-            <div class="m-home-era-card-bar"></div>
+            <div class="m-home-era-card-dates">${ERAS[i].datesShort}</div>
             <div class="m-home-era-card-count">${counts[i]}</div>
             <div class="m-home-era-card-name">${e.name}</div>
-            <div class="m-home-era-card-dates">${e.dates}</div>
+            <div class="m-home-era-card-watermark">${ERAS[i].shortName}</div>
           </div>`).join('')}
       </div>`);
   }
