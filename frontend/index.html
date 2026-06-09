@@ -1674,9 +1674,9 @@
     .mpro-image-credit a:hover { color: #fff; }
     .mpro-image { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; min-height: 340px; }
     .mpro-img-placeholder { width: 100%; min-height: 340px; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: 6rem; font-style: italic; color: var(--ink-5); }
-    .mpro-hero-ident { grid-column: 2; grid-row: 1; padding: 2.25rem 2.75rem 1rem; display: flex; flex-direction: column; gap: 0.65rem; min-width: 0; }
+    .mpro-hero-ident { grid-column: 2; grid-row: 1; padding: 2.25rem 4rem 1rem 2.75rem; display: flex; flex-direction: column; gap: 0.65rem; min-width: 0; }
     .mpro-hero-details { grid-column: 2; grid-row: 2; padding: 0 2.75rem 2rem; display: flex; flex-direction: column; gap: 0.65rem; }
-    .mpro-hero-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .mpro-hero-top { display: flex; align-items: center; justify-content: flex-start; gap: 0.75rem; flex-wrap: wrap; }
     .mpro-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
     .mpro-name { font-family: 'Fraunces', 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; font-style: italic; color: var(--ink); line-height: 1.05; letter-spacing: 0.01em; margin: 0; }
     .mpro-alt { font-family: 'Fraunces', 'EB Garamond', Georgia, serif; font-style: italic; color: var(--ink-4); font-size: 0.88rem; margin: 0; }
@@ -1744,8 +1744,9 @@
     }
     .mpro-root .mpro-badge { color: var(--fig-accent); }
     .mpro-root .graph-btn {
-      border: 1px solid color-mix(in srgb, var(--fig-accent) 38%, var(--border));
+      border: 1px solid color-mix(in srgb, var(--fig-accent) 55%, var(--border));
       color: var(--fig-accent); border-radius: 999px; padding: 0.4rem 0.9rem;
+      background: color-mix(in srgb, var(--fig-accent) 8%, transparent);
       transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
     }
     .mpro-root .graph-btn:hover { background: var(--fig-accent); color: #fff; border-color: var(--fig-accent); }
